@@ -1,0 +1,45 @@
+{
+  "name": "crop2ml",
+  "version": "1.0.0",
+  "description": "Représentation sémantique et modulaire des modèles de culture à l'aide d'un métalangage déclaratif",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElVinto/crop2ml.git"
+  },
+  "author": "vincent armant",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ElVinto/crop2ml/issues"
+  },
+  "homepage": "https://github.com/ElVinto/crop2ml#readme",
+  "dependencies": {
+    "archiver": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "directory-tree": "^2.2.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "eyes": "^0.1.8",
+    "formidable": "^1.2.2",
+    "generate-password": "^1.5.1",
+    "https": "^1.0.0",
+    "line-reader": "^0.4.0",
+    "mariadb": "^2.4.0",
+    "mongodb": "^3.5.9",
+    "mongoose": "^5.9.26",
+    "nodemailer": "^6.4.10",
+    "stringbuffer": "^1.0.0",
+    "unzipper": "^0.10.11",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
