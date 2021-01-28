@@ -2,11 +2,11 @@ var express = require('express');
 var router = express.Router();
 
 
-var mongodb = require('mongodb')
+var mangodb = require('mongodb')
 require('dotenv').config()
 // const { URL } = require('url')
 // const uri = "mongodb+srv://<username>:<password>@<your-cluster-url>/test?retryWrites=true&w=majority"
-var MONGODB_URI = process.env.MONGODB_URI
+var MONGODB_URI = process.env('MONGODB_URI')
 var MONGODB_REMOTE_HOST = 'mongodb://localhost/test'
 
 
@@ -37,7 +37,7 @@ router.get('/',  async function(req, res, next) {
 
 async function loadALlItems(){
 
-    const client = await mongodb.MongoClient.connect(uri, { useNewUrlParser: true , useUnifiedTopology: true});
+    const client = await mangodb.MongoClient.connect(uri, { useNewUrlParser: true , useUnifiedTopology: true});
     const itemsDriver =  client.db("test").collection("inventory");
     const items =  await itemsDriver.find({}).toArray();
 
@@ -49,6 +49,7 @@ async function loadALlItems(){
 
 router.get('/url2json',async function(req, res, next){
 
+    
 
     res.send(await parseXMLFromHTTP());
 
@@ -57,10 +58,10 @@ router.get('/url2json',async function(req, res, next){
 const defaultUrl = 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/STICS_SNOW/master/crop2ml/unit.Melting.xml'
 // https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/STICS_SNOW/master/crop2ml/unit.Preciprec.xml
 
-function parseXMLFromHTTP(url=defaultUrl){
+function parseXMLFromHTTP(url){
     const parser = new xml2js.Parser({
         attrkey: "Attributs",
-        explicitRoot: true,
+        explicitRoot: false,
         // rootName:'ModelUnit',
         explicitArray:false,
         cdata: true
@@ -130,8 +131,6 @@ async function xmlString2jsonObj(xmlString){
     return result
 }
 
-
-
 function jsonObj2xmlString(jsonObj){
     console.log('jsonObj2xmlString')
     console.log('jsonObj')
@@ -159,48 +158,6 @@ function jsonObj2xmlString(jsonObj){
 
 }
 
-async function xmlString2jsonModel(xmlString){
-    const parser = new xml2js.Parser({
-        attrkey: "Attributs",
-        explicitRoot: false,
-        // rootName:'Model',
-        explicitArray:false,
-        cdata: true
-    })
-    result = await parser.parseStringPromise(xmlString)
-
-    return result
-}
-
-// TODO Remove Model Unit and Model are now the same
-function jsonModel2xmlString(jsonObj){
-    console.log('jsonObj2xmlString')
-    console.log('jsonObj')
-    console.log(jsonObj)
-
-    
-    builder = new xml2js.Builder({
-        attrkey: "Attributs"
-        // , headless: true
-        , explicitRoot: true
-        , rootName:'Model'
-        , explicitArray: false
-        , cdata:true
-        , xmldec:{ 'version': '1.0', 'encoding': 'UTF-8' }
-        // , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/ModelUnit.dtd'}
-        })
-    
-    xmlString =   builder.buildObject(jsonObj).toString();
-    
-    console.log('xmlString')
-    console.log(xmlString)
-    
-    result = formatXml( xmlString , ['_id'])
-    return result
-
-}
-
-
 router.get('/json',async function(req, res, next){
     
 
@@ -217,50 +174,6 @@ router.get('/json',async function(req, res, next){
 
 // findXMLModelUnit
  
-
-router.get('/saveXMLModel',async function(req, res, next){
-
-    try{
-        console.log('/saveXMLModel')
-        let xmlurl =  req.query.xmlurl;
-        console.log(req.query)
-        
-        // Parse xml url
-        xmlString = await getFileFromUrl(xmlurl)
-        // console.log('parsed xmlString')
-        // console.log(xmlString)
-
-        // Tranform to JSON object
-        jsonModel = await xmlString2jsonModel(xmlString)
-
-        jsonModel['filePath']='server/'
-        jsonModel['tags']='server/'
-
-        console.log('jsonModel')
-        console.log(jsonModel)
-
-        // Save or update JSON object
-        // result = await saveJsonModelUnit(jsonModel)
-        saveJsonModel(jsonModel)
-            .then((result) =>{
-
-                // res.send(jsonObj2xmlString(jsonModel))
-                res.send(result)
-            })
-            .catch( (error) => {
-                console.log(error)
-                
-                res.send(error.message)
-            })
-
-        
-
-    }catch(error){
-        res.send(error.message)
-    }
-
-});
-
 
 
 
@@ -732,50 +645,6 @@ async function deleteJsonModelUnitById (modelid){
 
 // TODO update to post querry
 
-async function saveJsonModel (jsonModel){
-    console.log('saveJsonModel')
-    return new Promise(async (resolve, reject) => {
-        try{
-            const MongoClient = require('mongodb').MongoClient;
-            const uri = MONGODB_URI;
-            const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-            await client.connect()
-            console.log(`succesful connection to ${MONGODB_URI}` )
-
-            const collection = client.db("crop2ml").collection("models");
-            
-            const modelid = jsonModel.Attributs.modelid
-
-            const filter = {'Attributs.modelid': modelid}
-            const replacement = jsonModel
-            const options = { upsert: true, returnNewDocument: true}
-
-            console.log(`insert or replace : {'Attributs.modelid': ${modelid} } `)
-
-            var result = await collection.findOneAndReplace(filter,replacement,options)
-
-            if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
-                result.value = jsonModel;
-            }
-            
-            result = JSON.parse(JSON.stringify(result))
-
-            console.log('result')
-            console.log(result)
-
-            await client.close()
-            resolve(result)
-                   
-        }catch(error){
-            console.log(error)
-            if( typeof client !== 'undefined')
-                await client.close()
-            reject(error);
-        }
-    }) 
-  
-}
-
 
 async function saveJsonModelUnit (jsonModelUnit){
 
@@ -783,9 +652,7 @@ async function saveJsonModelUnit (jsonModelUnit){
         console.log('saveJsonModelUnit')
         try{
             const mongoose = require('mongoose')
-            // mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true}); 
-            console.log(`Try connection to ${MONGODB_URI}` )
-            mongoose.connect(MONGODB_URI,{useNewUrlParser:true , useUnifiedTopology: true}); 
+            mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
             const db = mongoose.connection;
             
             db.on('error', console.error.bind(console, 'connection error:'));
@@ -793,7 +660,7 @@ async function saveJsonModelUnit (jsonModelUnit){
             db.once('open', async function(){
 
                 try{
-                    console.log(`succesful connection to ${MONGODB_URI}` )
+                    console.log(`succesful connection to ${MONGODB_HOST}` )
 
                     const ModelUnit = buildMongooseModelUnit(mongoose)
 
@@ -810,8 +677,7 @@ async function saveJsonModelUnit (jsonModelUnit){
                             {new:true, upsert: true, useFindAndModify: false}
                         ).exec()
                     
-                    console.log('result')
-                    console.log(result)
+                    // console.log(result)
 
                     result = JSON.parse(JSON.stringify(result))
                     
@@ -1136,6 +1002,14 @@ router.get('/model',async function(req, res, next){
 
 
 
+
+
+
+
+
+
+
+
 /*
     Todo
     
@@ -1262,7 +1136,7 @@ function formatXml(xmlString,tagsToRem=[]) {
 
 async function insertModelUnitInMongoDb(model){
     
-        const client = await mongodb.MongoClient.connect(uri, { useNewUrlParser: true , useUnifiedTopology: true});
+        const client = await mangodb.MongoClient.connect(uri, { useNewUrlParser: true , useUnifiedTopology: true});
         const itemsDriver =  client.db("crop2ml").collection("models");
         const items =  await itemsDriver.insertOne(model);
         client.close()

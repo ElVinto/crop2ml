@@ -10,11 +10,9 @@ const directoryTree = require("directory-tree");
 
 
 
-
-var mangodb = require('mongodb')
-// const uri = "mongodb+srv://<username>:<password>@<your-cluster-url>/test?retryWrites=true&w=majority"
-var uri = "mongodb://localhost:27017"
-var MONGODB_HOST = 'mongodb://localhost/test'
+var mongodb = require('mongodb')
+require('dotenv').config()
+var MONGODB_URI = process.env.MONGODB_URI
 
 var eyes = require('eyes');
 var https = require('https');
@@ -28,6 +26,7 @@ var StringBuffer = require("stringbuffer");
 
 
 var xml2js = require('xml2js');
+const { resolve } = require('path');
 dirTree = require('../../services/DirTree.js');
 
 
@@ -59,7 +58,7 @@ router.post('/upload',  async function(req, res, next) {
 
         try{
 
-            console.log('saveXMLModelUnit')
+            console.log('saveXMLModel')
             // let xmlurl =  req.query.xmlurl;
             // console.log(req.query)
             
@@ -70,15 +69,14 @@ router.post('/upload',  async function(req, res, next) {
     
             // Tranform to JSON object
             
-            xmlString2jsonObj(xmlString).then(jsonModel => {
+            xmlString2jsonModel(xmlString).then(jsonModel => {
 
                 console.log('jsonModel')
                 console.log(jsonModel)
     
                 // Save or update JSON object
                 // result = await saveJsonModelUnit(jsonModel)
-                saveJsonModelUnit(jsonModel)
-                .then((result) =>{
+                saveJsonModel(jsonModel).then((result) =>{
     
                     // res.send(jsonObj2xmlString(jsonModel))
                     res.send(result)
@@ -88,16 +86,9 @@ router.post('/upload',  async function(req, res, next) {
                 })
                 .catch( (error) => {
                     console.log(error)
-                    
                     res.send(error.message)
                 })
-    
-            
-
-            })
-    
-            
-    
+            })    
         }catch(error){
             res.send(error.message)
         }
@@ -160,19 +151,17 @@ router.post('/uploadZip',  async function(req, res, next) {
               console.log('newPackageNames')
               console.log(newPackageNames)
 
-                // get most recent folder does not work
-                //   const mostRecentDir = getMostRecentDir(packagesPath).dirName
-                //   console.log('mostRecentDir');
-                //   let tree = directoryTree('./server/data/packages/'+mostRecentDir);
+              
+             await addModels('server/data/packages/'+zipPackageName+'/crop2ml')
 
             
               // 
               // get Package Tree
               let tree = dirTree.getDirTree('server/data/packages/'+zipPackageName)
-              console.log('tree: ')
-              console.log(tree)
+            //   console.log('tree: ')
+            //   console.log(tree)
 
-              // Add all model units
+              // Add all model 
 
               
               
@@ -198,6 +187,7 @@ router.post('/uploadZip',  async function(req, res, next) {
      
 });
 
+
 router.post('/packageTree',  function(req, res, next) {
 
     console.log('START post /packageTree')
@@ -217,39 +207,46 @@ router.post('/packageTree',  function(req, res, next) {
 
 })
 
+router.post('/modelTree',  async function(req, res, next) {
 
-function getMostRecentDir (dir) {
-    const files = orderReccentFiles(dir);
-
-    return files.length ? files[0] : undefined;
-};
-
-function orderReccentFiles (dir) {
-                  fs.readdirSync(dir)
-                      .filter(fName => fs.lstatSync(dir+'/'+fName).isDirectory())
-                      .map(dirName => ({ dirName, atime: fs.lstatSync(dir+'/'+dirName).atime }))
-                      .sort((a, b) => b.atime.getTime() - a.atime.getTime());
-}
+    console.log('START post /modelTree')
 
 
-function extractZip(source, dest){
-
-    return new Promise((resolve,reject)=>{
-        
-        try{
-            let file = fs.createReadStream(source).pipe(unzipper.Extract({ path: dest }))
-            file.on('finish', ()=>{
-                // console.log('extracted zip:')
-                // console.log(file)
-                resolve('extraction: successful')
-            })
-        }catch(error) {
-            reject(error.message);
-        }
-
-    })
     
-}
+    // get all modelids from crop2ml models collection
+
+    let modelMetaDatas = await getAllModelMetaData();
+
+    let modelIds = []
+    let tree = {
+        name: 'models',
+        children:[]
+    }
+
+    for(modelMetaData of modelMetaDatas){
+        let modelId = modelMetaData.id
+        let modelPath = modelId.split('.')
+        let curTree = tree; 
+        for(let i=0;i<modelPath.length; i++){
+            if(curTree.children.includes(modelPath[i])){
+                curTree =children[modelPath[i]]
+            }else{
+                let nvTree = {name :modelPath[i], children:[] }
+                curTree.children.push(nvTree)
+                curTree = nvTree
+            }
+        }
+    }
+
+    console.log('tree: ')
+    console.log(tree)
+    console.log('END post /packageTree');
+    res.send(JSON.parse(JSON.stringify(tree)));
+
+})
+
+
+
 
 
 router.get('/zipFolder',async function(req,res,next){
@@ -275,7 +272,6 @@ router.post('/zipFolder',async function(req,res,next){
 })
 
 
-
 /**
  * @param {String} source
  * @param {String} out 
@@ -297,267 +293,178 @@ function zipDirectory(source, out) {
   });
 }
 
+/**
+ * 
+ * @param {String} source 
+ * @param {String} dest 
+ */
+function extractZip(source, dest){
 
-
-async function xmlString2jsonObj(xmlString){
-    const parser = new xml2js.Parser({
-        attrkey: "Attributs",
-        explicitRoot: true,
-        rootName:'ModelUnit',
-        explicitArray:false,
-        cdata: true
-    })
-    result = await parser.parseStringPromise(xmlString)
-
-    return result
-}
-
-async function saveJsonModelUnit (jsonModelUnit){
-
-    return new Promise((resolve, reject) => {
-        console.log('saveJsonModelUnit')
-        try{
-            const mongoose = require('mongoose')
-            mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
-            const db = mongoose.connection;
-            
-            db.on('error', console.error.bind(console, 'connection error:'));
-
-            db.once('open', async function(){
-
-                try{
-                    console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                    const ModelUnit = buildMongooseModelUnit(mongoose)
-
-                    const receivedModelUnit = new ModelUnit(jsonModelUnit)
-
-                    await  receivedModelUnit.validate();
-
-                    model_name = jsonModelUnit.ModelUnit.Attributs.name
-
-                    console.log(`insert or update : {'ModelUnit.Attributs.name': ${model_name} } `)
-                    result = await ModelUnit.findOneAndUpdate(
-                            {'ModelUnit.Attributs.name': model_name},
-                            {ModelUnit: jsonModelUnit.ModelUnit},
-                            {new:true, upsert: true, useFindAndModify: false}
-                        ).exec()
-                    
-                    // console.log(result)
-
-                    result = JSON.parse(JSON.stringify(result))
-                    
-                    db.close();
-                    resolve(result)
-
-                }catch(error){
-                    db.close();
-                    reject(error)
-                }
-            });
-            
-        }catch (err) { 
-            resolve(err.message)
-            // reject(err); 
-        }
-    })   
-}
-
-function buildMongooseModelUnit(mongoose){
-
-    if(mongoose.modelNames().find(e => e==='ModelUnit')){
-        return mongoose.model('ModelUnit')
-    }
-
-    const OutputValueSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true}, // CADTA #REQUIRED
-            description: {type: String, required: false}, // CADTA #REQUIRED
-            precision: {type: String, required: false} // CADTA #REQUIRED
-        },
-        _: {type: String, required: true} // CADTA #REQUIRED
-    })
-
-    const InputValueSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true} // CADTA #REQUIRED
-        },
-        _: {type: String, required: true} // CADTA #REQUIRED
-    })
-
-    const TestSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true}, // CADTA #REQUIRED
-            description: {type: String, required: false}, // CDATA #IMPLIED
-            uri: {type: String, required: false} // CDATA #IMPLIED
-        },
-        InputValue:{type:[InputValueSchema], required: false},
-        OutputValue:{type:[OutputValueSchema], required: false},
-    })
-
-    const TestsetSchema = new mongoose.Schema({
-        Testset:[{
-            Attributs:{
-                name: {type: String, required: true}, // CDATA #REQUIRED
-                description: {type: String, required: true}, // CDATA #REQUIRED
-                parameterset: {type: String, required: true}, // NMTOKEN #REQUIRED
-                uri: {type: String, required: false} // CDATA #IMPLIED
-            },
-            Test :{type: [TestSchema], required: false }
-        }]
-    })
-
-    const ParamSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true}, // NMTOKEN #REQUIRED
-        },
-        _: {type: String, required: true}, // NMTOKEN #REQUIRED
-    })
-
-    const ParametersetSchema = new mongoose.Schema({
-        Parameterset:[{
-            Attributs:{
-                description: {type: String, required: true}, // CDATA #REQUIRED
-                name: {type: String, required: true}, // NMTOKEN #REQUIRED
-                uri: {type: String, required: false} // CDATA #IMPLIED
-            },
-            Param :{type: [ParamSchema], required: false }
-        }]
-    }
+    return new Promise((resolve,reject)=>{
         
-    );
+        try{
+            let file = fs.createReadStream(source).pipe(unzipper.Extract({ path: dest }))
+            file.on('finish', ()=>{
+                // console.log('extracted zip:')
+                // console.log(file)
+                resolve('extraction: successful')
+            })
+        }catch(error) {
+            reject(error.message);
+        }
 
-    const AlgorithmSchema = new mongoose.Schema(
-        {  
-            Attributs:{
-                language: {type: String, required: true}, // CDATA #REQUIRED
-                platform: {type: String, required: false}, // CDATA #IMPLIED
-                filename: {type: String, required: false}, //  CDATA #IMPLIED
-                function: {type: String, required: false} // CDATA #IMPLIED
-            }
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-    const FunctionSchema = new mongoose.Schema(
-        {
-            name: {type: String, required: true}, // CDATA #REQUIRED
-	        language: {type: String, required: true}, // CDATA #REQUIRED
-	        filename: {type: String, required: false}, // CDATA #IMPLIED
-	        type: {
-                type: String,
-                required: false,
-                enum:['internal','external'] //  (internal|external) #REQUIRED
-            }, 
-	        description: {type: String, required: false}, // CDATA #IMPLIED>
-
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-
-    );
-
-
-    const OutputSchema = new mongoose.Schema(
-        {
-            Output:[{ 
-                Attributs:{
-                    name: {type: String, required: true}, //  NMTOKEN #REQUIRED
-                    datatype: {
-                        type: String,
-                        required: [true,`datatype  required for path Attributs.datatype `],
-                        enum: ['STRING', 'STRINGARRAY', 'STRINGLIST', 'DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
-                        
-                    }, 
-                    description: {type: String, required: false}, // CDATA #REQUIRED
-                    max: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    min: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    variablecategory: {
-                        type: String,
-                        required: false,
-                        enum: ['state', 'rate', 'auxiliary']
-                    }, 
-                    unit: {type: String, required: true}, //CDATA #REQUIRED
-                    uri: {type: String, required: false}, //CDATA #IMPLIED
-                }
-            }]
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-
-    const InputSchema = new mongoose.Schema(
-        {
-            Input: [{
-                Attributs:{
-                    name: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
-                    datatype: {
-                        type: String,
-                        required: true,
-                        enum: ['STRING','STRINGARRAY','STRINGLIST','DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
-                    }, 
-                    description: {type: String, required:true}, // CDATA #REQUIRED
-                    default: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    max: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    min: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    inputtype: {type: String, required: true}, // (variable|parameter) #REQUIRED
-                    parametercategory : {
-                        type: String,
-                        required: false,
-                        enum: ['constant','species','genotypic','soil','private']
-                    }, // TODO (constant|species|genotypic|soil|private) #IMPLIED
-                    variablecategory : {
-                        type: String,
-                        required: false,
-                        enum: ['state','rate','auxiliary']
-                    }, 
-                    unit: {type: String, required: true}, //  CDATA #REQUIRED
-                    uri : {type: String, required: false}, // CDATA #IMPLIED>
-                }
-            }]
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-
-    const DescriptionSchema = new mongoose.Schema(
-        {
-            Title: {type: String, required: true},
-            Authors:{type: String, required: true},
-            Institution: {type: String, required: true},
-            URI:{trype: String, required: false},
-            Reference: {type: String, required: false},
-            Abstract: {type: String, required: true}
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-    const ModelUnitSchema = new mongoose.Schema(
-        {
-            ModelUnit:{
-                Attributs: {
-                        name: {type: String, required:[true,'a model name is required']},
-                        modelid: { type:String, required:[true,'a modelid is required']},
-                        timestep: { type:String, required:[false,'a model timestep is required']},
-                        version:{String, required:[false,'a model version is required']}
-                    },
-
-                Description: {type: DescriptionSchema, require:[true,'a model description is required ']},
-                Inputs: {type: [InputSchema], required:false },
-                Outputs: {type:[OutputSchema], required:false},
-                Function:{type: FunctionSchema, require: false},
-                Algorithm:{type: AlgorithmSchema, require: false},
-                Parametersets:{type: [ParametersetSchema], require: true},
-                Testsets:{type: [TestsetSchema], require: true},
-            }
-      },
-      {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-    return mongoose.model('ModelUnit', ModelUnitSchema,'modelunits')
-      
+    })
+    
 }
 
 
+async function addModels(dirPath){
 
+    return new Promise(async (resolve,reject)=>{
+        try {
+            let xmlFNames =fs.readdirSync(dirPath).filter(fName => fName.includes('.xml'))
+            let savedJsonModels =[]
+            for(let xmlFName of xmlFNames ){
+                let jsonModel = await xmlFile2jsonModel(dirPath+'/'+xmlFName)
+
+                let idProp = typeof jsonModel.Attributs.modelid === 'undefined'? "id" : "modelid"
+                let idVal =  typeof jsonModel.Attributs.modelid === 'undefined'? jsonModel.Attributs.id : jsonModel.Attributs.modelid
+
+                let keywords = []
+                keywords = keywords.concat(jsonModel.Description.Authors.split(' ').filter(s => s.length))
+                keywords = keywords.concat(jsonModel.Description.Institution.split(' ').filter(s => s.length))
+                keywords = keywords.concat(idVal.split('.').filter(s => s.length>0))
+
+
+                jsonModel["meta"]={
+                    dirPath,
+                    xmlFName,
+                    idProp,
+                    idVal,
+                    keywords
+                }
+
+                let savedJsonModel = await saveJsonModel(jsonModel)
+
+                console.log(savedJsonModel.value.Attributs)                
+                savedJsonModels.push(savedJsonModel)
+            }
+            resolve(true)
+            
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+async function xmlFile2jsonModel(xmlFPath){
+    
+    return new Promise((resolve,reject)=>{
+        try {
+            let fileData = fs.readFileSync(path.resolve(xmlFPath))
+            parser = new xml2js.Parser({
+                attrkey: "Attributs",
+                explicitRoot: false,
+                rootName: 'Model',
+                explicitArray: false,
+                cdata: true,
+            });
+            parser.parseStringPromise(fileData).then(
+                result => {
+                    // console.log(xmlFPath)
+                    // console.log(result.Attributs)
+                    resolve( result)
+                }
+            )
+        } catch (error) {
+            reject(error)
+        }
+    })
+
+}
+
+
+async function saveJsonModel (jsonModel){
+    console.log('saveJsonModel')
+    return new Promise(async (resolve, reject) => {
+        try{
+            const MongoClient = require('mongodb').MongoClient;
+            const uri = MONGODB_URI;
+            const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
+            await client.connect()
+            console.log(`succesful connection to ${MONGODB_URI}` )
+
+            const collection = client.db("crop2ml").collection("models");
+            
+            const modelidProperty = typeof jsonModel.Attributs.modelid === 'undefined'? "id" : "modelid"
+            const modelid =  typeof jsonModel.Attributs.modelid === 'undefined'? jsonModel.Attributs.id : jsonModel.Attributs.modelid
+
+            
+
+            const filterKey = `Attributs.${modelidProperty}`
+            
+            const filter = { filterKey: modelid}
+            const replacement = jsonModel
+            const options = { upsert: true, returnNewDocument: true}
+
+            console.log("insert or replace :  ")
+            console.log(filtder)
+
+            var result = await collection.findOneAndReplace(filter,replacement,options)
+
+            if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
+                result.value = jsonModel;
+            }
+            
+            result = JSON.parse(JSON.stringify(result))
+
+            console.log('result')
+            console.log(result)
+
+            await client.close()
+            resolve(result)
+                   
+        }catch(error){
+            console.log(error)
+            if( typeof client !== 'undefined')
+                await client.close()
+            reject(error);
+        }
+    }) 
+  
+}
+
+async function getAllModelMetaData(){
+    console.log('getAllModelMetaData')
+    return new Promise(async (resolve, reject) => {
+        try{
+            const MongoClient = require('mongodb').MongoClient;
+            const uri = MONGODB_URI;
+            const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
+            await client.connect()
+            console.log(`succesful connection to ${MONGODB_URI}` )
+
+            const collection = client.db("crop2ml").collection("models");
+            
+            const filter = {}
+
+            var result = await collection.find(filter)
+            
+            result = JSON.parse(JSON.stringify(result))
+
+            console.log('result')
+            console.log(result)
+
+            await client.close()
+            resolve(result)
+                   
+        }catch(error){
+            console.log(error)
+            if( typeof client !== 'undefined')
+                await client.close()
+            reject(error);
+        }
+    }) 
+}
 
 module.exports = router;

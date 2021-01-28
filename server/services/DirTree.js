@@ -59,7 +59,7 @@ class DirTree{
             if(extensions.includes(argDirTree.extension)){
                 return {
                     name: argDirTree.name,
-                    id: `${argDirTree.name}_TestId`
+                    // id: `${argDirTree.name}_TestId`
                 }
             }else{
                 return null;
@@ -76,7 +76,7 @@ class DirTree{
                 let newName = argDirTree.name==='packages'?'models':argDirTree.name;
                 return {
                     name: newName,
-                    id: `${argDirTree.name}_TestId`,
+                    // id: `${argDirTree.name}_TestId`,
                     children: nvDirTreeChildren
                 } 
             }
