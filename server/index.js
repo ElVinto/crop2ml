@@ -10,12 +10,17 @@ app.use(cors());
 
 
 var mongodbServices = require('./routes/api/mongodb-services');
-// li nk the route /mongodb-services to the router mongodb-services
+// link the route /mongodb-services to the router mongodb-services
 app.use('/mongodb-services', mongodbServices);
 
-var fileSystemServices = require('./routes/api/fileSystem-services');
-// link the route /fileSystem-services to the router fileSystem
-app.use('/fileSystem-services', fileSystemServices);
+var ServerFileSystemRoutes = require('./routes/api/ServerFileSystemRoutes');
+app.use('/ServerFileSystemRoutes', ServerFileSystemRoutes);
+
+var JsonModelDBRoutes = require('./routes/api/JsonModelDBRoutes');
+app.use('/JsonModelDBRoutes', JsonModelDBRoutes);
+
+var AuthentificationDBRoutes = require('./routes/api/AuthentificationDBRoutes');
+app.use('/AuthentificationDBRoutes', AuthentificationDBRoutes);
 
 
 

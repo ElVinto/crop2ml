@@ -47,7 +47,6 @@ class DirTree{
                 // nvDirTree['children'].push({})
                 // this.clean(argDirTreeChild,nvDirTree['children'][nvDirTree['children'].length-1])
                 
-                
             }
             return 
         }

@@ -10,7 +10,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 
 class JsonModelData{
 
-    static findAllJsonModels = async () =>{
+    static getModelUnits = async () =>{
         
         return new Promise((resolve, reject) => {
             
@@ -18,10 +18,10 @@ class JsonModelData{
                 // let body ={
                 //     modelType: 'modelUnits',
                 // }
-                // axios.post(url + "mongodb-services/findAllJsonModels", body).then(res => {
+                // axios.post(url + "mongodb-services/findAllJsonModelUnits", body).then(res => {
                 //     resolve(res.data) ;
                 // })
-                axios.post(url + "JsonModelDBRoutes/findAllJsonModels").then(res => {
+                axios.get(url + "mongodb-services/findAllJsonModelUnits").then(res => {
                     resolve(res.data) ;
                 })
 
@@ -35,14 +35,14 @@ class JsonModelData{
     }
 
 
-    static async getModelById (modelid){
+    static async getModelUnitById (modelid){
         return new Promise((resolve, reject) => {
             
             try { 
                 let body ={
                     modelid: modelid,
                 }
-                axios.post(url + "mongodb-services/findJsonModelById", body).then(res => {
+                axios.post(url + "mongodb-services/findJsonModelUnitById", body).then(res => {
                     resolve(res.data) ;
                 })
                 
@@ -54,14 +54,14 @@ class JsonModelData{
     }
 
 
-    static async saveModel (modelUnit){
+    static async saveModelUnit (modelUnit){
         return new Promise((resolve, reject) => {
             
             try { 
                 let body ={
                     modelUnit: modelUnit,
                 }
-                axios.post(url + "mongodb-services/saveJsonModel", body).then(res => {
+                axios.post(url + "mongodb-services/saveJsonModelUnit", body).then(res => {
                     resolve(res.data) ;
                 })
                 
@@ -72,14 +72,14 @@ class JsonModelData{
         })
     }
 
-    static async deleteModelById (modelid){
+    static async deleteModelUnitById (modelid){
         return new Promise((resolve, reject) => {
             
             try { 
                 let body ={
                     modelid: modelid,
                 }
-                axios.post(url + "mongodb-services/deleteJsonModelById", body).then(res => {
+                axios.post(url + "mongodb-services/deleteJsonModelUnitById", body).then(res => {
                     resolve(res.data) ;
                 })
                 

@@ -1,81 +1,43 @@
 <template>
 
-  <div id=catalog v-if="$store.getters.getDataAreLoaded" style="display:block; overflow: scroll; height:80vh; width:100%; margin-top:20px;" >
+  <div id ="repository" v-if="$store.getters.getDataAreLoaded" style="display:block;  " >
 
     <div class ="row"  > 
+      
+      <div id="models" class="col-lg-3" style="font-size:0.75em"> 
 
-      <div id="models" class="col-sm-3">
+        <div   class="row" >
+          <div  class="col-sm-12">
 
 
+            <div v-if="modelTree">
+              <b> Model repository : </b>
+              <div id="packages">
+              <b-tree-view 
+                v-on:nodeSelect="nodeSelect" 
+                :data="modelTree"  
 
-        <div id="package" class="row" >
-          <div class="col-sm-12">
+                nodeKeyProp="id"
+                nodeChildrenProp="children"
 
-            <b> Import new package: </b>
-            <b-input-group class="mt-3" style="width:100%">
-              <div class="custom-file" ref="customPackageRef" >
-                <input type="file" id="zip" ref="zip"  v-on:change="handleZipUpload()" class="custom-file-input" >
-                 <label class="custom-file-label" ref="customPackageLabelRef" for="zip" style="text-align:center">Choose package.zip</label>
+                :renameNodeOnDblClick=false 
+                :contextMenu=false 
+                :contextMenuItems=[] 
+              >
+              </b-tree-view>
               </div>
-              <div class="input-group-append">
-                <b-button variant="secondary"  v-on:click="submitZip()">Send</b-button>
-              </div>
-            </b-input-group>
-            <p v-if="packageZipName">
-              {{`package to upload: ${packageZipName}`}}
-            </p>
-            
-
-          </div>
-        </div>
-
-          
-
-        <div id="package" class="row" >
-          <div class="col-sm-12">
-            <b> Export new package: </b>
-
-            <b-input-group class="mt-3">
-              <b-input-group-prepend>
-                <b-input-group-text> Choose</b-input-group-text>
-              </b-input-group-prepend>
-              
-              <b-form-input ref="package" placeholder="package name" > </b-form-input>
-              
-              <b-input-group-append>
-                <b-button variant="success"> Download</b-button>
-                <!-- <b-button variant="info">Button</b-button> -->
-              </b-input-group-append>
-            </b-input-group>
-
-          </div>
-        </div>
-
-        <hr>
-
-        <div id="package" class="row" >
-            <div class="col-sm-12">
-              <p>
-                <b> Import new model unit: </b>
-              </p>
-              <p>
-                <input type="file" id="file" ref="file"  v-on:change="handleFileUpload()" style="width:100%">
-              </p>
-              <p>
-                <button type="button" class="btn btn-secondary" v-on:click="submitFile()" style="width:80%;">Add</button>
-              </p>
             </div>
+
+          </div>
         </div>
-        <hr>
-
-        
-
 
         <div id="modelunits"  class="row" >
           <div  class="col-sm-12">
-
-            <b> List of model units: </b>
-            <b-list-group class="dropdown-menu scrollable-menu" role="menu" style="width:100%">
+            
+            
+            <b> Single Model: </b>
+            
+            <b-list-group class="scrollable-menu" role="menu" style="width:100%">
               <b-list-group-item 
                 v-for="modelid in $store.state.modelUnits.keys()"
                 v-bind:key="modelid"
@@ -84,36 +46,18 @@
                 {{ modelid}}
               </b-list-group-item>
             </b-list-group>
-
           </div>
         </div>
 
-        <!-- <div class="row" >
-          <div  class="col-md-12 ">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> List of model units <span class="caret"></span> </button>
-                <ul class="dropdown-menu scrollable-menu" role="menu">
-                  <li class="btn"
-                    v-for="modelid in $store.getters.getModelUnits.keys()"
-                    v-bind:key="modelid"
-                    v-on:click="selectModelUnitById(modelid)"
-                  >
-                    {{ modelid}}
-                  </li>
-                </ul>
-            </div>
-          </div>
-        </div> -->
-
         <div id="modelcompositions"  class="row">
           <div  class="col-sm-12">
-            <b> List of model compositions </b>
+            <b> List of compositions: </b>
           </div>
         </div>
       </div>
 
-      <div id="modelContent" v-if="selectedModelUnitId"  class="col-sm-9"  >
-          
+      <div id="modelContent"   class="col-lg-7"  >
+        <div v-if="selectedModelUnitId">
           <div id="modelIdAndActions" class="row">
             <div class="col-md-3">
                 <div @mouseleave="showCurrentRating(0)" style="display:inline-block;">
@@ -122,26 +66,26 @@
                 <div style="margin-top:10px;font-weight:bold;">{{currentRating}}</div>
             </div >
 
-            <div class="col-md-6">
+            <div class="col-md-5">
               <h2 style="text-align:center;">{{ `${selectedModelUnitId}`}} </h2>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="row" style="margin-top:5px;">
                 <div class="col-md-4">
-                  <button type="button" class="btn btn-success" v-on:click="saveModel()" style="width:100%;" > 
+                  <button type="button" class="btn btn-success myButtonStyle" v-on:click="saveModel()"  > 
                     Save 
                   </button>
                 </div >
 
                 <div class="col-md-4">
-                  <button type="button" class="btn btn-info" v-on:click="reInitModel()" style="width:100%;" > 
+                  <button type="button" class="btn btn-info myButtonStyle" v-on:click="reInitModel()"  > 
                     Reinit 
                   </button>
                 </div >
 
                 <div class="col-md-4">
-                  <button type="button" class="btn btn-danger" v-on:click="deleteModel()" style="width:100%;" > 
+                  <button type="button" class="btn btn-danger myButtonStyle" v-on:click="deleteModel()"  > 
                     Delete 
                   </button>
               </div >
@@ -477,8 +421,56 @@
             </div>
 
           </div>
-         
+        </div>
+        <div v-else>
+          No Model Selected
+        </div>
           
+      </div>
+
+      <div id="modelInfo" class="col-lg-2">
+        
+        <div>
+          <b-card sub-title="Uploader" >
+            <p>
+              TODO
+            </p>
+          </b-card>
+        </div>
+
+        <div>
+          <b-card sub-title="Version" >
+          <p>
+            TODO
+          </p>
+          </b-card>
+        </div>
+
+         <div>
+          <b-card sub-title="Community" >
+          <p>
+            TODO
+          </p>
+          </b-card>
+        </div>
+
+        <div>
+          <b-card sub-title="Tags" >
+          <p>
+            TODO
+          </p>
+          </b-card>
+        </div>
+
+         <div>
+          <b-card sub-title="Favourite by" >
+          <p>
+            TODO
+          </p>
+          </b-card>
+        </div>
+        
+
       </div>
       
     </div>
@@ -489,8 +481,10 @@
 <script>
 
 // import ModelUnitServices from "../services/ModelUnitServices"
-import FileSystemServices from "../services/ClientServerFileSystem"
+import FileSystemServices from "../services/ClientFileSystemServices"
 import StarRating from 'vue-star-rating'
+
+import { bTreeView } from 'bootstrap-vue-treeview'
 
 
 
@@ -533,14 +527,15 @@ export default {
         currentRating: "No Rating",
         currentSelectedRating: "No Current Rating",
 
-
+        modelTree: null,
         
       }
     },
 
   components: {
-    StarRating
 
+    StarRating,
+    bTreeView
   },
 
   async created() {
@@ -563,6 +558,11 @@ export default {
       await this.$store.dispatch('initModelUnits');
     }
 
+    this.modelTree = [await FileSystemServices.getModelTree()]
+    
+    console.log('this.modelTree: ')
+    console.log(this.modelTree)
+
     console.log("END mounted Catalog")
   },
 
@@ -579,6 +579,15 @@ export default {
 
   methods: {
 
+    nodeSelect(event){
+      if(event.selected){
+        if(event.data.name.indexOf('.xml')>0){
+          console.log(`event.data.name : ${event.data.name}`)
+          console.log(`event.data.id : ${event.data.id}`)
+        }
+        
+      }
+    },
 
     handleFileUpload(){
       console.log("START handleFileUpload")
@@ -766,9 +775,9 @@ export default {
 
 <style scoped>
 
-#catalog{
+#repository{
   width:100%;
-  overflow:scroll;
+  overflow: scroll;
 }
 
 p{
@@ -782,12 +791,35 @@ p{
   padding: 20px;
 }
 
+#packages{
+  padding: 20px;
+  max-height: 50vh;
+  overflow:scroll;
+}
+
+.dropdown-menu {
+  height: 40vh;
+}
+
 .scrollable-menu {
-    height: auto;
-    max-height: 60vh;
+    max-height: 20vh; 
     overflow: scroll;
 }
 
+
+
+.info-frame{
+  outline-style:solid; 
+  outline-width:1px;
+  outline-color: grey ;
+  margin:5px;
+  border-radius: 45%;
+}
+
+.myButtonStyle{
+  width:100%;
+  font-size: 0.75em;
+}
 
 
 

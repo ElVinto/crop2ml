@@ -4,88 +4,178 @@
 
     <div class ="row"  > 
       
-      <div id="models" class="col-sm-2">
+      <div id="models" class="col-lg-3" >
 
-        <div   class="row" >
-          <div  class="col-sm-12">
+        <b-card >
+
+          <b-card-header header-tag="nav">
+            <b-nav tabs fill>
+              <b-nav-item @click="activateSearchMode()"  >Search</b-nav-item>
+              <b-nav-item @click="activateHierarchyMode()" >Hierarchy</b-nav-item>
+              <b-nav-item @click="activateListMode()" >List</b-nav-item>
+
+              <!-- <b-button variant="outline-secondary" @click="activateSearchMode()"  >Search</b-button>
+              <b-button variant="outline-secondary" @click="activateHierarchyMode()"  >Hierarchy</b-button>
+              <b-button variant="outline-secondary" @click="activateListMode()"  >List</b-button> -->
+              
+            </b-nav>
+          </b-card-header>
+          
+          <b-card-body >
+
+            <div v-if="searchMode" id="modelSearch" class="row">
+              <div  class="col-sm-12">
+                <p>
+                    Find a model by tags or keywords
+                </p>
+
+                <b-input-group id="Search"  >
+                  <b-form-input placeholder="tag, keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
+                  
+                  <datalist id="wordOptionDataList">
+                    <option  
+                      v-for="wordOption in $store.getters.getWordOptions"
+                      v-bind:key="wordOption"
+                      >
+                      {{wordOption}}
+                    </option>
+                  </datalist> 
+
+                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="submitSearch()" type="submit">Search</b-button>
+                </b-input-group>
+
+                <div v-if="selectedWord.length>0 && searchResults.fromTags !== null && searchResults.fromTags.length>0">
+                  <hr>
+                  <p style="text-align:left; ">
+                    {{`Tag "${selectedWord}": models founds`}}
+                  </p>
+                  <b-list-group class="scrollable-submenu" role="menu" style="width:100%">
+                    <b-list-group-item 
+                      v-for="modelid in searchResults.fromTags"
+                      v-bind:key="modelid"
+                      v-on:click="selectModelById(modelid)"
+                      style="font-size:0.7em" 
+                    >
+                      {{ modelid}}
+                    </b-list-group-item>
+                  </b-list-group>
+                </div>
+
+                <div v-if="selectedWord.length>0 && searchResults.fromKeywords !== null && searchResults.fromKeywords.length>0">
+                  <hr>
+                  <p style="text-align:left; font-size:0.9em">
+                    {{`Keyword "${selectedWord}": models found `}}
+                  </p>
+                  <b-list-group class="scrollable-submenu" role="menu" style="width:100%">
+                    <b-list-group-item 
+                      v-for="modelid in searchResults.fromKeywords"
+                      v-bind:key="modelid"
+                      v-on:click="selectModelById(modelid)"
+                      style="font-size:0.7em" 
+                    >
+                      {{ modelid}}
+                    </b-list-group-item>
+                  </b-list-group>
+                </div>
+
+                <div v-if="submittedSearch && searchResults.fromTags.length ===0 && searchResults.fromKeywords.length ===0">
+                  <hr>
+                  <p style="font-size:0.9em">
+                    {{`No model has been found `}}
+                  </p>
+                </div>
+                
 
 
-            <div v-if="packageTree">
-              <b> Model repository : </b>
-              <div id="packages">
-              <b-tree-view 
-                v-on:nodeSelect="nodeSelect" 
-                :data="packageTree"  
 
-                nodeKeyProp="id"
-                nodeChildrenProp="children"
 
-                :renameNodeOnDblClick=false 
-                :contextMenu=false 
-                :contextMenuItems=[] 
-              >
-              </b-tree-view>
               </div>
             </div>
 
-          </div>
-        </div>
+            <div v-if="hierarchyMode" id="modelTreeView"  class="row" >
+              <div  class="col-sm-12">
+                <p>
+                    Select a model in the hierarchy 
+                </p>
+                
+                <div v-if="modelTree">
+                  
+                  <div id="packages">
+                  <b-tree-view 
+                    v-on:nodeSelect="treeNodeSelect" 
+                    :data="modelTree"  
 
-        <div id="modelunits"  class="row" >
-          <div  class="col-sm-12">
-            
-            
-            <b> Single Model: </b>
-            
-            <b-list-group class="scrollable-menu" role="menu" style="width:100%">
-              <b-list-group-item 
-                v-for="modelid in $store.state.modelUnits.keys()"
-                v-bind:key="modelid"
-                v-on:click="selectModelUnitById(modelid)"
-              >
-                {{ modelid}}
-              </b-list-group-item>
-            </b-list-group>
-          </div>
-        </div>
+                    nodeKeyProp="id"
+                    nodeChildrenProp="children"
 
-        <div id="modelcompositions"  class="row">
-          <div  class="col-sm-12">
-            <b> List of compositions: </b>
-          </div>
-        </div>
+                    :renameNodeOnDblClick=false 
+                    :contextMenu=false 
+                    :contextMenuItems=[] 
+                  >
+                  </b-tree-view>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div v-if="listMode" id="modelList"  class="row" >
+              <div  class="col-sm-12">
+                <p>
+                  Select a model in the list: 
+                </p>
+                <b-list-group class="scrollable-menu" role="menu" style="width:100%">
+                  <b-list-group-item 
+                    v-for="modelid in $store.getters.getAlphabeticListOfModels"
+                    v-bind:key="modelid"
+                    v-on:click="selectModelById(modelid)"
+                    style="font-size:0.75em" 
+                  >
+                    {{ modelid}}
+                  </b-list-group-item>
+                </b-list-group>
+              </div>
+            </div>
+
+            
+          </b-card-body>
+        </b-card>
+
       </div>
 
-      <div id="modelContent"   class="col-sm-8"  >
-        <div v-if="selectedModelUnitId">
+      <div id="modelContent"   class="col-lg-7"  >
+        <div v-if="selectedModelId">
+
           <div id="modelIdAndActions" class="row">
-            <div class="col-md-3">
+            <div class="col-md-12">
+              <h2 style="text-align:center;">{{ `${selectedModelId}`}} </h2>
+            </div>
+          </div >
+
+          <div id="Actions" class="row">
+            <div class="col-md-4">
                 <div @mouseleave="showCurrentRating(0)" style="display:inline-block;">
                     <star-rating :show-rating="false" @current-rating="showCurrentRating" @rating-selected="setCurrentSelectedRating" :increment="0.5"></star-rating>
                 </div>
                 <div style="margin-top:10px;font-weight:bold;">{{currentRating}}</div>
             </div >
 
-            <div class="col-md-6">
-              <h2 style="text-align:center;">{{ `${selectedModelUnitId}`}} </h2>
-            </div>
-
-            <div class="col-md-3">
+            <div class="col-md-8">
               <div class="row" style="margin-top:5px;">
                 <div class="col-md-4">
-                  <button type="button" class="btn btn-success" v-on:click="saveModel()" style="width:100%;" > 
+                  <button type="button" class="btn btn-success myButtonStyle" v-on:click="saveModel()"  > 
                     Save 
                   </button>
                 </div >
 
                 <div class="col-md-4">
-                  <button type="button" class="btn btn-info" v-on:click="reInitModel()" style="width:100%;" > 
+                  <button type="button" class="btn btn-info myButtonStyle" v-on:click="reInitModel()"  > 
                     Reinit 
                   </button>
                 </div >
 
                 <div class="col-md-4">
-                  <button type="button" class="btn btn-danger" v-on:click="deleteModel()" style="width:100%;" > 
+                  <button type="button" class="btn btn-danger myButtonStyle" v-on:click="deleteModel()"  > 
                     Delete 
                   </button>
               </div >
@@ -107,26 +197,26 @@
 
           <br>
 
-          <div id="ModelUnitAttributs" > 
+          <div id="ModelAttributs" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitAttributs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitAttributs')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelAttributs')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelAttributs')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitAttributs">
+            <div v-if="expandedModelAttributs">
               <div id="AttributList" 
                 class="input-group mb-3"
-                v-for="(v,k) in selectedModelUnit.ModelUnit.Attributs"
+                v-for="(v,k) in selectedModel.Attributs"
                 v-bind:key="k"
               >
                 <div class="input-group-prepend"  style="width:100%;" >
                   <span class="input-group-text" id="basic-addon2">
                     {{ k }}
                   </span>
-                  <input class="form-control" v-model="selectedModelUnit.ModelUnit.Attributs[k]" :placeholder=v  >
+                  <input class="form-control" v-model="selectedModel.Attributs[k]" :placeholder=v  >
                 </div>
               </div>
             </div>
@@ -145,14 +235,14 @@
             <div v-if="expandedDescription">
               <div id="DescriptionList" 
                 class="input-group mb-3"
-                v-for="(v,k) in selectedModelUnit.ModelUnit.Description"
+                v-for="(v,k) in selectedModel.Description"
                 v-bind:key="k"
               >
                 <div class="input-group-prepend" style="width:100%;" >
                   <span class="input-group-text" >
                     {{ k }}
                   </span>
-                  <input class="form-control" v-model="selectedModelUnit.ModelUnit.Description[k]" :placeholder=v   >
+                  <input class="form-control" v-model="selectedModel.Description[k]" :placeholder=v   >
                 </div>
               </div>
             </div>
@@ -171,14 +261,14 @@
             <div v-if="expandedAlgorithm">
               <div id="AlgorithmAttributList" 
                 class="input-group mb-3"
-                v-for="(v,k) in selectedModelUnit.ModelUnit.Algorithm.Attributs"
+                v-for="(v,k) in selectedModel.Algorithm.Attributs"
                 v-bind:key="k"
               >
                 <div class="input-group-prepend" style="width:100%;" >
                   <span class="input-group-text" >
                     {{ k }}
                   </span>
-                  <input class="form-control" v-model="selectedModelUnit.ModelUnit.Algorithm.Attributs[k]" :placeholder=v   >
+                  <input class="form-control" v-model="selectedModel.Algorithm.Attributs[k]" :placeholder=v   >
                 </div>
               </div>
 
@@ -197,13 +287,13 @@
 
           </div>
 
-          <div id="ModelUnitInputs" > 
+          <div id="ModelInputs" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitInputs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitInputs')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelInputs')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelInputs')}} 
             </button>
-            <div v-if="expandedModelUnitInputs">
-              <button type="button" class="btn btn-link" v-on:click="addModelUnitInput()" style="text-align:left" > 
+            <div v-if="expandedModelInputs">
+              <button type="button" class="btn btn-link" v-on:click="addModelInput()" style="text-align:left" > 
                 add input
               </button>
             </div>
@@ -212,13 +302,13 @@
             <br>
             <br>
             
-            <div v-if="expandedModelUnitInputs">
+            <div v-if="expandedModelInputs">
 
               
 
               <div id="InputList" 
                 class="input-group mb-3"
-                v-for="(inputObj,inputIdx) in selectedModelUnit.ModelUnit.Inputs[0].Input"
+                v-for="(inputObj,inputIdx) in selectedModel.Inputs[0].Input"
                 v-bind:key="inputIdx"
               >
                 <p>{{`${inputObj.Attributs.name}`}}</p>
@@ -233,7 +323,7 @@
                     <span class="input-group-text" id="basic-addon2">
                       {{ inputObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Inputs[0].Input[inputIdx].Attributs[inputObjAttKey]" :placeholder=inputObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Inputs[0].Input[inputIdx].Attributs[inputObjAttKey]" :placeholder=inputObjAttVal  >
                   </div>
               
                 </div>
@@ -243,19 +333,19 @@
 
           </div>
 
-          <div id="ModelUnitOutputs" > 
+          <div id="ModelOutputs" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitOutputs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitOutputs')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelOutputs')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelOutputs')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitOutputs">
+            <div v-if="expandedModelOutputs">
               <div id="OutputList" 
                 class="input-group mb-3"
-                v-for="(outputObj,outputIdx) in selectedModelUnit.ModelUnit.Outputs[0].Output"
+                v-for="(outputObj,outputIdx) in selectedModel.Outputs[0].Output"
                 v-bind:key="outputIdx"
               >
                 <p>{{`${outputObj.Attributs.name}`}}</p>
@@ -270,7 +360,7 @@
                     <span class="input-group-text" id="basic-addon2">
                       {{ outputObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Outputs[0].Output[outputIdx].Attributs[outputObjAttKey]" :placeholder=outputObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Outputs[0].Output[outputIdx].Attributs[outputObjAttKey]" :placeholder=outputObjAttVal  >
                   </div>
               
                 </div>
@@ -281,19 +371,19 @@
           </div>
 
           <!-- TODO CHECK THE form -->
-          <div id="ModelUnitParametersets" > 
+          <div id="ModelParametersets" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitParametersets')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitParametersets')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelParametersets')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelParametersets')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitParametersets">
+            <div v-if="expandedModelParametersets">
               <div id="ParametersetList" 
                 class="input-group mb-3"
-                v-for="(paramsetObj,paramsetIdx) in selectedModelUnit.ModelUnit.Parametersets[0].Parameterset"
+                v-for="(paramsetObj,paramsetIdx) in selectedModel.Parametersets[0].Parameterset"
                 v-bind:key="paramsetIdx"
               >
                 <p>{{`${paramsetObj.Attributs.name}`}}</p>
@@ -308,7 +398,7 @@
                     <span class="input-group-text" >
                       {{ paramsetObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Parametersets[0].Parameterset[paramsetIdx].Attributs[paramsetObjAttKey]" :placeholder=paramsetObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Parametersets[0].Parameterset[paramsetIdx].Attributs[paramsetObjAttKey]" :placeholder=paramsetObjAttVal  >
                   </div>
               
                 </div>
@@ -324,7 +414,7 @@
                     <span class="input-group-text" >
                       {{ paramObjVal.Attributs.name }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Parametersets[0].Parameterset[paramsetIdx].Param[paramObjKey]._" :placeholder=paramObjVal._ >
+                    <input class="form-control" v-model="selectedModel.Parametersets[0].Parameterset[paramsetIdx].Param[paramObjKey]._" :placeholder=paramObjVal._ >
                   </div>
               
                 </div>
@@ -335,19 +425,19 @@
           </div>
 
           <!-- TODO -->
-          <div id="ModelUnitTestsets" > 
+          <div id="ModelTestsets" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitTestsets')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitTestsets')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelTestsets')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelTestsets')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitTestsets">
+            <div v-if="expandedModelTestsets">
               <div id="TestsetList" 
                 class="input-group mb-3"
-                v-for="(testsetObj,testsetIdx) in selectedModelUnit.ModelUnit.Testsets[0].Testset"
+                v-for="(testsetObj,testsetIdx) in selectedModel.Testsets[0].Testset"
                 v-bind:key="testsetIdx"
               >
                 <p>{{`${testsetObj.Attributs.name}`}}</p>
@@ -362,7 +452,7 @@
                     <span class="input-group-text" >
                       {{ testsetObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Attributs[testsetObjAttKey]" :placeholder=testsetObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Attributs[testsetObjAttKey]" :placeholder=testsetObjAttVal  >
                   </div>
               
                 </div>
@@ -378,7 +468,7 @@
                     <span class="input-group-text" >
                       name
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Test[testObjKey].Attributs.name" :placeholder=testObjVal.Attributs.name >
+                    <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Test[testObjKey].Attributs.name" :placeholder=testObjVal.Attributs.name >
                   </div>
                   
                   <br>
@@ -393,7 +483,7 @@
                       <span class="input-group-text" >
                         {{testInputObjVal.Attributs.name}}
                       </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Test[testObjKey].InputValue[testInputObjKey]._" :placeholder=testInputObjVal._ >
+                    <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Test[testObjKey].InputValue[testInputObjKey]._" :placeholder=testInputObjVal._ >
                     </div>
                   </div>
 
@@ -408,7 +498,7 @@
                       <span class="input-group-text" >
                         {{testOutputObjVal.Attributs.name}}
                       </span>
-                      <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Test[testObjKey].OutputValue[testOutputObjKey]._" :placeholder=testOutputObjVal._ >
+                      <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Test[testObjKey].OutputValue[testOutputObjKey]._" :placeholder=testOutputObjVal._ >
                     </div>
 
                   </div>
@@ -421,128 +511,173 @@
             </div>
 
           </div>
+
         </div>
+
         <div v-else>
-          No Model Selected
+            Select a model to view its description
         </div>
           
       </div>
 
-      <div id="modelInfo" class="col-sm-2">
+      <div id="modelInfo" class="col-lg-2" >
         
         <div>
           <b-card sub-title="Uploader" >
-            <p>
-              TODO
-            </p>
+            <b-card-img 
+                src="images/user_icon.png" 
+                style="max-width:50px" 
+                alt="User"
+                top>
+            </b-card-img>
+
+
           </b-card>
         </div>
 
         <div>
+          
           <b-card sub-title="Version" >
-          <p>
-            TODO
-          </p>
+            <b-card-img 
+                src="images/version_iconfinder_128px.png" 
+                style="max-width: 50px" 
+                alt="Users"
+                top>
+            </b-card-img>
+
           </b-card>
+
         </div>
 
-         <div>
+        <div>
           <b-card sub-title="Community" >
-          <p>
-            TODO
-          </p>
+            <b-card-img 
+                src="images/community_iconfinder_128px.png" 
+                style="max-width: 50px" 
+                alt="Users"
+                top>
+            </b-card-img>
+
+            <div v-if="selectedModelId">
+                Community TODO 
+            </div>
+            <div v-else>
+            </div>
+
           </b-card>
+
         </div>
 
         <div>
           <b-card sub-title="Tags" >
-          <p>
-            TODO
-          </p>
+          <b-card-img 
+                src="images/tag2_inconfinder_128px.png" 
+                style="max-width: 50px" 
+                alt="Users"
+                top>
+            </b-card-img>
           </b-card>
         </div>
 
          <div>
           <b-card sub-title="Favourite by" >
-          <p>
-            TODO
-          </p>
-          </b-card>
+          <b-card-img 
+                src="images/favourite_iconfinder_128px.png" 
+                style="max-width: 50px" 
+                alt="Users"
+                top>
+            </b-card-img>
+          </b-card>          
         </div>
         
 
-      </div>
       
-    </div>
+      
+      </div>
 
+  </div>
   </div>
   
 </template>
 <script>
 
-// import ModelUnitServices from "../services/ModelUnitServices"
-import FileSystemServices from "../services/FileSystemServices"
+import { bTreeView } from 'bootstrap-vue-treeview'
 import StarRating from 'vue-star-rating'
 
-import { bTreeView } from 'bootstrap-vue-treeview'
+import ClientServerJsonModel from "../services/ClientServerJsonModel"
+
 
 
 
 export default {
   name: 'Catalog',
 
-   data() {
-      return {
-
-        file:'',
-        fileName:'',
-
-        packageZip:{},
-        packageName: '',
-
-        errorMsg : "",
-
-        selectedModelUnitId: null,
-
-        selectedModelUnit:{},
-
-        modelUnitSchema :{},
-
-
-        expandedModelUnitAttributs :false,
-        
-        expandedDescription :false,
-
-        expandedAlgorithm :false,
-
-
-        expandedModelUnitInputs :false,
-
-        expandedModelUnitOutputs :false,
-
-        expandedModelUnitParametersets: false,
-
-        expandedModelUnitTestsets :false,
-
-        currentRating: "No Rating",
-        currentSelectedRating: "No Current Rating",
-
-        packageTree: null,
-        
-      }
-    },
-
   components: {
-
     StarRating,
     bTreeView
+  },
+
+  data() {
+    return {
+
+      file:'',
+      fileName:'',
+
+      packageZip:{},
+      packageName: '',
+
+      errorMsg : "",
+
+      selectedModelId: null,
+
+      selectedModel:{},
+
+      modelUnitSchema :{},
+
+      expandedModelAttributs :false,
+      
+      expandedDescription :false,
+
+      expandedAlgorithm :false,
+
+
+      expandedModelInputs :false,
+
+      expandedModelOutputs :false,
+
+      expandedModelParametersets: false,
+
+      expandedModelTestsets :false,
+
+      currentRating: "No Rating",
+      currentSelectedRating: "No Current Rating",
+
+      modelTree: null,
+
+      selectedWord: "",
+      submittedSearch:false,
+      searchResults:{
+        fromTags: [],
+        fromKeywords:[]
+      },
+      
+      
+      
+
+
+      searchMode:true,
+      hierarchyMode:false,
+      listMode:false,
+
+      
+    }
   },
 
   async created() {
 
     // console.log("START created Catalog")
 
-    // this.modelUnitSchema = ModelUnitServices.buildSchema();
+    // this.modelUnitSchema = ModelServices.buildSchema();
 
     // console.log("this.modelUnitSchema")
     // console.log(this.modelUnitSchema)
@@ -555,115 +690,94 @@ export default {
     console.log("START mounted Catalog")
 
     if (!this.$store.getters.getDataAreLoaded) {
-      await this.$store.dispatch('initModelUnits');
+      await this.$store.dispatch('initModels');
     }
 
-    this.packageTree = [await FileSystemServices.getPackageTree()]
+    this.modelTree = [await ClientServerJsonModel.requestModelTree()]
     
-    console.log('this.packageTree: ')
-    console.log(this.packageTree)
+    
+    console.log('this.modelTree: ')
+    console.log(this.modelTree)
 
     console.log("END mounted Catalog")
   },
 
   computed:{
 
-      // selectedModelUnit: function (){
-      //   return this.$store.getters.getModelUnits.get(this.selectedModelUnitId)
-      // }
-
-      // modelUnitIds () {
-      //   return this.$store.getters.getModelUnits.keys()
-      // }
   },
+
 
   methods: {
 
-    nodeSelect(event){
+    activateSearchMode(){
+      this.searchMode =true;
+      this.hierarchyMode =false;
+      this.listMode=false;
+    },
+
+    activateHierarchyMode(){
+      this.searchMode =false;
+      this.hierarchyMode =true;
+      this.listMode=false;
+    },
+
+    activateListMode(){
+      this.searchMode =false;
+      this.hierarchyMode =false;
+      this.listMode=true;
+    },
+
+    treeNodeSelect(event){
       if(event.selected){
         if(event.data.name.indexOf('.xml')>0){
           console.log(`event.data.name : ${event.data.name}`)
           console.log(`event.data.id : ${event.data.id}`)
         }
+        if(typeof event.data.idValue != 'undefined'){
+          console.log(`event.data.name : ${event.data.name}`)
+          console.log(`event.data.idValue : ${event.data.idValue}`)
+          this.selectModelById(event.data.idValue)
+        }
         
       }
     },
 
-    handleFileUpload(){
-      console.log("START handleFileUpload")
+    
+    async submitSearch(){
+      console.log("START submitSearch")
+      console.log(this.selectedWord)
 
-      this.file = this.$refs.file.files[0];
+      this.submittedSearch=true ;
 
-      console.log("END handleFileUpload")
-    },
+      // TODO reuse for more complex search with or condition
+      // const modelIdValues =  await ClientServerJsonModel.findJsonModelsBySearchWords([this.selectedWord]);
+      
+      if(typeof this.$store.state.keywordsObj[this.selectedWord] !=='undefined'){
+        this.searchResults.fromKeywords=this.$store.state.keywordsObj[this.selectedWord];
+      }
+      
+      if(typeof this.$store.state.tagsObj[this.selectedWord]!=='undefined'){
+          this.searchResults.fromTags=this.$store.state.tagsObj[this.selectedWord]
+      }
 
-    async submitFile(){
-      console.log("START submitFile")
-
-      // let formData = new FormData();
-      // formData.append('file', this.file);
-
-      console.log("xml sent: ")
-      console.log(this.file)
       
 
-      const jsonModel = await FileSystemServices.sendFile(this.file)
+      // console.log('this.$store.getters.getTags')
+      // console.log(this.$store.getters.getTags)
 
-      console.log("json received: ")
-      console.log(jsonModel.data)
-
-      this.$store.commit('addModelUnit',jsonModel.data);
-
-      console.log('this.$store.getters.getModelUnits')
-      console.log(this.$store.getters.getModelUnits)
-
+      console.log('this.searchResults')
+      console.log(this.searchResults)
       
-      this.selectModelUnitById(jsonModel.data.ModelUnit.Attributs.modelid)
-
-      console.log("END submitFile")
-    },
-
-    handleZipUpload(){
-      console.log("START handleZipUpload")
-
-
-      this.packageZip = this.$refs.zip.files[0];
-
-      console.log(" zip file")
-      console.log(this.packageZip)
-
-
-      console.log("END handleZipUpload")
-    },
-
-    async submitZip(){
-      console.log("START submitFile")
-
-      // let formData = new FormData();
-      // formData.append('file', this.file);
-
-      console.log("xml sent: ")
-      console.log(this.packageZip)
-      
-
-      const response = await FileSystemServices.sendZip(this.packageZip)
-
-      console.log("server response: ")
-      console.log(response)
-
-      // TODO add model unit for each model
-      // this.$store.commit('addModelUnit',jsonModel.data);
-
-      console.log("END submitZip")
+      console.log("END submitSearch")
     },
 
     async saveModel(){
       console.log("START saveModel")
 
       this.errorMsg =""
-      const res =  await this.$store.dispatch('saveModelUnit',this.selectedModelUnit);
+      const res =  await this.$store.dispatch('saveModel',this.selectedModel);
 
-      if(res.ModelUnit === undefined){
+      if(res.Model === undefined){
         this.errorMsg = res;
       }
 
@@ -678,18 +792,18 @@ export default {
 
       // TODO case of new empty model
       
-      const res = await this.$store.dispatch('reInitModelUnit',this.selectedModelUnitId);
+      const res = await this.$store.dispatch('reInitModel',this.selectedModelId);
 
-      if(res.ModelUnit !== undefined){
-        this.selectedModelUnit = this.$store.getters.getModelUnits.get(this.selectedModelUnitId)
+      if(res.Model !== undefined){
+        this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
       }else{
         this.errorMsg = res;
       }
       
       
       
-      console.log('this.selectedModelUnit')
-      console.log(this.selectedModelUnit)
+      console.log('this.selectedModel')
+      console.log(this.selectedModel)
 
       console.log("END reInitModel")
     },
@@ -700,21 +814,18 @@ export default {
 
       this.errorMsg =""
 
-      const deletedModelUnit = await this.$store.dispatch('deleteModelUnit',this.selectedModelUnit);
+      const deletedModel = await this.$store.dispatch('deleteModel',this.selectedModel);
 
-      console.log('deletedModelUnit')
-      console.log(deletedModelUnit)
+      console.log('deletedModel')
+      console.log(deletedModel)
 
-      this.selectedModelUnitId= null
+      this.selectedModelId= null
 
-      this.selectedModelUnit={}
+      this.selectedModel={}
 
       console.log("END deleteModel")
     },
 
-    addModelUnitInput(){
-
-    },
 
     
     sign: function(expanded){
@@ -729,8 +840,8 @@ export default {
 
       switch (paramName) {
 
-        case 'ModelUnitAttributs': 
-          return `${this.sign(this.expandedModelUnitAttributs)} Attributs` ;
+        case 'ModelAttributs': 
+          return `${this.sign(this.expandedModelAttributs)} Attributs` ;
         
         case 'Description': 
           return `${this.sign(this.expandedDescription)} ${paramName}` ;
@@ -738,17 +849,17 @@ export default {
         case 'Algorithm': 
           return `${this.sign(this.expandedAlgorithm)} ${paramName}` ; 
 
-        case 'ModelUnitInputs': 
-          return `${this.sign(this.expandedModelUnitInputs)} Inputs` ;
+        case 'ModelInputs': 
+          return `${this.sign(this.expandedModelInputs)} Inputs` ;
         
-        case 'ModelUnitOutputs': 
-          return `${this.sign(this.expandedModelUnitOutputs)} Outputs` ;
+        case 'ModelOutputs': 
+          return `${this.sign(this.expandedModelOutputs)} Outputs` ;
         
-        case 'ModelUnitParametersets': 
-          return `${this.sign(this.expandedModelUnitParametersets)} Parametersets` ;
+        case 'ModelParametersets': 
+          return `${this.sign(this.expandedModelParametersets)} Parametersets` ;
 
-        case 'ModelUnitTestsets': 
-          return `${this.sign(this.expandedModelUnitTestset)} Testsets` ;
+        case 'ModelTestsets': 
+          return `${this.sign(this.expandedModelTestset)} Testsets` ;
       
         default:
           break;
@@ -756,18 +867,28 @@ export default {
 
     },
 
-    selectModelUnitById: function (modelid){
-      this.selectedModelUnitId = modelid;
-      this.selectedModelUnit = this.$store.getters.getModelUnits.get(this.selectedModelUnitId)
+    selectModelById: function (modelid){
+      this.selectedModelId = modelid;
+      this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
     },
 
     showCurrentRating: function(rating) {
       this.currentRating = (rating === 0) ? this.currentSelectedRating : "Click to select " + rating + " stars"
     },
+    
     setCurrentSelectedRating: function(rating) {
       this.currentSelectedRating = "You have Selected: " + rating + " stars";
     }
     
+  },
+
+  watch:{
+    selectedWord(){
+      this.submittedSearch=false ;
+      this.searchResults.fromTags =[]
+      this.searchResults.fromKeywords =[]
+
+    }
   },
 
 }
@@ -777,7 +898,7 @@ export default {
 
 #repository{
   width:100%;
-  overflow: scroll;
+  /* overflow:auto; */
 }
 
 p{
@@ -787,8 +908,13 @@ p{
   padding-right: 2px;
 }
 
-#modelunits{
-  padding: 20px;
+#models{
+  outline-width: 2px;
+  outline-color: black;
+}
+
+#modelSearch{
+  /* padding: 20px; */
 }
 
 #packages{
@@ -802,7 +928,12 @@ p{
 }
 
 .scrollable-menu {
-    max-height: 20vh; 
+    max-height: 60vh; 
+    overflow: scroll;
+}
+
+.scrollable-submenu {
+    max-height: 30vh; 
     overflow: scroll;
 }
 
@@ -816,6 +947,10 @@ p{
   border-radius: 45%;
 }
 
+.myButtonStyle{
+  width:100%;
+  font-size: 0.75em;
+}
 
 
 

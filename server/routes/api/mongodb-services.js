@@ -387,9 +387,10 @@ router.get('/findJsonModelUnit',async function(req, res, next){
 
 
 async function findJsonModelUnit (model_name){
-
     return new Promise((resolve, reject) => {
         try{
+            console.log(`START findJsonModelUnit ${model_name}` )
+
             const mongoose = require('mongoose')
             mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
             const db = mongoose.connection;
@@ -429,7 +430,7 @@ async function findJsonModelUnit (model_name){
 }
 
 router.post('/findJsonModelUnitById',async function(req, res, next){
-
+    console.log(`START findJsonModelUnitById ${model_name}` )
     try{
         let modelid =  req.body.modelid;
         jsonModelUnit = await findJsonModelUnitById(modelid)
@@ -443,6 +444,8 @@ router.post('/findJsonModelUnitById',async function(req, res, next){
     }catch(error){
         console.log(error)
         res.send(error.toString())
+    }finally{
+        console.log(`End findJsonModelUnitById ${model_name}` )
     }
 
 });
