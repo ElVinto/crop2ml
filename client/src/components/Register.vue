@@ -96,6 +96,7 @@
         <p style="color:red;">
           {{registerErrorMsg}}
           try <a href="#/SignIn"> Sign In</a>
+          or <a href="#/Forget Password"> Forget Password</a>
         </p>
       </div>
   

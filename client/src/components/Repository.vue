@@ -238,14 +238,35 @@
                 v-for="(v,k) in selectedModel.Description"
                 v-bind:key="k"
               >
-                <div class="input-group-prepend" style="width:100%;" >
-                  <span class="input-group-text" >
-                    {{ k }}
-                  </span>
-                  <input class="form-control" v-model="selectedModel.Description[k]" :placeholder=v   >
+                <div v-if="k!=='Reference'">
+                  <div class="input-group-prepend" style="width:100%;" >
+                    <span class="input-group-text" >
+                      {{ k }}
+                    </span>
+                    <input class="form-control" v-model="selectedModel.Description[k]" :placeholder=v   >
+                  </div>
                 </div>
+
               </div>
+
+              <!-- Start Work in Progress -->
+              <div class="input-group-prepend" style="width:100%;" >
+                  <span class="input-group-text" >
+                     Abstract
+                  </span>
+                  <b-form-textarea id="textarea-plaintext"  :value="selectedModel.Description['Abstract']"></b-form-textarea>
+              </div>
+              <div class="input-group-prepend" style="width:100%;" >
+                  <span class="input-group-text" >
+                     Reference
+                  </span>
+                  <b-form-textarea id="textarea-plaintext"  :value="selectedModel.Description['Reference']"></b-form-textarea>
+              </div>
+              <!-- end Work in Progress -->
+
+
             </div>
+
 
           </div>
 
@@ -530,8 +551,11 @@
                 alt="User"
                 top>
             </b-card-img>
-
-
+            
+            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+                {{selectedModel.metaData.uploaderMail}}
+            </b-card-text>
+            
           </b-card>
         </div>
 
@@ -544,6 +568,10 @@
                 alt="Users"
                 top>
             </b-card-img>
+
+            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+                {{selectedModel.Attributs.version}}
+            </b-card-text>
 
           </b-card>
 
@@ -558,12 +586,6 @@
                 top>
             </b-card-img>
 
-            <div v-if="selectedModelId">
-                Community TODO 
-            </div>
-            <div v-else>
-            </div>
-
           </b-card>
 
         </div>
@@ -576,6 +598,15 @@
                 alt="Users"
                 top>
             </b-card-img>
+            
+            <div  v-if="selectedModelId">
+              <b-form-tags  class="modelInfoCardText text-capitalize" input-id="tags-basic" 
+                v-model="selectedModel.metaData.tags"
+                disabled placeholder="">
+              </b-form-tags>
+            </div>
+            
+
           </b-card>
         </div>
 
@@ -870,6 +901,13 @@ export default {
     selectModelById: function (modelid){
       this.selectedModelId = modelid;
       this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
+
+      console.log('this.selectedModelId')
+      console.log(this.selectedModelId)
+
+      console.log('this.selectedModel')
+      console.log(this.selectedModel)
+
     },
 
     showCurrentRating: function(rating) {
@@ -949,6 +987,10 @@ p{
 
 .myButtonStyle{
   width:100%;
+  font-size: 0.75em;
+}
+
+.modelInfoCardText{
   font-size: 0.75em;
 }
 

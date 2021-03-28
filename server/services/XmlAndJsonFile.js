@@ -1,6 +1,3 @@
-var uri = "mongodb://localhost:27017"
-var MONGODB_HOST = 'mongodb://localhost/test'
-
 var eyes = require('eyes');
 var https = require('https');
 
@@ -8,9 +5,7 @@ var fs = require('fs');
 var path = require('path');
 
 const lineReader = require('line-reader');
-
 var StringBuffer = require("stringbuffer");
-
 
 var xml2js = require('xml2js');
 

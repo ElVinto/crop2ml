@@ -1,6 +1,9 @@
 var mongodb = require('mongodb')
 require('dotenv').config()
 var MONGODB_URI = process.env.MONGODB_URI
+if(process.env.NODE_ENV==="development"){
+    MONGODB_URI = process.env.MONGODB_DEV_URI
+}
 
 class JsonModelDBServices{
 

@@ -48,7 +48,7 @@
             </p>
             
             <b-input-group style="padding-top: 1em; " prepend="Tags">
-              <b-form-tags
+              <b-form-tags class="text-capitalize"
                 v-model="tags"
                 separator=" ,;"
                 placeholder="Enter new tags separated by space, comma, semi-colon"

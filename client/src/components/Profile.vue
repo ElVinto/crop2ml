@@ -18,7 +18,7 @@
 
       <b-input-group prepend="First name" style="margin-top:1em">
         <b-form-input
-          :placeholder="firstName"
+          placeholder="(optional)"
           v-model="firstName"
           type="text"
         >
@@ -27,7 +27,7 @@
 
       <b-input-group prepend="Last name" style="margin-top:1em">
         <b-form-input
-          :placeholder="lastName"
+          placeholder="(optional)"
           v-model="lastName"
           type="text"
         >
@@ -36,7 +36,7 @@
 
       <b-input-group prepend="Pseudo" style="margin-top:1em">
         <b-form-input
-          :placeholder="pseudo"
+          placeholder="(optional)"
           v-model="pseudo"
           type="text"
         >

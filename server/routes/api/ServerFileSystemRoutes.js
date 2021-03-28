@@ -13,6 +13,9 @@ const directoryTree = require("directory-tree");
 var mongodb = require('mongodb')
 require('dotenv').config()
 var MONGODB_URI = process.env.MONGODB_URI
+if(process.env.NODE_ENV==="development"){
+    MONGODB_URI = process.env.MONGODB_DEV_URI
+}
 
 var eyes = require('eyes');
 var https = require('https');
@@ -68,8 +71,8 @@ router.post('/uploadZip',  async function(req, res, next) {
 
     
 
-    const oldpath = firstFile.path;
-    const zippath = './server/data/zip/' + firstFileName;
+    const oldpath = path.resolve(firstFile.path);
+    const zippath = path.resolve('./server/data/zip/' + firstFileName);
     await fs.rename(oldpath, zippath, async function (err) {
           if (err)
               throw err;
