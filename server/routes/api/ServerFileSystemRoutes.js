@@ -5,6 +5,7 @@ var path = require('path');
 var fs = require('fs');
 var unzipper = require('unzipper')
 var archiver = require('archiver');
+var mv = require('mv')
 
 const directoryTree = require("directory-tree");
 
@@ -73,7 +74,27 @@ router.post('/uploadZip',  async function(req, res, next) {
 
     const oldpath = path.resolve(firstFile.path);
     const zippath = path.resolve('./server/data/zip/' + firstFileName);
-    await fs.rename(oldpath, zippath, async function (err) {
+
+    // mv(oldpath, zippath, function(err) {
+    //     // done. it tried fs.rename first, and then falls back to
+    //     // piping the source file to the dest file and then unlinking
+    //     // the source file.
+
+    //     console.log(firstFile.path)
+    //     console.log(oldpath)
+    //     console.log(zippath)
+
+    //     if(err){
+    //         throw err 
+    //     }
+
+    //     console.log("file copied")
+    //   });
+
+
+
+    // await fs.rename(oldpath, zippath, async function (err) {
+    await mv(oldpath, zippath, async function(err) {  
           if (err)
               throw err;
 
@@ -118,18 +139,12 @@ router.post('/uploadZip',  async function(req, res, next) {
 
               res.send(JSON.parse(JSON.stringify(result)));
 
-              // TODO the package in json DB.
-
           } catch (error) {
               console.log(error)
               res.send(error.message);
           }
 
       });
-
-    
-
-    // res.json({ filename: firstFileName });
 
   });
      
