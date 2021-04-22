@@ -213,7 +213,7 @@
                 v-bind:key="k"
               >
                 <div class="input-group-prepend"  style="width:100%;" >
-                  <span class="input-group-text" id="basic-addon2">
+                  <span class="input-group-text">
                     {{ k }}
                   </span>
                   <input class="form-control" v-model="selectedModel.Attributs[k]" :placeholder=v  >
@@ -238,30 +238,27 @@
                 v-for="(v,k) in selectedModel.Description"
                 v-bind:key="k"
               >
-                <div v-if="k!=='Reference'">
-                  <div class="input-group-prepend" style="width:100%;" >
+                <!-- <div v-if="k!=='Abstract'"> -->
+                  <div v-if="k!=='Abstract'" class="input-group-prepend" style="width:100%;"  >
                     <span class="input-group-text" >
                       {{ k }}
                     </span>
-                    <input class="form-control" v-model="selectedModel.Description[k]" :placeholder=v   >
+                    <input class="form-control" v-model="selectedModel.Description[k]"   >
                   </div>
-                </div>
+                <!-- </div> -->
 
               </div>
 
               <!-- Start Work in Progress -->
-              <div class="input-group-prepend" style="width:100%;" >
-                  <span class="input-group-text" >
-                     Abstract
-                  </span>
-                  <b-form-textarea id="textarea-plaintext"  :value="selectedModel.Description['Abstract']"></b-form-textarea>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width:100%;" >
+                    <span class="input-group-text" >
+                      Abstract
+                    </span>
+                    <b-form-textarea id="textarea-plaintext"  v-model="selectedModel.Description['Abstract']"></b-form-textarea>
+                </div>
               </div>
-              <div class="input-group-prepend" style="width:100%;" >
-                  <span class="input-group-text" >
-                     Reference
-                  </span>
-                  <b-form-textarea id="textarea-plaintext"  :value="selectedModel.Description['Reference']"></b-form-textarea>
-              </div>
+              
               <!-- end Work in Progress -->
 
 
@@ -294,13 +291,13 @@
               </div>
 
               <!-- TODO updaload algorithm file  in -->
-              <div class="input-group mb-3">
+              <!-- <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text">Code</span>
                 </div>
                 <textarea class="form-control" aria-label="With textarea" placeholder= " TODO display the content of the algorithm file ">
                 </textarea>
-              </div>
+              </div> -->
 
              
 
@@ -313,26 +310,18 @@
             <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelInputs')" style="white-space:pre; width:100%;" > 
               {{formatLabel('ModelInputs')}} 
             </button>
-            <div v-if="expandedModelInputs">
-              <button type="button" class="btn btn-link" v-on:click="addModelInput()" style="text-align:left" > 
-                add input
-              </button>
-            </div>
-
 
             <br>
             <br>
             
             <div v-if="expandedModelInputs">
-
-              
-
+     
               <div id="InputList" 
                 class="input-group mb-3"
-                v-for="(inputObj,inputIdx) in selectedModel.Inputs[0].Input"
+                v-for="(inputObj,inputIdx) of selectedModel.Inputs.Input"
                 v-bind:key="inputIdx"
               >
-                <p>{{`${inputObj.Attributs.name}`}}</p>
+                <p>{{` Input ${inputIdx+1} : ${inputObj.Attributs.name}`}}</p>
 
                 <div id="InputObject" 
                   class="input-group mb-3"
@@ -344,12 +333,14 @@
                     <span class="input-group-text" id="basic-addon2">
                       {{ inputObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModel.Inputs[0].Input[inputIdx].Attributs[inputObjAttKey]" :placeholder=inputObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Inputs.Input[inputIdx].Attributs[inputObjAttKey]" :placeholder=inputObjAttVal  >
                   </div>
               
                 </div>
 
               </div>
+
+              <!-- // TODO handle one input -->
             </div>
 
           </div>
@@ -364,34 +355,55 @@
             <br>
             
             <div v-if="expandedModelOutputs">
-              <div id="OutputList" 
-                class="input-group mb-3"
-                v-for="(outputObj,outputIdx) in selectedModel.Outputs[0].Output"
-                v-bind:key="outputIdx"
-              >
-                <p>{{`${outputObj.Attributs.name}`}}</p>
 
-                <div id="OutputObject" 
+              <div v-if="selectedModel.Outputs.Output[0]">
+                <div id="OutputList" 
                   class="input-group mb-3"
-                  v-for="(outputObjAttVal,outputObjAttKey) in outputObj.Attributs"
-                  v-bind:key="outputObjAttKey"
+                  v-for="(outputObj, outputIdx) in selectedModel.Outputs.Output"
+                  v-bind:key="outputIdx"
                 >
-                    
-                  <div class="input-group-prepend"  style="width:100%;" >
-                    <span class="input-group-text" id="basic-addon2">
-                      {{ outputObjAttKey }}
-                    </span>
-                    <input class="form-control" v-model="selectedModel.Outputs[0].Output[outputIdx].Attributs[outputObjAttKey]" :placeholder=outputObjAttVal  >
+                  <p>{{`${outputObj.Attributs.name}`}}</p>
+
+                  <div id="OutputObject" 
+                    class="input-group mb-3"
+                    v-for="(outputObjAttVal,outputObjAttKey) in outputObj.Attributs"
+                    v-bind:key="outputObjAttKey"
+                  >
+                    <div class="input-group-prepend"  style="width:100%;" >
+                      <span class="input-group-text" id="basic-addon2">
+                        {{ outputObjAttKey }}
+                      </span>
+                      <input class="form-control" v-model="selectedModel.Outputs.Output[outputIdx].Attributs[outputObjAttKey]" :placeholder=outputObjAttVal  >
+                    </div>
+                
                   </div>
-              
+
                 </div>
+              </div>
+              <div v-if="selectedModel.Outputs.Output.Attributs">
+
+                  <p style="text-align: left;">{{` Output: ${selectedModel.Outputs.Output.Attributs.name}`}}</p>
+
+                  <div id="OutputObject" 
+                    class="input-group mb-3"
+                    v-for="(outputObjAttVal,outputObjAttKey) in selectedModel.Outputs.Output.Attributs"
+                    v-bind:key="outputObjAttKey"
+                  >
+                    <div class="input-group-prepend"  style="width:100%;" >
+                      <span class="input-group-text">
+                        {{ outputObjAttKey }}
+                      </span>
+                      <input class="form-control" v-model="selectedModel.Outputs.Output.Attributs[outputObjAttKey]" :placeholder=outputObjAttVal  >
+                    </div>
+                
+                  </div>
 
               </div>
+
             </div>
 
           </div>
 
-          <!-- TODO CHECK THE form -->
           <div id="ModelParametersets" > 
 
             <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelParametersets')" style="white-space:pre; width:100%;" > 
@@ -402,50 +414,72 @@
             <br>
             
             <div v-if="expandedModelParametersets">
-              <div id="ParametersetList" 
-                class="input-group mb-3"
-                v-for="(paramsetObj,paramsetIdx) in selectedModel.Parametersets[0].Parameterset"
-                v-bind:key="paramsetIdx"
-              >
-                <p>{{`${paramsetObj.Attributs.name}`}}</p>
+              
+              <div v-if="selectedModel.Parametersets.Parameterset[0]">
+                <div id="ParametersetList" 
+                  class="input-group mb-3"
+                  v-for="(paramsetObj,paramsetIdx) of selectedModel.Parametersets.Parameterset"
+                  v-bind:key="paramsetIdx"
+                >
+                  <p>{{`${paramsetObj.Attributs.name}`}}</p>
+
+                  <div id="ParametersetObject Attributs" 
+                    class="input-group mb-3"
+                    v-for="(paramsetObjAttVal,paramsetObjAttKey) in paramsetObj.Attributs"
+                    v-bind:key="paramsetObjAttKey"
+                  >
+                      
+                    <div class="input-group-prepend"  style="width:100%;" >
+                      <span class="input-group-text" >
+                        {{ paramsetObjAttKey }}
+                      </span>
+                      <input class="form-control" v-model="selectedModel.Parametersets.Parameterset[paramsetIdx].Attributs[paramsetObjAttKey]" :placeholder=paramsetObjAttVal  >
+                    </div>
+                
+                  </div>
+
+                  <p>Parametersets: </p>
+                  <div id="ParamObject" 
+                    class="input-group mb-3"
+                    v-for="(paramObjVal,paramObjKey) in paramsetObj.Param"
+                    v-bind:key="paramObjKey"
+                  >
+                      
+                    <div class="input-group-prepend"  style="width:100%;" >
+                      <span class="input-group-text" >
+                        {{ paramObjVal.Attributs.name }}
+                      </span>
+                      <input class="form-control" v-model="selectedModel.Parametersets.Parameterset[paramsetIdx].Param[paramObjKey]._" :placeholder=paramObjVal._ >
+                    </div>
+                
+                  </div>
+
+                </div>
+              </div>
+              <div v-if="selectedModel.Parametersets.Parameterset.Attributs">
+
+                <p style="text-align: left;">{{` Parameterset: ${selectedModel.Parametersets.Parameterset.Attributs.name}`}}</p>
 
                 <div id="ParametersetObject Attributs" 
-                  class="input-group mb-3"
-                  v-for="(paramsetObjAttVal,paramsetObjAttKey) in paramsetObj.Attributs"
-                  v-bind:key="paramsetObjAttKey"
-                >
-                    
-                  <div class="input-group-prepend"  style="width:100%;" >
-                    <span class="input-group-text" >
-                      {{ paramsetObjAttKey }}
-                    </span>
-                    <input class="form-control" v-model="selectedModel.Parametersets[0].Parameterset[paramsetIdx].Attributs[paramsetObjAttKey]" :placeholder=paramsetObjAttVal  >
+                    class="input-group mb-3"
+                    v-for="(paramsetObjAttVal,paramsetObjAttKey) in selectedModel.Parametersets.Parameterset.Attributs"
+                    v-bind:key="paramsetObjAttKey"
+                  >
+                      
+                    <div class="input-group-prepend"  style="width:100%;" >
+                      <span class="input-group-text" >
+                        {{ paramsetObjAttKey }}
+                      </span>
+                      <input class="form-control" v-model="selectedModel.Parametersets.Parameterset.Attributs[paramsetObjAttKey]" :placeholder=paramsetObjAttVal  >
+                    </div>
+                
                   </div>
-              
-                </div>
-
-                <p>Parameters: </p>
-                <div id="ParamObject" 
-                  class="input-group mb-3"
-                  v-for="(paramObjVal,paramObjKey) in paramsetObj.Param"
-                  v-bind:key="paramObjKey"
-                >
-                    
-                  <div class="input-group-prepend"  style="width:100%;" >
-                    <span class="input-group-text" >
-                      {{ paramObjVal.Attributs.name }}
-                    </span>
-                    <input class="form-control" v-model="selectedModel.Parametersets[0].Parameterset[paramsetIdx].Param[paramObjKey]._" :placeholder=paramObjVal._ >
-                  </div>
-              
-                </div>
-
               </div>
+
             </div>
 
           </div>
 
-          <!-- TODO -->
           <div id="ModelTestsets" > 
 
             <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelTestsets')" style="white-space:pre; width:100%;" > 
@@ -456,79 +490,148 @@
             <br>
             
             <div v-if="expandedModelTestsets">
-              <div id="TestsetList" 
-                class="input-group mb-3"
-                v-for="(testsetObj,testsetIdx) in selectedModel.Testsets[0].Testset"
-                v-bind:key="testsetIdx"
-              >
-                <p>{{`${testsetObj.Attributs.name}`}}</p>
-
-                <div id="TestsetObject Attributs" 
-                  class="input-group mb-3"
-                  v-for="(testsetObjAttVal,testsetObjAttKey) in testsetObj.Attributs"
-                  v-bind:key="testsetObjAttKey"
-                >
-                    
-                  <div class="input-group-prepend"  style="width:100%;" >
-                    <span class="input-group-text" >
-                      {{ testsetObjAttKey }}
-                    </span>
-                    <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Attributs[testsetObjAttKey]" :placeholder=testsetObjAttVal  >
-                  </div>
               
-                </div>
+              <div v-if="selectedModel.Testsets.Testset[0]">
 
-                <p>Tests: </p>
-                <div id="TestObject" 
+                <div id="TestsetList" 
                   class="input-group mb-3"
-                  v-for="(testObjVal,testObjKey) in testsetObj.Test"
-                  v-bind:key="testObjKey"
+                  v-for="(testsetObj,testsetIdx) of selectedModel.Testsets.Testset"
+                  v-bind:key="testsetIdx"
                 >
-                  Test
-                  <div class="input-group-prepend"  style="width:100%;" >
-                    <span class="input-group-text" >
-                      name
-                    </span>
-                    <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Test[testObjKey].Attributs.name" :placeholder=testObjVal.Attributs.name >
-                  </div>
                   
-                  <br>
-                  InputValues
-                  <div id="TestInputs" 
-                  class="input-group mb-3"
-                  v-for="(testInputObjVal,testInputObjKey) in testObjVal.InputValue"
-                  v-bind:key="testInputObjKey"
+                  <div id="TestsetObject Attributs" 
+                    class="input-group mb-3"
+                    v-for="(testsetObjAttVal,testsetObjAttKey) in testsetObj.Attributs"
+                    v-bind:key="testsetObjAttKey"
                   >
-                    
+                    <p>{{`Testset_${testsetObjAttKey+1}: ${testsetObj.Attributs.name}`}}</p>
+                      
                     <div class="input-group-prepend"  style="width:100%;" >
                       <span class="input-group-text" >
-                        {{testInputObjVal.Attributs.name}}
+                        {{ testsetObjAttKey }}
                       </span>
-                    <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Test[testObjKey].InputValue[testInputObjKey]._" :placeholder=testInputObjVal._ >
+                      <input class="form-control" v-model="selectedModel.Testsets.Testset[testsetIdx].Attributs[testsetObjAttKey]" :placeholder=testsetObjAttVal  >
                     </div>
+                
                   </div>
 
-                  OutputValues
-                  <div id="TestInputs" 
-                  class="input-group mb-3"
-                  v-for="(testOutputObjVal,testOutputObjKey) in testObjVal.OutputValue"
-                  v-bind:key="testOutputObjKey"
+                  <p>Tests: </p>
+                  <div id="TestObject" 
+                    class="input-group mb-3"
+                    v-for="(testObjVal,testObjKey) in testsetObj.Test"
+                    v-bind:key="testObjKey"
                   >
-                    
+                    Test
                     <div class="input-group-prepend"  style="width:100%;" >
                       <span class="input-group-text" >
-                        {{testOutputObjVal.Attributs.name}}
+                        name
                       </span>
-                      <input class="form-control" v-model="selectedModel.Testsets[0].Testset[testsetIdx].Test[testObjKey].OutputValue[testOutputObjKey]._" :placeholder=testOutputObjVal._ >
+                      <input class="form-control" v-model="selectedModel.Testsets.Testset[testsetIdx].Test[testObjKey].Attributs.name" :placeholder=testObjVal.Attributs.name >
+                    </div>
+                    
+                    <br>
+                    InputValues
+                    <div id="TestInputs" 
+                    class="input-group mb-3"
+                    v-for="(testInputObjVal,testInputObjKey) in testObjVal.InputValue"
+                    v-bind:key="testInputObjKey"
+                    >
+                      
+                      <div class="input-group-prepend"  style="width:100%;" >
+                        <span class="input-group-text" >
+                          {{testInputObjVal.Attributs.name}}
+                        </span>
+                      <input class="form-control" v-model="selectedModel.Testsets.Testset[testsetIdx].Test[testObjKey].InputValue[testInputObjKey]._" :placeholder=testInputObjVal._ >
+                      </div>
                     </div>
 
+                    OutputValues
+                    <div id="TestInputs" 
+                    class="input-group mb-3"
+                    v-for="(testOutputObjVal,testOutputObjKey) in testObjVal.OutputValue"
+                    v-bind:key="testOutputObjKey"
+                    >
+                      
+                      <div class="input-group-prepend"  style="width:100%;" >
+                        <span class="input-group-text" >
+                          {{testOutputObjVal.Attributs.name}}
+                        </span>
+                        <input class="form-control" v-model="selectedModel.Testsets.Testset[testsetIdx].Test[testObjKey].OutputValue[testOutputObjKey]._" :placeholder=testOutputObjVal._ >
+                      </div>
+
+                    </div>
+
+
+                
                   </div>
 
-
-              
                 </div>
+              </div>
+              <div v-if="selectedModel.Testsets.Testset.Attributs">
+                
+                  <p style="text-align:left">{{`TestSet: ${selectedModel.Testsets.Testset.Attributs.name}`}}</p>
+
+                  <div id="TestsetObject Attributs" 
+                    class="input-group mb-3"
+                    v-for="(testsetObjAttVal,testsetObjAttKey) in selectedModel.Testsets.Testset.Attributs"
+                    v-bind:key="testsetObjAttKey"
+                  >
+                      
+                    <div class="input-group-prepend"  style="width:100%;" >
+                      <span class="input-group-text" >
+                        {{ testsetObjAttKey }}
+                      </span>
+                      <input class="form-control" v-model="selectedModel.Testsets.Testset.Attributs[testsetObjAttKey]" :placeholder=testsetObjAttVal  >
+                    </div>
+                
+                  </div>
+
+
+                    <div class="input-group-prepend"  style="width:100%;" >
+                      <span class="input-group-text" >
+                        Test name
+                      </span>
+                      <input class="form-control" v-model="selectedModel.Testsets.Testset.Test.Attributs.name" >
+                    </div>
+                    
+                    <br>
+                    Input Values
+                    <div id="TestInputs" 
+                    class="input-group mb-3"
+                    v-for="(testInputObjVal,testInputObjKey) in selectedModel.Testsets.Testset.Test.InputValue"
+                    v-bind:key="testInputObjKey"
+                    >
+                      
+                      <div class="input-group-prepend"  style="width:100%;" >
+                        <span class="input-group-text" >
+                          {{testInputObjVal.Attributs.name}}
+                        </span>
+                      <input class="form-control" v-model="selectedModel.Testsets.Testset.Test.InputValue[testInputObjKey]._" :placeholder=testInputObjVal._ >
+                      </div>
+
+                    </div>
+
+                    <div>
+                      OutputValues
+                      <div id="TestInputs" 
+                      class="input-group mb-3"
+                      v-for="(testOutputObjVal,testOutputObjKey) in testObjVal.OutputValue"
+                      v-bind:key="testOutputObjKey"
+                      >
+                        
+                        <div class="input-group-prepend"  style="width:100%;" >
+                          <span class="input-group-text" >
+                            {{testOutputObjVal.Attributs.name}}
+                          </span>
+                          <input class="form-control" v-model="selectedModel.Testsets.Testset[testsetIdx].Test[testObjKey].OutputValue[testOutputObjKey]._" :placeholder=testOutputObjVal._ >
+                        </div>
+
+                      </div>
+                    </div>
 
               </div>
+
+
             </div>
 
           </div>

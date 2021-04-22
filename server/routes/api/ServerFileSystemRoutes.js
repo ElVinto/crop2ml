@@ -142,7 +142,7 @@ router.post('/uploadZip',  async function(req, res, next) {
           } catch (error) {
               console.log(error)
               res.send(error.message);
-          }
+        }
 
       });
 
