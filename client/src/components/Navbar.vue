@@ -24,7 +24,7 @@
           <b-dropdown-item href="#/Repository">Repository</b-dropdown-item>
           <b-dropdown-item href="#/Submit">Submit</b-dropdown-item>
           <b-dropdown-item href="#">Create</b-dropdown-item>
-          <b-dropdown-item href="#">Communities</b-dropdown-item>
+          <b-dropdown-item href="#/Communities">Communities</b-dropdown-item>
         </b-nav-item-dropdown>
 
         <b-nav-item-dropdown text="Tools" >

@@ -6,6 +6,8 @@ import Catalog from '../components/Catalog';
 import Repository from '../components/Repository';
 import Submit from '../components/Submit';
 
+import LegalMentions from '../components/LegalMentions.vue';
+
 import SignIn from '../components/SignIn';
 import SignOut from '../components/SignOut';
 import Register from '../components/Register';
@@ -13,8 +15,10 @@ import Profile from '../components/Profile';
 import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
 
+import Communities from '../components/Communities';
 
-import LegalMentions from '../components/LegalMentions.vue';
+
+
 
 Vue.use(Router)
 
@@ -85,6 +89,12 @@ export default new Router({
       path: '/ResetPassword',
       name: 'ResetPassword',
       component: ResetPassword
+    },
+
+    {
+      path: '/Communities',
+      name: 'Communities',
+      component: Communities
     },
 
   ]
