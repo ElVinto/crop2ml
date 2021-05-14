@@ -141,13 +141,13 @@
       <div id="modelContent"   class="col-lg-7"  >
         <div v-if="selectedModelId">
 
-          <div id="modelIdAndActions" class="row">
+          <!-- <div id="modelIdAndActions" class="row">
             <div class="col-md-12">
               <h2 style="text-align:center;">{{ `${selectedModelId}`}} </h2>
             </div>
-          </div >
+          </div > -->
 
-          <div id="Actions" class="row">
+          <!-- <div id="Actions" class="row">
             <div class="col-md-4">
                 <div @mouseleave="showCurrentRating(0)" style="display:inline-block;">
                     <star-rating :show-rating="false" @current-rating="showCurrentRating" @rating-selected="setCurrentSelectedRating" :increment="0.5"></star-rating>
@@ -182,7 +182,7 @@
 
             </div >
 
-          </div>
+          </div> -->
 
           <div id="modelId" v-if="errorMsg" class="row">
             <div class="col-md-12">
@@ -192,408 +192,435 @@
 
           <br>
 
-          <div id="ModelAttributs" > 
+          <model-preview :selectedModel="selectedModel"></model-preview>
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelAttributs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelAttributs')}} 
+          
+
+          <div id="ModelDetails">
+            
+            
+            <button type="button" class="btn btn-outline-secondary" v-on:click="flip('expandedModelDetails')" style=" float:right; white-space:pre; width:30%;" > 
+              {{formatLabel('ModelDetails')}} 
             </button>
 
-            <br>
-            <br>
-            
-            <div v-if="expandedModelAttributs">
-              <div id="AttributList" 
-                class="input-group mb-3"
-                v-for="(v,k) in selectedModel.Attributs"
-                v-bind:key="k"
-              >
-                <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                  <span class="input-group-text">
-                    {{ k }}
-                  </span>
-                  <span class="form-control"  > 
-                    {{ selectedModel.Attributs[k] }}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <div v-if="expandedModelDetails">
 
-          </div> 
+             <br>
+             <br>
+          
 
-          <div id="Description" >
+              <div id="ModelAttributs" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedDescription')" style="white-space: pre; width:100%;" > 
-              {{formatLabel('Description')}} 
-            </button>
+                <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelAttributs')" style="white-space:pre; width:100%;" > 
+                  {{formatLabel('ModelAttributs')}} 
+                </button>
 
-            <br>
-            <br>
-            
-            <div v-if="expandedDescription">
-              <div id="DescriptionList" 
-                class="input-group mb-3"
-                v-for="(v,k) in selectedModel.Description"
-                v-bind:key="k"
-              >
+                <br>
+                <br>
                 
-                  <div  class="input-group-prepend" style="width:100%; text-align:left; overflow:scroll;"  >
-
-                    <span class="input-group-text" >
-                      {{ k }}
-                    </span>
-                    <!-- <input class="form-control" v-model="selectedModel.Descriptin[k]"   > -->
-                    <span class="form-control">
-                      {{selectedModel.Description[k]}}
-                    </span>
-
-                  </div>
                 
-
-              </div>
-
-              
-              <!-- <div class="input-group mb-3" style="overflow:scroll">
-                <div class="input-group-prepend" style="width:100%; text-align:left; overflow:scroll">
-                    <span class="input-group-text" >
-                      Abstract
-                    </span>
-                    <textarea class="form-control"  disabled v-model="selectedModel.Description['Abstract']" id="textarea-plaintext" rows=3></textarea>
-                </div>
-              </div> -->
-              
-            </div>
-
-          </div>
-
-          <div id="Algorithm" >
-
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedAlgorithm')" style="white-space: pre; width:100%;" > 
-              {{formatLabel('Algorithm')}} 
-            </button>
-
-            <br>
-            <br>
-            
-            <div v-if="expandedAlgorithm">
-              <div id="AlgorithmAttributList" 
-                class="input-group mb-3"
-                v-for="(v,k) in selectedModel.Algorithm.Attributs"
-                v-bind:key="k"
-              >
-                <div class="input-group-prepend" style="width:100%; text-align:left; overflow:scroll;"  >
-                  <span class="input-group-text" >
-                    {{ k }}
-                  </span>
-                  <span class="form-control">
-                    {{ selectedModel.Algorithm.Attributs[k]}}
-                  </span> 
-                </div>
-              </div>
-
-              <!-- TODO updaload algorithm file  in -->
-              <!-- <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Code</span>
-                </div>
-                <textarea class="form-control" aria-label="With textarea" placeholder= " TODO display the content of the algorithm file ">
-                </textarea>
-              </div> -->
-
-             
-
-            </div>
-
-          </div>
-
-          <div id="ModelInputs" > 
-
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelInputs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelInputs')}} 
-            </button>
-
-            <br>
-            <br>
-            
-            <!-- // TODO handle one input the following code handle Several an array of Input-->
-            <div v-if="expandedModelInputs">
-     
-              <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
-
-                <b-card id="InputList" 
-                  class="input-group mb-3"
-                  v-for="(inputObj,inputIdx) of selectedModel.Inputs.Input"
-                  v-bind:key="inputIdx"
-                >
-                  <p style="text-align:left;"> {{` Input: ${inputObj.Attributs.name}`}}</p>
-
-                  <div id="InputObject" 
+                <div v-if="expandedModelAttributs">
+                  <div id="AttributList" 
                     class="input-group mb-3"
-                    v-for="(inputObjAttVal,inputObjAttKey) in inputObj.Attributs"
-                    v-bind:key="inputObjAttKey"
-                  >
-                      
-                    <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                      <span class="input-group-text" id="basic-addon2">
-                        {{ inputObjAttKey }}
-                      </span>
-                      <span class="form-control">
-                        {{inputObj.Attributs[inputObjAttKey]}}
-                      </span> 
-                    </div>
-                
-                  </div>
-
-                </b-card>
-
-              </div>
-
-              
-            </div>
-
-          </div>
-        
-
-
-          <div id="ModelOutputs" > 
-
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelOutputs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelOutputs')}} 
-            </button>
-
-            <br>
-            <br>
-            
-            <div v-if="expandedModelOutputs">
-
-              <div v-if="toArrayIfNeeded(selectedModel.Outputs.Output)">
-                
-                <b-card id="OutputList" 
-                  class="input-group mb-3"
-                  v-for="(outputObj, outputIdx) in toArrayIfNeeded(selectedModel.Outputs.Output)"
-                  v-bind:key="outputIdx"
-                >
-                  <p style="text-align:left;">{{`Output: ${outputObj.Attributs.name}`}}</p>
-
-                  <div id="OutputObject" 
-                    class="input-group mb-3"
-                    v-for="(outputObjAttVal,outputObjAttKey) in outputObj.Attributs"
-                    v-bind:key="outputObjAttKey"
+                    v-for="(v,k) in selectedModel.Attributs"
+                    v-bind:key="k"
                   >
                     <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                      <span class="input-group-text" v-bind:id="{ 'output': outputIdx }">
-                        {{ outputObjAttKey }}
+                      <span class="input-group-text">
+                        {{ k }}
                       </span>
-                      <span class="form-control">
-                         {{outputObj.Attributs[outputObjAttKey]}}
+                      <span class="form-control"  > 
+                        {{ selectedModel.Attributs[k] }}
                       </span>
                     </div>
-                
                   </div>
+                </div>
 
-                </b-card>
-              </div>
+              </div> 
 
-            </div>
+              <div id="Description" >
 
-          </div>
+                <button type="button" class="btn btn-secondary" v-on:click="flip('expandedDescription')" style="white-space: pre; width:100%;" > 
+                  {{formatLabel('Description')}} 
+                </button>
 
-          <div id="ModelParametersets" > 
-
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelParametersets')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelParametersets')}} 
-            </button>
-
-            <br>
-            <br>
-            
-            <div v-if="expandedModelParametersets">
-              
-              <div v-if="toArrayIfNeeded(selectedModel.Parametersets.Parameterset)">
-
-                <b-card  id="ParametersetList" 
-                  class="input-group mb-3"
-                  v-for="(paramsetObj,paramsetIdx) of toArrayIfNeeded(selectedModel.Parametersets.Parameterset)"
-                  v-bind:key="paramsetIdx"
-                >
-                  <p style="text-align:left">{{`Parameterset: ${paramsetObj.Attributs.name}`}}</p>
-
-                  <div id="ParametersetObject Attributs" 
+                <br>
+                <br>
+                
+                <div v-if="expandedDescription">
+                  <div id="DescriptionList" 
                     class="input-group mb-3"
-                    v-for="(paramsetObjAttVal,paramsetObjAttKey) in paramsetObj.Attributs"
-                    v-bind:key="paramsetObjAttKey"
+                    v-for="(v,k) in selectedModel.Description"
+                    v-bind:key="k"
                   >
-                      
-                    <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                      <span class="input-group-text" >
-                        {{ paramsetObjAttKey }}
-                      </span>
-                      <span class="form-control">
-                        {{ paramsetObj.Attributs[paramsetObjAttKey]}}
-                      </span>
-                    </div>
-                
-                  </div>
-
-                  <p style="text-align:left">  Parameters: </p>
-                  
-                  <b-card>
-                  <div id="ParamObject" 
-                    class="input-group mb-3"
                     
-                    v-for="(paramObjVal,paramObjKey) in paramsetObj.Param"
-                    v-bind:key="paramObjKey"
-                  >
-                      
-                    <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                      <span class="input-group-text" >
-                        {{ paramObjVal.Attributs.name }}
-                      </span>
-                      <span class="form-control">
-                        {{ paramObjVal._}}
-                      </span>  
-                    </div>
-                
-                  </div>
-                  </b-card>
+                      <div  class="input-group-prepend" style="width:100%; text-align:left; overflow:scroll;"  >
 
-                </b-card>
-
-              </div>
-
-              <!-- <div v-if="selectedModel.Parametersets.Parameterset.Attributs">
-
-                <p style="text-align: left;">{{` Parameterset: ${selectedModel.Parametersets.Parameterset.Attributs.name}`}}</p>
-
-                <div id="ParametersetObject Attributs" 
-                    class="input-group mb-3"
-                    v-for="(paramsetObjAttVal,paramsetObjAttKey) in selectedModel.Parametersets.Parameterset.Attributs"
-                    v-bind:key="paramsetObjAttKey"
-                  >
-                      
-                    <div class="input-group-prepend"  style="width:100%;" >
-                      <span class="input-group-text" >
-                        {{ paramsetObjAttKey }}
-                      </span>
-                      <span class="form-control">
-                        {{selectedModel.Parametersets.Parameterset.Attributs[paramsetObjAttKey]}}
-                      </span> 
-                    </div>
-                
-                  </div>
-              </div> -->
-
-            </div>
-
-          </div>
-
-          <div id="ModelTestsets" > 
-
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelTestsets')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelTestsets')}} 
-            </button>
-
-            <br>
-            <br>
-            
-            <div v-if="expandedModelTestsets">
-
-              <div v-if="toArrayIfNeeded(selectedModel.Testsets.Testset)">
-
-                <b-card id="TestsetList" 
-                  class="input-group mb-3"
-                  v-for="(testsetObj,testsetIdx) of toArrayIfNeeded(selectedModel.Testsets.Testset)"
-                  v-bind:key="testsetIdx"
-                >
-                
-                  <p style="text-align:left">{{`Testset: ${testsetObj.Attributs.name}`}}</p>
-
-
-                  <div id="TestsetObject Attributs" 
-                    class="input-group mb-3"
-                    v-for="(testsetObjAttVal,testsetObjAttKey) in testsetObj.Attributs"
-                    v-bind:key="testsetObjAttKey"
-                  >
-                      
-                    <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                      <span class="input-group-text" >
-                        {{ testsetObjAttKey }}
-                      </span>
-                      
-                      <span class="form-control">
-                        {{testsetObjAttVal}}
-                      </span> 
-                    </div>
-                
-                  </div>
-
-                  <p style="text-align:left">{{`Tests: `}}</p>
-                  <b-card style="width: 100%;"
-                     id="Test" 
-                    class="input-group mb-3"
-                    v-for="(testObj,testObjKey) of toArrayIfNeeded(testsetObj.Test)"
-                    v-bind:key="testObjKey"
-                  >
-
-                    <p style="text-align:left">{{`Test name: ${testObj.Attributs.name}`}}</p>
-                    
-
-                    <div v-if="toArrayIfNeeded(testObj.InputValue)">
-                      <p style="text-align:left"> Input values: </p>
-                      
-                      <div id="TestInputs" 
-                      class="input-group mb-3"
-                      v-for="(testObjInputVal,testInputObjKey) of toArrayIfNeeded(testObj.InputValue)"
-                      v-bind:key="testInputObjKey"
-                      >
-                        
-                        <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                          <span class="input-group-text" >
-                            {{testObjInputVal.Attributs.name}}
-                          </span>
-                        <span class="form-control" >
-                          {{testObjInputVal._}}
+                        <span class="input-group-text" >
+                          {{ k }}
                         </span>
-                        </div>
+                        <!-- <input class="form-control" v-model="selectedModel.Descriptin[k]"   > -->
+                        <span class="form-control">
+                          {{selectedModel.Description[k]}}
+                        </span>
 
                       </div>
-                    </div>
-
-
-                    <br>
-
-                    <div v-if="toArrayIfNeeded(testObj.OutputValue)">
-                      <p style="text-align:left"> Output values: </p>
-                      
-                      <div id="TestOutputs" 
-                      class="input-group mb-3"
-                      v-for="(testObjOutputVal,testOutputObjKey) of toArrayIfNeeded(testObj.OutputValue)"
-                      v-bind:key="testOutputObjKey"
-                      >
-                        
-                        <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                          <span class="input-group-text" >
-                            {{testObjOutputVal.Attributs.name}}
-                          </span>
-                        <span class="form-control" >
-                          {{testObjOutputVal._}}
-                        </span> 
-                        </div>
-
-                      </div>
-                    </div>
-
                     
-                
- 
-                  </b-card>
 
-                </b-card>
+                  </div>
+
+                  
+                  <!-- <div class="input-group mb-3" style="overflow:scroll">
+                    <div class="input-group-prepend" style="width:100%; text-align:left; overflow:scroll">
+                        <span class="input-group-text" >
+                          Abstract
+                        </span>
+                        <textarea class="form-control"  disabled v-model="selectedModel.Description['Abstract']" id="textarea-plaintext" rows=3></textarea>
+                    </div>
+                  </div> -->
+                  
+                </div>
 
               </div>
 
+              <div id="Algorithm" >
+
+                <button type="button" class="btn btn-secondary" v-on:click="flip('expandedAlgorithm')" style="white-space: pre; width:100%;" > 
+                  {{formatLabel('Algorithm')}} 
+                </button>
+
+                <br>
+                <br>
+                
+                <div v-if="expandedAlgorithm">
+                  <div id="AlgorithmAttributList" 
+                    class="input-group mb-3"
+                    v-for="(v,k) in selectedModel.Algorithm.Attributs"
+                    v-bind:key="k"
+                  >
+                    <div class="input-group-prepend" style="width:100%; text-align:left; overflow:scroll;"  >
+                      <span class="input-group-text" >
+                        {{ k }}
+                      </span>
+                      <span class="form-control">
+                        {{ selectedModel.Algorithm.Attributs[k]}}
+                      </span> 
+                    </div>
+                  </div>
+
+                  <!-- TODO updaload algorithm file  in -->
+                  <!-- <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Code</span>
+                    </div>
+                    <textarea class="form-control" aria-label="With textarea" placeholder= " TODO display the content of the algorithm file ">
+                    </textarea>
+                  </div> -->
+
+                
+
+                </div>
+
+              </div>
+
+              <div id="ModelInputs" > 
+
+                <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelInputs')" style="white-space:pre; width:100%;" > 
+                  {{formatLabel('ModelInputs')}} 
+                </button>
+
+                <br>
+                <br>
+                
+                <div v-if="expandedModelInputs">
+        
+                  <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
+
+                    <!-- Display inputs in a table  -->
+
+                    <b-table class="myTableCell" :responsive="'lg'" :no-border-collapse="true" :small="true" :fixed="true" :striped="true" :hover="true" :items="toItems(selectedModel.Inputs.Input)"></b-table>
+
+                    <!-- Display inputs in an list -->
+
+                    <!-- <b-card id="InputList" 
+                      class="input-group mb-3"
+                      v-for="(inputObj,inputIdx) of toArrayIfNeeded(selectedModel.Inputs.Input)"
+                      v-bind:key="inputIdx"
+                    >
+                      <p style="text-align:left;"> {{` Input: ${inputObj.Attributs.name}`}}</p>
+
+                      <div id="InputObject" 
+                        class="input-group mb-3"
+                        v-for="(inputObjAttVal,inputObjAttKey) in inputObj.Attributs"
+                        v-bind:key="inputObjAttKey"
+                      >
+                          
+                        <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
+                          <span class="input-group-text">
+                            {{ inputObjAttKey }}
+                          </span>
+                          <span class="form-control">
+                            {{inputObj.Attributs[inputObjAttKey]}}
+                          </span> 
+                        </div>
+                    
+                      </div>
+
+                    </b-card> -->
+
+
+                  </div>
+
+                  
+                </div>
+
+              </div>
+            
+              <div id="ModelOutputs" > 
+
+                <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelOutputs')" style="white-space:pre; width:100%;" > 
+                  {{formatLabel('ModelOutputs')}} 
+                </button>
+
+                <br>
+                <br>
+                
+                <div v-if="expandedModelOutputs">
+
+                  <b-table class="myTableCell" :responsive="'lg'" :no-border-collapse="true" :small="true" :fixed="true" :striped="true" :hover="true" :items="toItems(selectedModel.Outputs.Output)"></b-table>
+
+                  <!-- <div v-if="toArrayIfNeeded(selectedModel.Outputs.Output)">
+                    
+                    <b-card id="OutputList" 
+                      class="input-group mb-3"
+                      v-for="(outputObj, outputIdx) in toArrayIfNeeded(selectedModel.Outputs.Output)"
+                      v-bind:key="outputIdx"
+                    >
+                      <p style="text-align:left;">{{`Output: ${outputObj.Attributs.name}`}}</p>
+
+                      <div id="OutputObject" 
+                        class="input-group mb-3"
+                        v-for="(outputObjAttVal,outputObjAttKey) in outputObj.Attributs"
+                        v-bind:key="outputObjAttKey"
+                      >
+                        <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
+                          <span class="input-group-text" v-bind:id="{ 'output': outputIdx }">
+                            {{ outputObjAttKey }}
+                          </span>
+                          <span class="form-control">
+                            {{outputObj.Attributs[outputObjAttKey]}}
+                          </span>
+                        </div>
+                    
+                      </div>
+
+                    </b-card>
+                  </div> -->
+
+                </div>
+
+              </div>
+
+              <div id="ModelParametersets" > 
+
+                <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelParametersets')" style="white-space:pre; width:100%;" > 
+                  {{formatLabel('ModelParametersets')}} 
+                </button>
+
+                <br>
+                <br>
+                
+                <div v-if="expandedModelParametersets">
+                  
+                  <div v-if="toArrayIfNeeded(selectedModel.Parametersets.Parameterset)">
+
+                    <b-card  id="ParametersetList" 
+                      class="input-group mb-3"
+                      v-for="(paramsetObj,paramsetIdx) of toArrayIfNeeded(selectedModel.Parametersets.Parameterset)"
+                      v-bind:key="paramsetIdx"
+                    >
+                      <p style="text-align:left">{{`Parameterset: ${paramsetObj.Attributs.name}`}}</p>
+
+                      <div id="ParametersetObject Attributs" 
+                        class="input-group mb-3"
+                        v-for="(paramsetObjAttVal,paramsetObjAttKey) in paramsetObj.Attributs"
+                        v-bind:key="paramsetObjAttKey"
+                      >
+                          
+                        <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
+                          <span class="input-group-text" >
+                            {{ paramsetObjAttKey }}
+                          </span>
+                          <span class="form-control">
+                            {{ paramsetObj.Attributs[paramsetObjAttKey]}}
+                          </span>
+                        </div>
+                    
+                      </div>
+
+                      <p style="text-align:left">  Parameters: </p>
+                      
+                      <b-card>
+                      <div id="ParamObject" 
+                        class="input-group mb-3"
+                        
+                        v-for="(paramObjVal,paramObjKey) in paramsetObj.Param"
+                        v-bind:key="paramObjKey"
+                      >
+                          
+                        <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
+                          <span class="input-group-text" >
+                            {{ paramObjVal.Attributs.name }}
+                          </span>
+                          <span class="form-control">
+                            {{ paramObjVal._}}
+                          </span>  
+                        </div>
+                    
+                      </div>
+                      </b-card>
+
+                    </b-card>
+
+                  </div>
+
+                  <!-- <div v-if="selectedModel.Parametersets.Parameterset.Attributs">
+
+                    <p style="text-align: left;">{{` Parameterset: ${selectedModel.Parametersets.Parameterset.Attributs.name}`}}</p>
+
+                    <div id="ParametersetObject Attributs" 
+                        class="input-group mb-3"
+                        v-for="(paramsetObjAttVal,paramsetObjAttKey) in selectedModel.Parametersets.Parameterset.Attributs"
+                        v-bind:key="paramsetObjAttKey"
+                      >
+                          
+                        <div class="input-group-prepend"  style="width:100%;" >
+                          <span class="input-group-text" >
+                            {{ paramsetObjAttKey }}
+                          </span>
+                          <span class="form-control">
+                            {{selectedModel.Parametersets.Parameterset.Attributs[paramsetObjAttKey]}}
+                          </span> 
+                        </div>
+                    
+                      </div>
+                  </div> -->
+
+                </div>
+
+              </div>
+
+              <div id="ModelTestsets" > 
+
+                <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelTestsets')" style="white-space:pre; width:100%;" > 
+                  {{formatLabel('ModelTestsets')}} 
+                </button>
+
+                <br>
+                <br>
+                
+                <div v-if="expandedModelTestsets">
+
+                  <div v-if="toArrayIfNeeded(selectedModel.Testsets.Testset)">
+
+                    <b-card id="TestsetList" 
+                      class="input-group mb-3"
+                      v-for="(testsetObj,testsetIdx) of toArrayIfNeeded(selectedModel.Testsets.Testset)"
+                      v-bind:key="testsetIdx"
+                    >
+                    
+                      <p style="text-align:left">{{`Testset: ${testsetObj.Attributs.name}`}}</p>
+
+
+                      <div id="TestsetObject Attributs" 
+                        class="input-group mb-3"
+                        v-for="(testsetObjAttVal,testsetObjAttKey) in testsetObj.Attributs"
+                        v-bind:key="testsetObjAttKey"
+                      >
+                          
+                        <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
+                          <span class="input-group-text" >
+                            {{ testsetObjAttKey }}
+                          </span>
+                          
+                          <span class="form-control">
+                            {{testsetObjAttVal}}
+                          </span> 
+                        </div>
+                    
+                      </div>
+
+                      <p style="text-align:left">{{`Tests: `}}</p>
+                      <b-card style="width: 100%;"
+                        id="Test" 
+                        class="input-group mb-3"
+                        v-for="(testObj,testObjKey) of toArrayIfNeeded(testsetObj.Test)"
+                        v-bind:key="testObjKey"
+                      >
+
+                        <p style="text-align:left">{{`Test name: ${testObj.Attributs.name}`}}</p>
+                        
+
+                        <div v-if="toArrayIfNeeded(testObj.InputValue)">
+                          <p style="text-align:left"> Input values: </p>
+                          
+                          <div id="TestInputs" 
+                          class="input-group mb-3"
+                          v-for="(testObjInputVal,testInputObjKey) of toArrayIfNeeded(testObj.InputValue)"
+                          v-bind:key="testInputObjKey"
+                          >
+                            
+                            <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
+                              <span class="input-group-text" >
+                                {{testObjInputVal.Attributs.name}}
+                              </span>
+                            <span class="form-control" >
+                              {{testObjInputVal._}}
+                            </span>
+                            </div>
+
+                          </div>
+                        </div>
+
+
+                        <br>
+
+                        <div v-if="toArrayIfNeeded(testObj.OutputValue)">
+                          <p style="text-align:left"> Output values: </p>
+                          
+                          <div id="TestOutputs" 
+                          class="input-group mb-3"
+                          v-for="(testObjOutputVal,testOutputObjKey) of toArrayIfNeeded(testObj.OutputValue)"
+                          v-bind:key="testOutputObjKey"
+                          >
+                            
+                            <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
+                              <span class="input-group-text" >
+                                {{testObjOutputVal.Attributs.name}}
+                              </span>
+                            <span class="form-control" >
+                              {{testObjOutputVal._}}
+                            </span> 
+                            </div>
+
+                          </div>
+                        </div>
+
+                        
+                    
+    
+                      </b-card>
+
+                    </b-card>
+
+                  </div>
+
+
+                </div>
+
+              </div>
 
             </div>
-
           </div>
 
         </div>
@@ -697,19 +724,20 @@
 <script>
 
 import { bTreeView } from 'bootstrap-vue-treeview'
-import StarRating from 'vue-star-rating'
+// import StarRating from 'vue-star-rating'
 
 import ClientServerJsonModel from "../services/ClientServerJsonModel"
 
-
+import ModelPreview from './ModelPreview'
 
 
 export default {
   name: 'Catalog',
 
   components: {
-    StarRating,
-    bTreeView
+    // StarRating,
+    bTreeView,
+    ModelPreview,
   },
 
   data() {
@@ -728,6 +756,8 @@ export default {
       selectedModel:{},
 
       modelUnitSchema :{},
+
+      expandedModelDetails: false,
 
       expandedModelAttributs :false,
       
@@ -840,14 +870,21 @@ export default {
 
     toArrayIfNeeded(obj){
       
-      console.log("toArrayIfNeeded") 
 
       if(obj instanceof Array ){
-        
         return obj
       }else{ 
         return [obj]
       }
+    },
+
+    toItems(input_or_output){
+      let array_of_obj = this.toArrayIfNeeded(input_or_output);
+      let items = [];
+      for(let obj of array_of_obj){
+        items.push(obj.Attributs)
+      }
+      return items;
     },
 
     
@@ -948,6 +985,10 @@ export default {
 
       switch (paramName) {
 
+        case 'ModelDetails': 
+          return `${this.sign(this.expandedModelDetails)} Details` ;
+        
+
         case 'ModelAttributs': 
           return `${this.sign(this.expandedModelAttributs)} Attributs` ;
         
@@ -1029,7 +1070,7 @@ p{
 }
 
 #modelSearch{
-  /* padding: 20px; */
+
 }
 
 #myDisabledInput{
@@ -1061,6 +1102,14 @@ p{
 
 }
 
+.myTableCell{
+   width: 100%; 
+  /* white-space: nowrap; */
+  overflow: scroll;
+  /* text-overflow: scroll;  */
+  font-size: 0.75em;
+  
+}
 
 
 .info-frame{
