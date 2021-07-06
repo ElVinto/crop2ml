@@ -18,7 +18,6 @@ class DirTree{
         return directoryTree(path)
     }
 
-
     static getDirTree(path){
         return this.createDirTree(path)
     }

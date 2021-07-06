@@ -139,6 +139,7 @@ class JsonModelDBServices{
         }) 
     }
 
+
     static async findAllModels(){
         
         return new Promise(async (resolve, reject) => {
@@ -174,6 +175,51 @@ class JsonModelDBServices{
             }
         }) 
     }
+
+    static async findAllModelPackageNames(){
+        
+        return new Promise(async (resolve, reject) => {
+            try{
+    
+                console.log(' START findAllModelPackageNames')
+    
+                const MongoClient = require('mongodb').MongoClient;
+                const uri = MONGODB_URI;
+                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
+                await client.connect()
+                console.log(`succesful connection to ${MONGODB_URI}` )
+    
+                const collection = client.db("crop2ml").collection("models");
+                
+                const metaDataPackageNames = await collection.find({}).project({"metaData.packageName":1 ,_id:0}).toArray()
+                
+ 
+
+                // remove duplicate packqge Names
+                let result = []
+                metaDataPackageNames.forEach(m =>{
+                    if(!result.includes(m.metaData.packageName)){
+                        result.push(m.metaData.packageName)
+                    }
+                })
+                
+    
+                // console.log('result')
+                // console.log(result)
+    
+                await client.close()
+                resolve(result)
+                       
+            }catch(error){
+                console.log(error)
+                if( typeof client !== 'undefined')
+                    await client.close()
+                reject(error);
+            }finally{
+                console.log('END findAllModelPackageNames')
+            }
+        }) 
+    }
     
     static async getAllModelsMetaData(){
         
@@ -190,7 +236,6 @@ class JsonModelDBServices{
     
                 const collection = client.db("crop2ml").collection("models");
                 
-    
                 const result = await collection.find({}).project({metaData:1}).toArray()
                 
     

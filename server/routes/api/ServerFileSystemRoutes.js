@@ -7,6 +7,7 @@ var unzipper = require('unzipper')
 var archiver = require('archiver');
 var mv = require('mv')
 
+
 const directoryTree = require("directory-tree");
 
 
@@ -171,7 +172,6 @@ router.post('/packageTree',  function(req, res, next) {
 })
 
 
-
 router.get('/zipFolder',async function(req,res,next){
     
     // const foldername = req.query.folder;
@@ -193,6 +193,22 @@ router.post('/zipFolder',async function(req,res,next){
     
 
 })
+
+router.post('/downloadFile',async function(req,res,next){
+
+    console.log( 'START /downloadFile ')
+    
+     var filePath = path.resolve(req.body.serverFilePath);
+
+     console.log(filePath)
+
+     console.log( 'END /downloadFile ')
+
+     res.sendFile(filePath)
+
+})
+
+
 
 
 /**
@@ -368,6 +384,7 @@ async function saveJsonModel (jsonModel){
     }) 
   
 }
+
 async function saveJsonKeywords (modelMetaData){
     console.log('saveJsonKeywords')
     console.log(modelMetaData)

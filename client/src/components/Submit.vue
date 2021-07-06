@@ -250,7 +250,7 @@ export default {
     },
 
     async submitZip(){
-      console.log("START submitFile")
+      console.log("START submitZip")
 
       // let formData = new FormData();
       // formData.append('file', this.file);
@@ -259,9 +259,7 @@ export default {
       console.log("this.tags")
       console.log(this.tags)
 
-
       this.packageZip.packageName = this.packageName
-      
       
       console.log("this.packageZip to send: ")
       console.log(this.packageZip)

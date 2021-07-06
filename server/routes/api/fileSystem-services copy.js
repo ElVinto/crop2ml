@@ -9,8 +9,6 @@ var archiver = require('archiver');
 const directoryTree = require("directory-tree");
 
 
-
-
 var mangodb = require('mongodb')
 // const uri = "mongodb+srv://<username>:<password>@<your-cluster-url>/test?retryWrites=true&w=majority"
 var uri = "mongodb://localhost:27017"
@@ -19,7 +17,7 @@ var MONGODB_HOST = 'mongodb://localhost/test'
 var eyes = require('eyes');
 var https = require('https');
 
-var fs = require('fs');
+
 
 
 const lineReader = require('line-reader');

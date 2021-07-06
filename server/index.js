@@ -19,8 +19,14 @@ app.use('/ServerFileSystemRoutes', ServerFileSystemRoutes);
 var JsonModelDBRoutes = require('./routes/api/JsonModelDBRoutes');
 app.use('/JsonModelDBRoutes', JsonModelDBRoutes);
 
+var CommunityDBRoutes = require('./routes/api/CommunityDBRoutes');
+app.use('/CommunityDBRoutes', CommunityDBRoutes);
+
 var AuthentificationDBRoutes = require('./routes/api/AuthentificationDBRoutes');
 app.use('/AuthentificationDBRoutes', AuthentificationDBRoutes);
+
+var UserDBRoutes = require('./routes/api/UserDBRoutes');
+app.use('/UserDBRoutes', UserDBRoutes);
 
 
 

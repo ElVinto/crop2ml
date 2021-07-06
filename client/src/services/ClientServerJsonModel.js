@@ -42,7 +42,23 @@ class ClientServerJsonModel{
                     resolve(res.data) ;
                 })
 
-                
+            } catch (err) { 
+                console.error(err);
+                reject(err);
+            }
+        })
+
+    }
+
+    static findAllModelPackageNames = async () =>{
+        
+        return new Promise((resolve, reject) => {
+            
+            try { 
+                axios.get(url + "JsonModelDBRoutes/findAllModelPackageNames").then(res => {
+                    resolve(res.data) ;
+                })
+
             } catch (err) { 
                 console.error(err);
                 reject(err);

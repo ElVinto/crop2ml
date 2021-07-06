@@ -12,7 +12,7 @@
         
         <b-row no-gutters>
             <b-col lg="3" >
-                <b-card-img src="images/modeling_iconfinder_128px" style="max-width:100px"   alt="Model Preview" ></b-card-img>
+                <b-card-img src="images/modeling_iconfinder_128px.png" style="max-width:100px"   alt="Model Preview" ></b-card-img>
             </b-col>
             <b-col lg="9" class="text-left">
                 <h4>  {{ selectedModel.Description.Title}}</h4>

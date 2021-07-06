@@ -37,6 +37,23 @@ router.post('/findAllJsonModels',async function(req, res, next){
 
 });
 
+router.get('/findAllModelPackageNames',async function(req, res, next){
+
+    try{
+        modelPackageNames = await JsonModelDBServices.findAllModelPackageNames()
+        if(modelPackageNames){
+            res.send(modelPackageNames)
+        }else{
+            res.send(`No model has been found`)
+        }
+        
+    }catch(error){
+        console.log(error)
+        res.send(error.toString())
+    }
+
+});
+
 router.post('/findAllKeywords',async function(req, res, next){
 
     try{

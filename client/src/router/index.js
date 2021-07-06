@@ -15,7 +15,10 @@ import Profile from '../components/Profile';
 import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
 
-import Communities from '../components/Communities';
+import Communities from '../components/community/Communities';
+import NewCommunity from '../components/community/NewCommunity';
+import EditCommunity from '../components/community/EditCommunity';
+import ViewCommunityDetails from '../components/community/ViewCommunityDetails';
 
 
 
@@ -95,6 +98,26 @@ export default new Router({
       path: '/Communities',
       name: 'Communities',
       component: Communities
+    },
+
+    {
+      path: '/NewCommunity',
+      name: 'NewCommunity',
+      component: NewCommunity
+    },
+
+    {
+      path: '/EditCommunity',
+      name: 'EditCommunity',
+      component: EditCommunity,
+      props:true
+    },
+
+    {
+      path: '/ViewCommunityDetails',
+      name: 'ViewCommunityDetails',
+      component: ViewCommunityDetails,
+      props:true
     },
 
   ]
