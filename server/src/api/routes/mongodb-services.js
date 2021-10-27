@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
+let ModelUnit = require('../../models/modelUnit')
 
 var mongodb = require('mongodb')
 require('dotenv').config()
@@ -401,8 +402,6 @@ async function findJsonModelUnit (model_name){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
-
                 console.log(`findOne : {'ModelUnit.Attributs.name': '${model_name}' } `)
                 result = await ModelUnit.findOne({'ModelUnit.Attributs.name': model_name },{'_id':0, '__v':0})
                 
@@ -465,8 +464,6 @@ async function findJsonModelUnitById (modelid){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
-
                 console.log(`findOne : {'ModelUnit.Attributs.modelid': '${modelid}' } `)
                 result = await ModelUnit.findOne({'ModelUnit.Attributs.modelid': modelid },{'_id':0, '__v':0})
                 
@@ -527,8 +524,6 @@ async function findAllJsonModelUnits (){
             db.once('open', async function(){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                const ModelUnit = buildMongooseModelUnit(mongoose)
 
                 console.log(`find : {} `)
                 // result = await ModelUnit.find({},{'ModelUnit.Attributs.name': 1, 'ModelUnit.Attributs.modelid':1})
@@ -591,8 +586,6 @@ async function findAllJsonModelUnitSummaries (){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
-
                 console.log(`find : {} `)
                 result = await ModelUnit.find({},{'ModelUnit.Attributs.name': 1, 'ModelUnit.Attributs.modelid':1})
                 
@@ -649,8 +642,6 @@ async function deleteJsonModelUnit (model_name){
             db.once('open', async function(){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                const ModelUnit = buildMongooseModelUnit(mongoose)
 
                 console.log(`delete : {'ModelUnit.Attributs.name': ${model_name} } `)
                 result = await ModelUnit.findOneAndDelete({'ModelUnit.Attributs.name': model_name}).exec()
@@ -710,8 +701,6 @@ async function deleteJsonModelUnitById (modelid){
             db.once('open', async function(){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                const ModelUnit = buildMongooseModelUnit(mongoose)
 
                 console.log(`delete : {'ModelUnit.Attributs.modelid': ${modelid} } `)
                 result = await ModelUnit.findOneAndDelete({'ModelUnit.Attributs.modelid': modelid}).exec()
@@ -798,8 +787,6 @@ async function saveJsonModelUnit (jsonModelUnit){
                 try{
                     console.log(`succesful connection to ${MONGODB_URI}` )
 
-                    const ModelUnit = buildMongooseModelUnit(mongoose)
-
                     const receivedModelUnit = new ModelUnit(jsonModelUnit)
 
                     await  receivedModelUnit.validate();
@@ -833,201 +820,6 @@ async function saveJsonModelUnit (jsonModelUnit){
         }
     })   
 }
-    
-
-function buildMongooseModelUnit(mongoose){
-
-    if(mongoose.modelNames().find(e => e==='ModelUnit')){
-        return mongoose.model('ModelUnit')
-    }
-
-    const OutputValueSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true}, // CADTA #REQUIRED
-            description: {type: String, required: false}, // CADTA #REQUIRED
-            precision: {type: String, required: false} // CADTA #REQUIRED
-        },
-        _: {type: String, required: true} // CADTA #REQUIRED
-    })
-
-    const InputValueSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true} // CADTA #REQUIRED
-        },
-        _: {type: String, required: true} // CADTA #REQUIRED
-    })
-
-    const TestSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true}, // CADTA #REQUIRED
-            description: {type: String, required: false}, // CDATA #IMPLIED
-            uri: {type: String, required: false} // CDATA #IMPLIED
-        },
-        InputValue:{type:[InputValueSchema], required: false},
-        OutputValue:{type:[OutputValueSchema], required: false},
-    })
-
-    const TestsetSchema = new mongoose.Schema({
-        Testset:[{
-            Attributs:{
-                name: {type: String, required: true}, // CDATA #REQUIRED
-                description: {type: String, required: true}, // CDATA #REQUIRED
-                parameterset: {type: String, required: true}, // NMTOKEN #REQUIRED
-                uri: {type: String, required: false} // CDATA #IMPLIED
-            },
-            Test :{type: [TestSchema], required: false }
-        }]
-    })
-
-    const ParamSchema = new mongoose.Schema({
-        Attributs:{
-            name: {type: String, required: true}, // NMTOKEN #REQUIRED
-        },
-        _: {type: String, required: true}, // NMTOKEN #REQUIRED
-    })
-
-    const ParametersetSchema = new mongoose.Schema({
-        Parameterset:[{
-            Attributs:{
-                description: {type: String, required: true}, // CDATA #REQUIRED
-                name: {type: String, required: true}, // NMTOKEN #REQUIRED
-                uri: {type: String, required: false} // CDATA #IMPLIED
-            },
-            Param :{type: [ParamSchema], required: false }
-        }]
-    }
-        
-    );
-
-    const AlgorithmSchema = new mongoose.Schema(
-        {  
-            Attributs:{
-                language: {type: String, required: true}, // CDATA #REQUIRED
-                platform: {type: String, required: false}, // CDATA #IMPLIED
-                filename: {type: String, required: false}, //  CDATA #IMPLIED
-                function: {type: String, required: false} // CDATA #IMPLIED
-            }
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-    const FunctionSchema = new mongoose.Schema(
-        {
-            name: {type: String, required: true}, // CDATA #REQUIRED
-	        language: {type: String, required: true}, // CDATA #REQUIRED
-	        filename: {type: String, required: false}, // CDATA #IMPLIED
-	        type: {
-                type: String,
-                required: false,
-                enum:['internal','external'] //  (internal|external) #REQUIRED
-            }, 
-	        description: {type: String, required: false}, // CDATA #IMPLIED>
-
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-
-    );
-
-
-    const OutputSchema = new mongoose.Schema(
-        {
-            Output:[{ 
-                Attributs:{
-                    name: {type: String, required: true}, //  NMTOKEN #REQUIRED
-                    datatype: {
-                        type: String,
-                        required: [true,`datatype  required for path Attributs.datatype `],
-                        enum: ['STRING', 'STRINGARRAY', 'STRINGLIST', 'DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
-                        
-                    }, 
-                    description: {type: String, required: false}, // CDATA #REQUIRED
-                    max: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    min: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    variablecategory: {
-                        type: String,
-                        required: false,
-                        enum: ['state', 'rate', 'auxiliary']
-                    }, 
-                    unit: {type: String, required: true}, //CDATA #REQUIRED
-                    uri: {type: String, required: false}, //CDATA #IMPLIED
-                }
-            }]
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-
-    const InputSchema = new mongoose.Schema(
-        {
-            Input: [{
-                Attributs:{
-                    name: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
-                    datatype: {
-                        type: String,
-                        required: true,
-                        enum: ['STRING','STRINGARRAY','STRINGLIST','DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
-                    }, 
-                    description: {type: String, required:true}, // CDATA #REQUIRED
-                    default: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    max: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    min: {type: String, required: false}, // TODO CDATA #IMPLIED
-                    inputtype: {type: String, required: true}, // (variable|parameter) #REQUIRED
-                    parametercategory : {
-                        type: String,
-                        required: false,
-                        enum: ['constant','species','genotypic','soil','private']
-                    }, // TODO (constant|species|genotypic|soil|private) #IMPLIED
-                    variablecategory : {
-                        type: String,
-                        required: false,
-                        enum: ['state','rate','auxiliary']
-                    }, 
-                    unit: {type: String, required: true}, //  CDATA #REQUIRED
-                    uri : {type: String, required: false}, // CDATA #IMPLIED>
-                }
-            }]
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-
-    const DescriptionSchema = new mongoose.Schema(
-        {
-            Title: {type: String, required: true},
-            Authors:{type: String, required: true},
-            Institution: {type: String, required: true},
-            URI:{trype: String, required: false},
-            Reference: {type: String, required: false},
-            Abstract: {type: String, required: true}
-        },
-        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-    const ModelUnitSchema = new mongoose.Schema(
-        {
-            ModelUnit:{
-                Attributs: {
-                        name: {type: String, required:[true,'a model name is required']},
-                        modelid: { type:String, required:[true,'a modelid is required']},
-                        timestep: { type:String, required:[false,'a model timestep is required']},
-                        version:{String, required:[false,'a model version is required']}
-                    },
-
-                Description: {type: DescriptionSchema, require:[true,'a model description is required ']},
-                Inputs: {type: [InputSchema], required:false },
-                Outputs: {type:[OutputSchema], required:false},
-                Function:{type: FunctionSchema, require: false},
-                Algorithm:{type: AlgorithmSchema, require: false},
-                Parametersets:{type: [ParametersetSchema], require: true},
-                Testsets:{type: [TestsetSchema], require: true},
-            }
-      },
-      {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-    );
-
-    return mongoose.model('ModelUnit', ModelUnitSchema,'modelunits')
-      
-}
 
 async function createTestModelUnit(model_name){
 
@@ -1043,8 +835,6 @@ async function createTestModelUnit(model_name){
             db.once('open', async function(){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                const ModelUnit = buildMongooseModelUnit(mongoose)
 
                 const m = new  ModelUnit({
                         ModelUnit:{
@@ -1074,8 +864,6 @@ async function createTestModelUnit(model_name){
 async function createTestModelUnitAndSave(model_name){
     return new Promise(async (resolve, reject) => {
         try{
-            const ModelUnit = buildMongooseModelUnit(mongoose)
-
 
             m = await createTestModelUnit(model_name)
             m.save()
@@ -1164,7 +952,7 @@ router.get('/model',async function(req, res, next){
 */
 
 
-async function  parseXMLFromFile(){
+async function parseXMLFromFile(){
     
     const fPath = "./server/data/xml/melting.xml"
     let fileData = fs.readFileSync(path.resolve(fPath))
@@ -1298,12 +1086,9 @@ router.get('/schema',async function(req, res, next){
 
 async function cleanAndAddDocs(mongoose){
 
-    const ModelUnit = buildMongooseModelUnit(mongoose)
-
     console.log(` nb docs before  cleanAndAddDocs ${await ModelUnit.find({}).countDocuments() } `)
 
     await ModelUnit.deleteMany({});
-
 
     m1 = new  ModelUnit({
             ModelUnit:{
@@ -1315,11 +1100,6 @@ async function cleanAndAddDocs(mongoose){
     )
     
     await m1.save()
-
-
-
-
-
 
     m2 = new  ModelUnit({
             ModelUnit:{
@@ -1336,26 +1116,50 @@ async function cleanAndAddDocs(mongoose){
 
     result =[]
 
-    
-
-    
     result.push({q1: {'ModelUnit.Attributs.name': 'm1'}})
     result.push({result_q1: await ModelUnit.find({ 'ModelUnit.Attributs.name': 'm1'})})
 
     console.log(` q2: {'ModelUnit.Inputs.Input.Attributs.name': 'm2.i1'} `)
     console.log(` result : ${await ModelUnit.find({ 'ModelUnit.Inputs.Input.Attributs.name': /i1/} )} `)
 
-    
-
     // const result = await ModelUnit.find({})
 
     return result
 }
 
+
+
+
+
+/********************** UNUSED *******************/
+
+/*
+    Unused
+    Ex.
+        transform Input[{att: , v: }{att: , v: }] to [{Input:{att: , v: }}, {Input:{att: , v: }}]
+        formatParsedArray(modelUnitJsonObj.ModelUnit,'Inputs','Input')
+ */
+function formatParsedArray(parsedObj,arrayKey,elmtKey){
+    if(Array.isArray(parsedObj[arrayKey]))
+        return;
+
+    const nvArray =[]
+    if(Array.isArray(parsedObj[arrayKey][elmtKey])){
+        parsedObj[arrayKey][elmtKey].forEach( e => {
+            const nvObj = {}
+            nvObj[elmtKey] = e;
+            nvArray.push(nvObj)
+        });
+    }else{
+        const nvObj = {}
+        nvObj[elmtKey] = parsedObj[arrayKey][elmtKey];
+        nvArray.push(nvObj)
+    }
+    parsedObj[arrayKey]=nvArray
+}
+
 async function testQuery(mongoose){
 
-    
-    const ModelUnit = buildMongooseModelUnit(mongoose)
 
     const nb = await ModelUnit.find({'Attributs.name': /^m/}).countDocuments()
     console.log(` nb docs ${nb}`)
@@ -1534,33 +1338,6 @@ async function createSchema(mongoose){
 
     return JSON.stringify(result)
 
-}
-
-
-
-/*
-    Unused
-    Ex.
-        transform Input[{att: , v: }{att: , v: }] to [{Input:{att: , v: }}, {Input:{att: , v: }}]
-        formatParsedArray(modelUnitJsonObj.ModelUnit,'Inputs','Input')
- */
-function formatParsedArray(parsedObj,arrayKey,elmtKey){
-    if(Array.isArray(parsedObj[arrayKey]))
-        return;
-
-    const nvArray =[]
-    if(Array.isArray(parsedObj[arrayKey][elmtKey])){
-        parsedObj[arrayKey][elmtKey].forEach( e => {
-            const nvObj = {}
-            nvObj[elmtKey] = e;
-            nvArray.push(nvObj)
-        });
-    }else{
-        const nvObj = {}
-        nvObj[elmtKey] = parsedObj[arrayKey][elmtKey];
-        nvArray.push(nvObj)
-    }
-    parsedObj[arrayKey]=nvArray
 }
 
 

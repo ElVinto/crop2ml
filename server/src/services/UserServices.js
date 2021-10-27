@@ -5,7 +5,7 @@ if(process.env.NODE_ENV==="development"){
     MONGODB_URI = process.env.MONGODB_DEV_URI
 }
 
-class UserDBServices{
+class UserServices{
 
     static async getRegisteredEmails(){
        
@@ -44,9 +44,6 @@ class UserDBServices{
             }
         }) 
     }
-
-    
-    
-
 }
-module.exports = UserDBServices
+
+module.exports = UserServices

@@ -5,7 +5,7 @@ if(process.env.NODE_ENV==="development"){
     MONGODB_URI = process.env.MONGODB_DEV_URI
 }
 
-class CommunityDBServices{
+class CommunityServices{
 
 
     static async saveCommunity (community){
@@ -98,4 +98,4 @@ class CommunityDBServices{
     
 
 }
-module.exports = CommunityDBServices
+module.exports = CommunityServices

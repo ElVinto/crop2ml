@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-AuthentificationDBServices = require('../../services/AuthentificationDBServices.js');
+AuthServices = require('../../services/authServices.js');
 
 router.post('/register',async function(req, res, next){
 
     try{
-        userInfo = await AuthentificationDBServices.register(req.body)        
+        userInfo = await AuthServices.register(req.body)        
         res.send(userInfo)
     }catch(error){
         console.log(error)
@@ -18,7 +18,7 @@ router.post('/register',async function(req, res, next){
 router.post('/updateProfile',async function(req, res, next){
 
     try{
-        userInfo = await AuthentificationDBServices.updateProfile(req.body)        
+        userInfo = await AuthServices.updateProfile(req.body)        
         res.send(userInfo)
     }catch(error){
         console.log(error)
@@ -30,7 +30,7 @@ router.post('/updateProfile',async function(req, res, next){
 router.post('/singIn',async function(req, res, next){
 
     try{
-        userInfo = await AuthentificationDBServices.signIn(req.body)        
+        userInfo = await AuthServices.signIn(req.body)        
         res.send(userInfo)
     }catch(error){
         console.log(error)
@@ -44,7 +44,7 @@ router.post('/forgotPassword', async function(req, res, next) {
     try{
         console.log('req.body')
         console.log(req.body)
-        userInfo = await AuthentificationDBServices.forgotPassword(req.body)     
+        userInfo = await AuthServices.forgotPassword(req.body)     
         console.log('END POST forgotPassword')
         res.send(userInfo)
     }catch(error){
@@ -57,14 +57,12 @@ router.post('/forgotPassword', async function(req, res, next) {
 router.post('/resetPassword', async function(req, res, next) {
 
     try{
-        userInfo = await AuthentificationDBServices.resetPassword(req.body)        
+        userInfo = await AuthServices.resetPassword(req.body)        
         res.send(userInfo)
     }catch(error){
         console.log(error)
         res.send(error.toString())
     }
 });
-
-
 
 module.exports = router;

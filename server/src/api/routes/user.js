@@ -1,14 +1,14 @@
 var express = require('express');
 var router = express.Router();
 
-UserDBServices = require('../../services/UserDBServices.js');
+UserServices = require('../../services/UserServices.js');
 
 
 
 router.get('/getRegisteredEmails',async function(req, res, next){
 
     try{
-        let registeredEmails = await UserDBServices.getRegisteredEmails()
+        let registeredEmails = await UserServices.getRegisteredEmails()
         if(registeredEmails){
             res.send(registeredEmails)
         }else{

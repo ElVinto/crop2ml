@@ -11,7 +11,7 @@ if(process.env.NODE_ENV==="development"){
     MONGODB_URI = process.env.MONGODB_DEV_URI
 }
 
-class AuthentificationDBServices{
+class AuthServices{
 
     static async register(userRegistrationDetails){
         console.log('START register')
@@ -295,10 +295,6 @@ class AuthentificationDBServices{
             }
         }) 
     }
-
-
-
-
-
 }
-module.exports = AuthentificationDBServices
+
+module.exports = AuthServices

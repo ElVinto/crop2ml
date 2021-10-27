@@ -4,3 +4,4 @@ mapclient
 .DS_Store
 .env
 devInfo
+/database/*

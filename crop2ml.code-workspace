@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "."
+		},
+		{
+			"name": "database",
+			"path": "./database"
+		},
+		{
+			"name": "server",
+			"path": "./server"
+		},
+		{
+			"name": "client",
+			"path": "./client"
+		},
+	],
+	"settings": {
+		"files.exclude": {
+			"database": true,
+			"server": true,
+			"client": true,
+		},
+	}
+}

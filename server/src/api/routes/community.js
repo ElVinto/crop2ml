@@ -4,8 +4,7 @@ var formidable = require('formidable');
 var path = require('path');
 var mv = require('mv')
 
-CommunityDBServices = require('../../services/CommunityDBServices.js');
-
+CommunityServices = require('../../services/communityServices.js');
 
 router.post('/createCommunity',  async function(req, res, next) {
 
@@ -49,7 +48,7 @@ router.post('/createCommunity',  async function(req, res, next) {
 
             fields['image_path']= JSON.stringify(new_relative_path)
 
-            const result = await CommunityDBServices.saveCommunity(fields)
+            const result = await CommunityServices.saveCommunity(fields)
 
             console.log(result);
 
@@ -72,7 +71,7 @@ router.post('/createCommunity',  async function(req, res, next) {
 router.get('/getAllCommunities',async function(req, res, next){
 
     try{
-        let communities = await CommunityDBServices.getAllCommunities()
+        let communities = await CommunityServices.getAllCommunities()
         if(communities){
             res.send(communities)
         }else{
@@ -85,8 +84,5 @@ router.get('/getAllCommunities',async function(req, res, next){
     }
 
 });
-
-
-
 
 module.exports = router;
