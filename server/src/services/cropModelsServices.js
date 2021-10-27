@@ -1,11 +1,6 @@
-var mongodb = require('mongodb')
-require('dotenv').config()
-var MONGODB_URI = process.env.MONGODB_URI
-if(process.env.NODE_ENV==="development"){
-    MONGODB_URI = process.env.MONGODB_DEV_URI
-}
+let ModelUnit = require('../models/modelUnit')
 
-class JsonModelDBServices{
+class CropModelsServices{
 
     static async saveModel (jsonModel){
         console.log('saveJsonModel')
@@ -147,23 +142,30 @@ class JsonModelDBServices{
     
                 console.log(' START getAllModels')
     
-                const MongoClient = require('mongodb').MongoClient;
+                /*const MongoClient = require('mongodb').MongoClient;
                 const uri = MONGODB_URI;
                 const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
                 await client.connect()
                 console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("models");
+    */
+                //const collection = client.db("crop2ml").collection("models");
+
+                ModelUnit.find({}, function(err, models){
+                    if(err){
+                        console.log(err)
+                        resolve(err)
+                    } else {
+                        console.log(models)
+                        resolve(models)
+                    }
+                })
                 
     
-                const result = await collection.find({}).toArray()
+                //const result = await collection.find({}).toArray()
                 
     
-                console.log('result')
-                console.log(result)
-    
-                await client.close()
-                resolve(result)
+                //await client.close()
+                //resolve(result)
                        
             }catch(error){
                 console.log(error)
@@ -256,4 +258,4 @@ class JsonModelDBServices{
         }) 
     }
 }
-module.exports = JsonModelDBServices
+module.exports = CropModelsServices

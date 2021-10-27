@@ -6,17 +6,18 @@ let path = require('path')
 let dbConfig = require('./config/dbConfig');
 
 // Connecting mongoDB
-mongoose.Promise = global.Promise;
 mongoose.connect(dbConfig.db, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}).then(() => {
-        console.log('Database connected')
-    },
-    error => {
-        console.log('Database could not be connected : ' + error)
-    }
-)
+})
+
+let db = mongoose.connection;
+db.once('open', function() {
+    console.log('Database connected')
+})
+db.on('error', function(err) {
+    console.log(err)
+})
 
 // Setting up express
 const app = express();
@@ -31,8 +32,8 @@ app.use('/mongodb-services', mongodbServices);
 const files = require('./api/routes/files');
 app.use('/files', files);
 
-const JsonModelDBRoutes = require('./api/routes/JsonModelDBRoutes');
-app.use('/JsonModelDBRoutes', JsonModelDBRoutes);
+const cropModels = require('./api/routes/cropModels');
+app.use('/cropmodels', cropModels);
 
 const community = require('./api/routes/community');
 app.use('/community', community);

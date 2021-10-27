@@ -16,8 +16,8 @@ vscode firefox debugger and chrome debugger extensions
 `docker-compose -f docker-compose.dev.yml up`
 # Create Mongo DB
 In new terminal
-##`docker exec -it crop2ml_db_1 /bin/sh`
-##`psql -U postgres`
+`docker exec -it crop2ml_db_1 /bin/sh`
+`mongo -u "root" -p "password"`
 ##`CREATE DATABASE dbtest;`
 ##`\q`
 Ctrl+D to exit the bash

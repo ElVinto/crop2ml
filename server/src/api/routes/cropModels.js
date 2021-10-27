@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-JsonModelDBServices = require('../../services/JsonModelDBServices.js');
+CropModelsServices = require('../../services/CropModelsServices.js');
 
 router.post('/findJsonModelsBySearchWords',async function(req, res, next){
 
     try{
-        jsonModelIds = await JsonModelDBServices.findJsonModelsBySearchWords(req.body.searchWords)
+        jsonModelIds = await CropModelsServices.findJsonModelsBySearchWords(req.body.searchWords)
         if(jsonModelIds){
             res.send(jsonModelIds)
         }else{
@@ -23,7 +23,7 @@ router.post('/findJsonModelsBySearchWords',async function(req, res, next){
 router.post('/findAllJsonModels',async function(req, res, next){
 
     try{
-        jsonModels = await JsonModelDBServices.findAllModels()
+        jsonModels = await CropModelsServices.findAllModels()
         if(jsonModels){
             res.send(jsonModels)
         }else{
@@ -40,7 +40,7 @@ router.post('/findAllJsonModels',async function(req, res, next){
 router.get('/findAllModelPackageNames',async function(req, res, next){
 
     try{
-        modelPackageNames = await JsonModelDBServices.findAllModelPackageNames()
+        modelPackageNames = await CropModelsServices.findAllModelPackageNames()
         if(modelPackageNames){
             res.send(modelPackageNames)
         }else{
@@ -57,7 +57,7 @@ router.get('/findAllModelPackageNames',async function(req, res, next){
 router.post('/findAllKeywords',async function(req, res, next){
 
     try{
-        jsonModels = await JsonModelDBServices.findAllModels()
+        jsonModels = await CropModelsServices.findAllModels()
         if(jsonModels){
             res.send(jsonModels)
         }else{
@@ -79,7 +79,7 @@ router.post('/modelTree',  async function(req, res, next) {
 
     // get all modelids from crop2ml models collection
 
-    let modelsMetaData = await JsonModelDBServices.getAllModelsMetaData();
+    let modelsMetaData = await CropModelsServices.getAllModelsMetaData();
 
     let tree = {
         name: 'models',

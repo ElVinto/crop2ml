@@ -312,9 +312,8 @@ router.get('/saveJsonModelUnit',async function(req, res, next){
         console.log('/saveJsonModelUnit')
         let model_name =  req.query.name;
 
-        jsonTestModel = await createTestModelUnit(model_name)
+        jsonTestModel = createTestModelUnit(model_name)
 
-        console.log('jsonTestModel')
         console.log(jsonTestModel)
 
         result = await saveJsonModelUnit(jsonTestModel)
@@ -771,6 +770,13 @@ async function saveJsonModel (jsonModel){
 
 async function saveJsonModelUnit (jsonModelUnit){
 
+    let model = await ModelUnit.findOneAndUpdate(
+        {'Attributs.name': jsonModelUnit.Attributs.name},
+        {jsonModelUnit},
+        {new:true, upsert: true, useFindAndModify: false}
+    )
+    console.log(model)
+    /*
     return new Promise((resolve, reject) => {
         console.log('saveJsonModelUnit')
         try{
@@ -814,51 +820,26 @@ async function saveJsonModelUnit (jsonModelUnit){
                 }
             });
             
+            
+            
         }catch (err) { 
             resolve(err.message)
             // reject(err); 
         }
-    })   
+    })   */
 }
 
-async function createTestModelUnit(model_name){
+function createTestModelUnit(model_name) {
 
-    return new Promise( async (resolve, reject) => {
-        console.log('createTestModelUnit')
-        try{
-            const mongoose = require('mongoose')
-            mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
-            const db = mongoose.connection;
-            
-            db.on('error', console.error.bind(console, 'connection error:'));
-
-            db.once('open', async function(){
-
-                console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                const m = new  ModelUnit({
-                        ModelUnit:{
-                            Attributs :{ name: model_name ,modelid: `${model_name} X` },
-                            Description :{Attributs:{Title: "test model", Authors: "A1 A2"}},
-                            Inputs: [ {Input: {Attributs: {name: model_name+".i1"}}}, {Input: {Attributs: {name: model_name+".i2"}}}  ],
-                        }
-                    }
-                )
-                
-                db.close();
-
-                console.log('TestModelUnit')
-                console.log(m)
-
-                resolve(m)
-            });
-            
-        }catch (err) { 
-            
-            reject(err); 
+    var model = new  ModelUnit({
+        ModelUnit:{
+            Attributs :{ name: model_name ,modelid: `${model_name} X` },
+            Description :{Attributs:{Title: "test model", Authors: "A1 A2"}},
+            Inputs: [ {Input: {Attributs: {name: model_name+".i1"}}}, {Input: {Attributs: {name: model_name+".i2"}}}  ],
         }
     })
-    
+
+    return model
 }
 
 async function createTestModelUnitAndSave(model_name){

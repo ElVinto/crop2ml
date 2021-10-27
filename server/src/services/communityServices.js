@@ -1,9 +1,10 @@
-var mongodb = require('mongodb')
+/*var mongodb = require('mongodb')
 require('dotenv').config()
+
 var MONGODB_URI = process.env.MONGODB_URI
 if(process.env.NODE_ENV==="development"){
     MONGODB_URI = process.env.MONGODB_DEV_URI
-}
+}*/
 
 class CommunityServices{
 
@@ -65,13 +66,13 @@ class CommunityServices{
     
                 console.log(' START getAllCommunities')
     
-                const MongoClient = require('mongodb').MongoClient;
+                /*const MongoClient = require('mongodb').MongoClient;
                 const uri = MONGODB_URI;
                 const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
                 await client.connect()
-                console.log(`succesful connection to ${MONGODB_URI}` )
+                console.log(`succesful connection to ${MONGODB_URI}` )*/
     
-                const collection = client.db("crop2ml").collection("communities");
+                const collection = client.db("test").collection("communities");
                 
     
                 const result = await collection.find({}).toArray()
