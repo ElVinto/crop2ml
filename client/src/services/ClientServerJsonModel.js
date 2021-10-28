@@ -20,7 +20,7 @@ class ClientServerJsonModel{
                     searchWords: searchWords,
                 }
                 
-                axios.post(url + "JsonModelDBRoutes/findJsonModelsBySearchWords",body).then(res => {
+                axios.post(url + "cropmodels/findJsonModelsBySearchWords",body).then(res => {
                     resolve(res.data) ;
                 })
 
@@ -33,21 +33,18 @@ class ClientServerJsonModel{
 
     }
 
+    //OK
     static findAllJsonModels = async () =>{
-        
         return new Promise((resolve, reject) => {
-            
             try { 
-                axios.post(url + "JsonModelDBRoutes/findAllJsonModels").then(res => {
+                axios.post(url + "cropmodels/findAllJsonModels").then(res => {
                     resolve(res.data) ;
                 })
-
             } catch (err) { 
                 console.error(err);
                 reject(err);
             }
         })
-
     }
 
     static findAllModelPackageNames = async () =>{
@@ -55,7 +52,7 @@ class ClientServerJsonModel{
         return new Promise((resolve, reject) => {
             
             try { 
-                axios.get(url + "JsonModelDBRoutes/findAllModelPackageNames").then(res => {
+                axios.get(url + "cropmodels/findAllModelPackageNames").then(res => {
                     resolve(res.data) ;
                 })
 
@@ -78,7 +75,7 @@ class ClientServerJsonModel{
                 // axios.post(url + "mongodb-services/findAllJsonModels", body).then(res => {
                 //     resolve(res.data) ;
                 // })
-                axios.post(url + "JsonModelDBRoutes/findAllKeywords").then(res => {
+                axios.post(url + "cropmodels/findAllKeywords").then(res => {
                     resolve(res.data) ;
                 })
 
@@ -91,10 +88,11 @@ class ClientServerJsonModel{
 
     }
 
+    //OK
     static requestModelTree (){
         return new Promise((resolve,reject)=>{
             try{
-                axios.post(url + "JsonModelDBRoutes/modelTree").then(res => {
+                axios.post(url + "cropmodels/modelTree").then(res => {
                     resolve(res.data) ;
                 })
             }catch(err){
@@ -103,7 +101,61 @@ class ClientServerJsonModel{
                 reject(err);
             }
         })
+    }
 
+    static async getModelById (modelid){
+        return new Promise((resolve, reject) => {
+            
+            try { 
+                let body ={
+                    modelid: modelid,
+                }
+                axios.post(url + "mongodb-services/findJsonModelById", body).then(res => {
+                    resolve(res.data) ;
+                })
+                
+            } catch (err) { 
+                console.error(err);
+                reject(err);
+            }
+        })
+    }
+
+
+    static async saveModel (modelUnit){
+        return new Promise((resolve, reject) => {
+            
+            try { 
+                let body ={
+                    modelUnit: modelUnit,
+                }
+                axios.post(url + "mongodb-services/saveJsonModel", body).then(res => {
+                    resolve(res.data) ;
+                })
+                
+            } catch (err) { 
+                console.error(err);
+                reject(err);
+            }
+        })
+    }
+
+    static async deleteModelById (modelid){
+        return new Promise((resolve, reject) => {
+            
+            try { 
+                let body ={
+                    modelid: modelid,
+                }
+                axios.post(url + "mongodb-services/deleteJsonModelById", body).then(res => {
+                    resolve(res.data) ;
+                })
+                
+            } catch (err) { 
+                console.error(err);
+                reject(err);
+            }
+        })
     }
 }
 

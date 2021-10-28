@@ -28,15 +28,13 @@ const TestSchema = new Schema({
 })
 
 const TestsetSchema = new Schema({
-    Testset:[{
-        Attributs:{
-            name: {type: String, required: true}, // CDATA #REQUIRED
-            description: {type: String, required: true}, // CDATA #REQUIRED
-            parameterset: {type: String, required: true}, // NMTOKEN #REQUIRED
-            uri: {type: String, required: false} // CDATA #IMPLIED
-        },
-        Test :{type: [TestSchema], required: false }
-    }]
+    Attributs:{
+        name: {type: String, required: true}, // CDATA #REQUIRED
+        description: {type: String, required: true}, // CDATA #REQUIRED
+        parameterset: {type: String, required: true}, // NMTOKEN #REQUIRED
+        uri: {type: String, required: false} // CDATA #IMPLIED
+    },
+    Test :{type: [TestSchema], required: false }
 })
 
 const ParamSchema = new Schema({
@@ -47,17 +45,13 @@ const ParamSchema = new Schema({
 })
 
 const ParametersetSchema = new Schema({
-    Parameterset:[{
-        Attributs:{
-            description: {type: String, required: true}, // CDATA #REQUIRED
-            name: {type: String, required: true}, // NMTOKEN #REQUIRED
-            uri: {type: String, required: false} // CDATA #IMPLIED
-        },
-        Param :{type: [ParamSchema], required: false }
-    }]
-}
-    
-);
+    Attributs:{
+        description: {type: String, required: true}, // CDATA #REQUIRED
+        name: {type: String, required: true}, // NMTOKEN #REQUIRED
+        uri: {type: String, required: false} // CDATA #IMPLIED
+    },
+    Param :{type: [ParamSchema], required: false }
+});
 
 const AlgorithmSchema = new Schema(
     {  
@@ -85,33 +79,30 @@ const FunctionSchema = new Schema(
 
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
-
 );
 
 
 const OutputSchema = new Schema(
     {
-        Output:[{ 
-            Attributs:{
-                name: {type: String, required: true}, //  NMTOKEN #REQUIRED
-                datatype: {
-                    type: String,
-                    required: [true,`datatype  required for path Attributs.datatype `],
-                    enum: ['STRING', 'STRINGARRAY', 'STRINGLIST', 'DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
-                    
-                }, 
-                description: {type: String, required: false}, // CDATA #REQUIRED
-                max: {type: String, required: false}, // TODO CDATA #IMPLIED
-                min: {type: String, required: false}, // TODO CDATA #IMPLIED
-                variablecategory: {
-                    type: String,
-                    required: false,
-                    enum: ['state', 'rate', 'auxiliary']
-                }, 
-                unit: {type: String, required: true}, //CDATA #REQUIRED
-                uri: {type: String, required: false}, //CDATA #IMPLIED
-            }
-        }]
+        Attributs:{
+            name: {type: String, required: true}, //  NMTOKEN #REQUIRED
+            datatype: {
+                type: String,
+                required: [true,`datatype  required for path Attributs.datatype `],
+                enum: ['STRING', 'STRINGARRAY', 'STRINGLIST', 'DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
+                
+            }, 
+            description: {type: String, required: false}, // CDATA #REQUIRED
+            max: {type: String, required: false}, // TODO CDATA #IMPLIED
+            min: {type: String, required: false}, // TODO CDATA #IMPLIED
+            variablecategory: {
+                type: String,
+                required: false,
+                enum: ['state', 'rate', 'auxiliary']
+            }, 
+            unit: {type: String, required: true}, //CDATA #REQUIRED
+            uri: {type: String, required: false}, //CDATA #IMPLIED
+        }
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
@@ -119,33 +110,31 @@ const OutputSchema = new Schema(
 
 const InputSchema = new Schema(
     {
-        Input: [{
-            Attributs:{
-                name: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
-                datatype: {
-                    type: String,
-                    required: true,
-                    enum: ['STRING','STRINGARRAY','STRINGLIST','DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
-                }, 
-                description: {type: String, required:true}, // CDATA #REQUIRED
-                default: {type: String, required: false}, // TODO CDATA #IMPLIED
-                max: {type: String, required: false}, // TODO CDATA #IMPLIED
-                min: {type: String, required: false}, // TODO CDATA #IMPLIED
-                inputtype: {type: String, required: true}, // (variable|parameter) #REQUIRED
-                parametercategory : {
-                    type: String,
-                    required: false,
-                    enum: ['constant','species','genotypic','soil','private']
-                }, // TODO (constant|species|genotypic|soil|private) #IMPLIED
-                variablecategory : {
-                    type: String,
-                    required: false,
-                    enum: ['state','rate','auxiliary']
-                }, 
-                unit: {type: String, required: true}, //  CDATA #REQUIRED
-                uri : {type: String, required: false}, // CDATA #IMPLIED>
-            }
-        }]
+        Attributs:{
+            name: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
+            datatype: {
+                type: String,
+                required: true,
+                enum: ['STRING','STRINGARRAY','STRINGLIST','DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
+            }, 
+            description: {type: String, required:true}, // CDATA #REQUIRED
+            default: {type: String, required: false}, // TODO CDATA #IMPLIED
+            max: {type: String, required: false}, // TODO CDATA #IMPLIED
+            min: {type: String, required: false}, // TODO CDATA #IMPLIED
+            inputtype: {type: String, required: true}, // (variable|parameter) #REQUIRED
+            parametercategory : {
+                type: String,
+                required: false,
+                enum: ['constant','species','genotypic','soil','private']
+            }, // TODO (constant|species|genotypic|soil|private) #IMPLIED
+            variablecategory : {
+                type: String,
+                required: false,
+                enum: ['state','rate','auxiliary']
+            }, 
+            unit: {type: String, required: true}, //  CDATA #REQUIRED
+            uri : {type: String, required: false}, // CDATA #IMPLIED>
+        }
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
@@ -165,24 +154,22 @@ const DescriptionSchema = new Schema(
 
 const ModelUnitSchema = new Schema(
     {
-        ModelUnit:{
-            Attributs: {
-                    name: {type: String, required:[true,'a model name is required']},
-                    modelid: { type:String, required:[true,'a modelid is required']},
-                    timestep: { type:String, required:[false,'a model timestep is required']},
-                    version:{String, required:[false,'a model version is required']}
-                },
+        Attributs: {
+                name: {type: String, required:[true,'a model name is required']},
+                modelid: { type:String, required:[true,'a modelid is required']},
+                timestep: { type:String, required:[false,'a model timestep is required']},
+                version:{String, required:[false,'a model version is required']}
+            },
 
-            Description: {type: DescriptionSchema, require:[true,'a model description is required ']},
-            Inputs: {type: [InputSchema], required:false },
-            Outputs: {type:[OutputSchema], required:false},
-            Function:{type: FunctionSchema, require: false},
-            Algorithm:{type: AlgorithmSchema, require: false},
-            Parametersets:{type: [ParametersetSchema], require: true},
-            Testsets:{type: [TestsetSchema], require: true},
-        }
+        Description: {type: DescriptionSchema, require:[true,'a model description is required ']},
+        Inputs: {type: [InputSchema], required:false },
+        Outputs: {type:[OutputSchema], required:false},
+        Function:{type: FunctionSchema, require: false},
+        Algorithm:{type: AlgorithmSchema, require: false},
+        Parametersets:{type: [ParametersetSchema], require: true},
+        Testsets:{type: [TestsetSchema], require: true},
   },
   {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
 
-module.exports = mongoose.model('ModelUnit', ModelUnitSchema, 'modelunits')
+module.exports = mongoose.model('ModelUnit', ModelUnitSchema, 'models')

@@ -5,3 +5,4 @@ mapclient
 .env
 devInfo
 /database/*
+*/data/*

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import DBServices from '../services/DBServices.js'
+import DBServices from '../services/DBServices_DELETE.js'
 
 Vue.use(Vuex);
 

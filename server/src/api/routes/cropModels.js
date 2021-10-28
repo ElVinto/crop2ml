@@ -4,37 +4,31 @@ var router = express.Router();
 CropModelsServices = require('../../services/CropModelsServices.js');
 
 router.post('/findJsonModelsBySearchWords',async function(req, res, next){
-
-    try{
+    try {
         jsonModelIds = await CropModelsServices.findJsonModelsBySearchWords(req.body.searchWords)
         if(jsonModelIds){
             res.send(jsonModelIds)
         }else{
             res.send(`No model has been found`)
         }
-        
-    }catch(error){
+    } catch(error){
         console.log(error)
         res.send(error.toString())
     }
-
 });
 
 router.post('/findAllJsonModels',async function(req, res, next){
-
-    try{
+    try {
         jsonModels = await CropModelsServices.findAllModels()
         if(jsonModels){
             res.send(jsonModels)
         }else{
             res.send(`No model has been found`)
         }
-        
-    }catch(error){
+    } catch(error){
         console.log(error)
         res.send(error.toString())
     }
-
 });
 
 router.get('/findAllModelPackageNames',async function(req, res, next){
@@ -72,7 +66,7 @@ router.post('/findAllKeywords',async function(req, res, next){
 });
 
 
-
+//OK
 router.post('/modelTree',  async function(req, res, next) {
 
     console.log('START post /modelTree')

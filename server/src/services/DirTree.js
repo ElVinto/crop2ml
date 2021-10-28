@@ -17,7 +17,7 @@ class DirTree{
     static createDirTree = (path) =>{
         return directoryTree(path)
     }
-
+    
     static getDirTree(path){
         return this.createDirTree(path)
     }

@@ -16,7 +16,7 @@ class UserRequests{
             
             try { 
 
-                axios.get(url+'UserDBRoutes/getRegisteredEmails').then( res =>{
+                axios.get(url+'user/getRegisteredEmails').then( res =>{
                     console.log(' getRegisteredEmails SUCCESS!!');
                     resolve(res.data)
                 })

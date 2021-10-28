@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import DBServices from '../services/DBServices.js'
 import ClientServerJsonModel from '../services/ClientServerJsonModel.js'
 
 Vue.use(Vuex);
@@ -176,7 +175,7 @@ export default new Vuex.Store({
             try { 
                console.log("START reInitmodel "+modelid)
 
-               DBServices.getmodelById(modelid).then(savedmodel =>{ 
+               ClientServerJsonModel.getmodelById(modelid).then(savedmodel =>{ 
                   
                   if(savedmodel.model !== undefined){
                      console.log('savedmodel')
@@ -201,7 +200,7 @@ export default new Vuex.Store({
          console.log("START savemodel")
          console.log(model)
 
-         const savedmodel = await DBServices.savemodel(model)
+         const savedmodel = await ClientServerJsonModel.savemodel(model)
 
          if(savedmodel.model !== undefined){
             commit('addmodel',savedmodel)
@@ -219,7 +218,7 @@ export default new Vuex.Store({
          console.log("START STORE deletemodel")
          
 
-         const deletedmodel = await DBServices.deletemodelById(model.model.Attributs.modelid)
+         const deletedmodel = await ClientServerJsonModel.deletemodelById(model.model.Attributs.modelid)
 
          console.log("deletedmodel")
          console.log(deletedmodel)

@@ -25,7 +25,7 @@ class CommunityRequests{
                     formData.append(k, JSON.stringify(communityInfo[k]))
                 }
 
-                axios.post(url+'CommunityDBRoutes/createCommunity', formData, {
+                axios.post(url+'community/createCommunity', formData, {
                     // headers: formData.getHeaders()
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -55,7 +55,7 @@ class CommunityRequests{
             try { 
                 
                 
-                axios.get(url + "CommunityDBRoutes/getAllCommunities").then(res => {
+                axios.get(url + "community/getAllCommunities").then(res => {
                     resolve(res.data) ;
                 })
 

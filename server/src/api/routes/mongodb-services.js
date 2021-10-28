@@ -173,34 +173,6 @@ async function xmlString2jsonModel(xmlString){
     return result
 }
 
-// TODO Remove Model Unit and Model are now the same
-function jsonModel2xmlString(jsonObj){
-    console.log('jsonObj2xmlString')
-    console.log('jsonObj')
-    console.log(jsonObj)
-
-    
-    builder = new xml2js.Builder({
-        attrkey: "Attributs"
-        // , headless: true
-        , explicitRoot: true
-        , rootName:'Model'
-        , explicitArray: false
-        , cdata:true
-        , xmldec:{ 'version': '1.0', 'encoding': 'UTF-8' }
-        // , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/ModelUnit.dtd'}
-        })
-    
-    xmlString =   builder.buildObject(jsonObj).toString();
-    
-    console.log('xmlString')
-    console.log(xmlString)
-    
-    result = formatXml( xmlString , ['_id'])
-    return result
-
-}
-
 
 router.get('/json',async function(req, res, next){
     
@@ -405,139 +377,6 @@ async function findJsonModelUnit (model_name){
                 result = await ModelUnit.findOne({'ModelUnit.Attributs.name': model_name },{'_id':0, '__v':0})
                 
                 db.close();
-
-                // console.log('\n result: ')
-                // console.log(result)
-
-                // console.log('\n JSON.stringify(result)')
-                // console.log(JSON.stringify(result))
-
-                // console.log('\n JSON.parse(JSON.stringify(result))')
-                // console.log(JSON.parse(JSON.stringify(result)))
-
-                result = JSON.parse(JSON.stringify(result))
-
-                resolve(result)
-            });
-            
-        }catch (err) { 
-            reject(err); 
-        }
-    })
-    
-}
-
-router.post('/findJsonModelUnitById',async function(req, res, next){
-    console.log(`START findJsonModelUnitById ${model_name}` )
-    try{
-        let modelid =  req.body.modelid;
-        jsonModelUnit = await findJsonModelUnitById(modelid)
-        if(jsonModelUnit){
-            res.send(jsonModelUnit)
-        }else{
-            res.send(`ModelUnit ${modelid} NOT FOUND, the model has to be recorded first.`)
-        }
-
-        
-    }catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }finally{
-        console.log(`End findJsonModelUnitById ${model_name}` )
-    }
-
-});
-
-
-async function findJsonModelUnitById (modelid){
-
-    return new Promise((resolve, reject) => {
-        try{
-            const mongoose = require('mongoose')
-            mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
-            const db = mongoose.connection;
-            
-            db.on('error', console.error.bind(console, 'connection error:'));
-
-            db.once('open', async function(){
-
-                console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                console.log(`findOne : {'ModelUnit.Attributs.modelid': '${modelid}' } `)
-                result = await ModelUnit.findOne({'ModelUnit.Attributs.modelid': modelid },{'_id':0, '__v':0})
-                
-                db.close();
-
-                // console.log('\n result: ')
-                // console.log(result)
-
-                // console.log('\n JSON.stringify(result)')
-                // console.log(JSON.stringify(result))
-
-                // console.log('\n JSON.parse(JSON.stringify(result))')
-                // console.log(JSON.parse(JSON.stringify(result)))
-
-                result = JSON.parse(JSON.stringify(result))
-
-                resolve(result)
-            });
-            
-        }catch (err) { 
-            reject(err); 
-        }
-    })
-    
-}
-
-
-
-
-router.get('/findAllJsonModelUnits',async function(req, res, next){
-
-    try{
-        jsonModelUnits = await findAllJsonModelUnits()
-        if(jsonModelUnits){
-            res.send(jsonModelUnits)
-        }else{
-            res.send(`No ModelUnit has been found`)
-        }
-        
-    }catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }
-
-});
-
-
-async function findAllJsonModelUnits (){
-
-    return new Promise((resolve, reject) => {
-        try{
-            const mongoose = require('mongoose')
-            mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
-            const db = mongoose.connection;
-            
-            db.on('error', console.error.bind(console, 'connection error:'));
-
-            db.once('open', async function(){
-
-                console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                console.log(`find : {} `)
-                // result = await ModelUnit.find({},{'ModelUnit.Attributs.name': 1, 'ModelUnit.Attributs.modelid':1})
-                result = await ModelUnit.find({})
-                
-                db.close();
-
-                // console.log('\n result: ')
-                // console.log(result)
-
-                // console.log('\n JSON.stringify(result)')
-                // console.log(JSON.stringify(result))
-
-                // console.log('\n JSON.parse(JSON.stringify(result))')
-                // console.log(JSON.parse(JSON.stringify(result)))
 
                 result = JSON.parse(JSON.stringify(result))
 
@@ -769,7 +608,7 @@ async function saveJsonModel (jsonModel){
 
 
 async function saveJsonModelUnit (jsonModelUnit){
-
+    console.log(jsonModelUnit.Attributs.name)
     let model = await ModelUnit.findOneAndUpdate(
         {'Attributs.name': jsonModelUnit.Attributs.name},
         {jsonModelUnit},
@@ -971,12 +810,7 @@ async function parseXMLFromFile(){
 
     await insertModelUnitInMongoDb(modelUnitJsonObj);
     fs.writeFileSync("./server/data/melting.json", JSON.stringify(modelUnitJsonObj));
-
-
-
     objRead = await JSON.parse(fs.readFileSync("./server/data/melting.json"))
-    
-
     builder = new xml2js.Builder({
         attrkey: "Attributs"
         // , headless: true
@@ -986,17 +820,13 @@ async function parseXMLFromFile(){
         , cdata:true
         , xmldec:{ 'version': '1.0', 'encoding': 'UTF-8' }
         , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/ModelUnit.dtd'}
-        })
+    })
 
-    
     xmlString =  builder.buildObject(objRead).toString();
-    
-
     res = formatXml(
         xmlString =xmlString,
         tagsToRem =['_id'])
     
-
     console.log(res)
 
     // fs.writeFileSync("./server/data/m1.xml", builder.buildObject(objRead));
@@ -1033,13 +863,10 @@ function formatXml(xmlString,tagsToRem=[]) {
 }
 
 async function insertModelUnitInMongoDb(model){
-    
-        const client = await mongodb.MongoClient.connect(uri, { useNewUrlParser: true , useUnifiedTopology: true});
-        const itemsDriver =  client.db("crop2ml").collection("models");
-        const items =  await itemsDriver.insertOne(model);
-        client.close()
-        
-
+    const client = await mongodb.MongoClient.connect(uri, { useNewUrlParser: true , useUnifiedTopology: true});
+    const itemsDriver =  client.db("crop2ml").collection("models");
+    const items =  await itemsDriver.insertOne(model);
+    client.close()
 }
 
 router.get('/schema',async function(req, res, next){
@@ -1059,18 +886,13 @@ router.get('/schema',async function(req, res, next){
 
         db.close();
     });
-
-    
-
 });
 
 
 async function cleanAndAddDocs(mongoose){
 
     console.log(` nb docs before  cleanAndAddDocs ${await ModelUnit.find({}).countDocuments() } `)
-
     await ModelUnit.deleteMany({});
-
     m1 = new  ModelUnit({
             ModelUnit:{
                 Attributs :{ name: "m1" },
@@ -1081,7 +903,6 @@ async function cleanAndAddDocs(mongoose){
     )
     
     await m1.save()
-
     m2 = new  ModelUnit({
             ModelUnit:{
                 Attributs :{ name: "m2" },
@@ -1092,11 +913,8 @@ async function cleanAndAddDocs(mongoose){
     )
     
     await m2.save()
-
     console.log(` nb docs after cleanAndAddDocs ${await ModelUnit.find({}).countDocuments()}`)
-
     result =[]
-
     result.push({q1: {'ModelUnit.Attributs.name': 'm1'}})
     result.push({result_q1: await ModelUnit.find({ 'ModelUnit.Attributs.name': 'm1'})})
 
@@ -1197,9 +1015,6 @@ async function testQuery(mongoose){
                     }
                 ]
             }
-
-            
-
         }
     );
 

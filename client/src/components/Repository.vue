@@ -742,72 +742,38 @@ export default {
 
   data() {
     return {
-
       file:'',
       fileName:'',
-
       packageZip:{},
       packageName: '',
-
       errorMsg : "",
-
       selectedModelId: null,
-
       selectedModel:{},
-
       modelUnitSchema :{},
-
       expandedModelDetails: false,
-
       expandedModelAttributs :false,
-      
       expandedDescription :false,
-
       expandedAlgorithm :false,
-
-
       expandedModelInputs :false,
-
       expandedModelOutputs :false,
-
       expandedModelParametersets: false,
-
       expandedModelTestsets :false,
-
       currentRating: "No Rating",
       currentSelectedRating: "No Current Rating",
-
       modelTree: null,
-
       selectedWord: "",
       submittedSearch:false,
       searchResults:{
         fromTags: [],
         fromKeywords:[]
       },
-      
-      
-      
-
-
       searchMode:true,
       hierarchyMode:false,
       listMode:false,
-
-      
     }
   },
 
   async created() {
-
-    // console.log("START created Catalog")
-
-    // this.modelUnitSchema = ModelServices.buildSchema();
-
-    // console.log("this.modelUnitSchema")
-    // console.log(this.modelUnitSchema)
-
-    // console.log("END created Catalog")
   },
 
   async mounted() {
@@ -817,18 +783,14 @@ export default {
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-
     this.modelTree = [await ClientServerJsonModel.requestModelTree()]
-    
-    
+
     console.log('this.modelTree: ')
     console.log(this.modelTree)
-
     console.log("END mounted Catalog")
   },
 
   computed:{
-
   },
 
 
@@ -869,8 +831,6 @@ export default {
 
 
     toArrayIfNeeded(obj){
-      
-
       if(obj instanceof Array ){
         return obj
       }else{ 
@@ -904,11 +864,6 @@ export default {
       if(typeof this.$store.state.tagsObj[this.selectedWord]!=='undefined'){
           this.searchResults.fromTags=this.$store.state.tagsObj[this.selectedWord]
       }
-
-      
-
-      // console.log('this.$store.getters.getTags')
-      // console.log(this.$store.getters.getTags)
 
       console.log('this.searchResults')
       console.log(this.searchResults)

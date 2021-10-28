@@ -1,5 +1,3 @@
-var mongodb = require('mongodb')
-
 var path = require('path');
 var fs = require('fs');
 var unzipper = require('unzipper')
@@ -8,11 +6,8 @@ var fs = require('fs');
 var xml2js = require('xml2js');
 dirTree = require('../services/DirTree.js');
 
-require('dotenv').config()
-var MONGODB_URI = process.env.MONGODB_URI
-if(process.env.NODE_ENV==="development"){
-    MONGODB_URI = process.env.MONGODB_DEV_URI
-}
+let ModelUnit = require('../models/modelUnit')
+let Keyword = require('../models/keyword')
 
 class FilesServices {
 
@@ -21,7 +16,7 @@ class FilesServices {
      * @param {String} out 
      * @returns {Promise}
      */
-    zipDirectory(source, out) {
+    static async zipDirectory(source, out) {
         const archive = archiver('zip', { zlib: { level: 9 }});
         const stream = fs.createWriteStream(out);
     
@@ -42,32 +37,29 @@ class FilesServices {
      * @param {String} source 
      * @param {String} dest 
      */
-    extractZip(source, dest){
-    
+    //OK
+    static async extractZip(source, dest){
         return new Promise((resolve,reject)=>{
-          
             try{
                 let file = fs.createReadStream(source).pipe(unzipper.Extract({ path: dest }))
                 file.on('finish', ()=>{
-                    // console.log('extracted zip:')
-                    // console.log(file)
                     resolve('extraction: successful')
                 })
             }catch(error) {
                 reject(error.message);
             }
-      })
+        })
     }
 
-    async addModelsFrom(dirPath,modelMetaDataPart){
-
+    //OK
+    static async addModelsFrom(dirPath,modelMetaDataPart){
         return new Promise(async (resolve,reject)=>{
             try {
                 let xmlFNames =fs.readdirSync(dirPath).filter(fName => fName.includes('.xml'))
                 let savedJsonModels =[]
                 let extractedKeywords =[]
                 for(let xmlFName of xmlFNames ){
-                    let jsonModel = await xmlFile2jsonModel(dirPath+'/'+xmlFName)
+                    let jsonModel = await this.xmlFile2jsonModel(dirPath+'/'+xmlFName)
     
                     let idProperty = typeof jsonModel.Attributs.modelid === 'undefined'? "id" : "modelid"
                     let idValue =  typeof jsonModel.Attributs.modelid === 'undefined'? jsonModel.Attributs.id : jsonModel.Attributs.modelid
@@ -87,21 +79,17 @@ class FilesServices {
                         packageName: modelMetaDataPart.packageName,
                         uploaderMail: modelMetaDataPart.uploaderMail
                     }
-    
-                    let savedJsonModel = await saveJsonModel(jsonModel)
+                    console.log(jsonModel)
+                    let savedJsonModel = await this.saveJsonModel(jsonModel)
                     savedJsonModels.push(savedJsonModel)
     
-                    await saveJsonKeywords(jsonModel.metaData)
+                    await this.saveJsonKeywords(jsonModel.metaData)
     
-                    for(keyword of jsonModel.metaData.keywords){
+                    for(var keyword in jsonModel.metaData.keywords){
                         if(extractedKeywords.indexOf(keyword)===-1){
                             extractedKeywords.push(keyword)
                         }
                     }
-    
-                    // console.log(savedJsonModel.value.Attributs)
-    
-                    
                 }
                 resolve([savedJsonModels,extractedKeywords])
                 
@@ -111,12 +99,13 @@ class FilesServices {
         })
     }
     
-    async xmlFile2jsonModel(xmlFPath){
+    //OK
+    static async xmlFile2jsonModel(xmlFPath){
         
         return new Promise((resolve,reject)=>{
             try {
                 let fileData = fs.readFileSync(path.resolve(xmlFPath))
-                parser = new xml2js.Parser({
+                let parser = new xml2js.Parser({
                     attrkey: "Attributs",
                     explicitRoot: false,
                     rootName: 'Model',
@@ -137,90 +126,49 @@ class FilesServices {
     
     }
     
-    async saveJsonModel (jsonModel){
-        console.log('saveJsonModel')
+    //OK
+    static async saveJsonModel (jsonModel){
         return new Promise(async (resolve, reject) => {
             try{
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-    
-                // console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("models");
-                
-                // const modelidProperty = typeof jsonModel.Attributs.modelid === 'undefined'? "id" : "modelid"
-                // const modelid =  typeof jsonModel.Attributs.modelid === 'undefined'? jsonModel.Attributs.id : jsonModel.Attributs.modelid
-    
-    
-                let filter ={}
-                filter[`Attributs.${jsonModel.metaData.idProperty}`]= jsonModel.metaData.idValue
-    
-                const replacement = jsonModel
+                const filter = {'Attributs.modelid': jsonModel.metaData.idValue}
+                const update = jsonModel
                 const options = { upsert: true, returnNewDocument: true}
-    
-                console.log("insert or replace :  ")
-                console.log(filter)
-    
-                var result = await collection.findOneAndReplace(filter,replacement,options)
-    
-                if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
+                var result = await ModelUnit.updateOne(filter,update,options)
+                //CMZ comment
+                /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
                     result.value = jsonModel;
-                }
-                
+                }*/
                 result = JSON.parse(JSON.stringify(result))
-    
-                // console.log('result')
-                // console.log(result)
-    
-                await client.close()
                 resolve(result)
                        
             }catch(error){
                 console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
                 reject(error);
             }
         }) 
       
     }
     
-    async saveJsonKeywords (modelMetaData){
-        console.log('saveJsonKeywords')
-        console.log(modelMetaData)
-    
+    //OK
+    static async saveJsonKeywords (modelMetaData){
         return new Promise(async (resolve, reject) => {
             try{
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                // console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("keywords");
-                
-                for(k of modelMetaData.keywords){
+                modelMetaData.keywords.forEach(async(k) => {
                     const filter = {keyword: k, modelIdValue: modelMetaData.idValue }
-                    const replacement = {keyword: k, modelIdValue: modelMetaData.idValue }
+                    const update = {keyword: k, modelIdValue: modelMetaData.idValue }
                     const options = { upsert: true, returnNewDocument: true}
-                    var result = await collection.findOneAndReplace(filter,replacement,options)
-                    if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
+                    
+                    await Keyword.updateOne(filter,update,options)
+                    //CMZ comment
+                    /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
                         result.value = replacement;
-                    }
-                    console.log('insert : ')
-                    console.log(replacement)
-                    // console.log(result)
-                }
-    
-                await client.close()
+                    }*/
+                })
+
                 resolve()
                        
             }catch(error){
                 console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
                 reject(error);
             }
         }) 
@@ -232,7 +180,7 @@ class FilesServices {
         return new Promise(async (resolve, reject) => {
             try{
     
-                console.log(' START getAllModels')
+                console.log(' START getAllModels 2')
     
                 const MongoClient = require('mongodb').MongoClient;
                 const uri = MONGODB_URI;

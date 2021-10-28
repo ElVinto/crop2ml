@@ -16,7 +16,7 @@ class Authentification {
         
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "AuthentificationDBRoutes/register", userRegistrationDetails).then(res => {
+                axios.post(url + "auth/register", userRegistrationDetails).then(res => {
                     
                     console.log("Authentification.END register");
                     
@@ -33,7 +33,7 @@ class Authentification {
         
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "AuthentificationDBRoutes/updateProfile", profileDetails).then(res => {
+                axios.post(url + "auth/updateProfile", profileDetails).then(res => {
                     
                     console.log("Authentification.END updateProfile");
                     
@@ -51,7 +51,7 @@ class Authentification {
         let body = { email, password}
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "AuthentificationDBRoutes/singIn", body).then(res => {
+                axios.post(url + "auth/signIn", body).then(res => {
                     resolve(res.data);
                 })
 
@@ -64,7 +64,7 @@ class Authentification {
         return new Promise((resolve, reject) => {
             try {
                 let body = { email}
-                axios.post(url + "AuthentificationDBRoutes/forgotPassword", body).then(res => {
+                axios.post(url + "auth/forgotPassword", body).then(res => {
                     resolve(res.data);
                 })
 
@@ -76,7 +76,7 @@ class Authentification {
         
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "AuthentificationDBRoutes/resetPassword", resetPasswordDetails).then(res => {
+                axios.post(url + "auth/resetPassword", resetPasswordDetails).then(res => {
                     resolve(res.data);
                 })
 

@@ -27,7 +27,7 @@ router.post('/updateProfile',async function(req, res, next){
 
 });
 
-router.post('/singIn',async function(req, res, next){
+router.post('/signIn',async function(req, res, next){
 
     try{
         userInfo = await AuthServices.signIn(req.body)        

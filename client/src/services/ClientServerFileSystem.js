@@ -30,7 +30,7 @@ class ClientServerFileSystem {
                 //     headers: formData.getHeaders()
                 // });
 
-                axios.post(url+'ServerFileSystemRoutes/uploadZip', formData, {
+                axios.post(url+'files/uploadZip', formData, {
                     // headers: formData.getHeaders()
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -55,7 +55,7 @@ class ClientServerFileSystem {
     static requestPackageTree (){
         return new Promise((resolve,reject)=>{
             try{
-                axios.post(url + "fileSystem-services/packageTree").then(res => {
+                axios.post(url + "files/packageTree").then(res => {
                     resolve(res.data) ;
                 })
             }catch(err){
@@ -76,7 +76,7 @@ class ClientServerFileSystem {
 
             axios({
                 method: 'post',
-                url: url+'fileSystem-services/downloadZip',
+                url: url+'files/downloadZip',
                 data: {packageName},
                 responseType: 'stream'
             }).then( response => {
@@ -134,7 +134,7 @@ class ClientServerFileSystem {
             
             axios({
                 method: 'post',
-                url: url+'fileSystem-services/downloadFile',
+                url: url+'files/downloadFile',
                 data: {serverFilePath},
                 responseType: 'stream'
             }).then( response => {
@@ -156,10 +156,7 @@ class ClientServerFileSystem {
             
         })
     }
-
-
-
-    
-
 }
+
+
 export default ClientServerFileSystem;

@@ -50,6 +50,7 @@ class CropModelsServices{
         }) 
       
     }
+
     static async saveKeywords (modelMetaData){
         console.log('saveJsonKeywords')
         console.log(modelMetaData)
@@ -140,7 +141,7 @@ class CropModelsServices{
         return new Promise(async (resolve, reject) => {
             try{
     
-                console.log(' START getAllModels')
+                console.log(' START getAllModels 1')
     
                 /*const MongoClient = require('mongodb').MongoClient;
                 const uri = MONGODB_URI;
@@ -167,13 +168,9 @@ class CropModelsServices{
                 //await client.close()
                 //resolve(result)
                        
-            }catch(error){
+            } catch(error){
                 console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
                 reject(error);
-            }finally{
-                console.log('END getAllModels')
             }
         }) 
     }
@@ -224,36 +221,14 @@ class CropModelsServices{
     }
     
     static async getAllModelsMetaData(){
-        
         return new Promise(async (resolve, reject) => {
             try{
-    
-                console.log(' START getAllModelsMetaData')
-    
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("models");
-                
-                const result = await collection.find({}).project({metaData:1}).toArray()
-                
-    
-                // console.log('result')
-                // console.log(result)
-    
-                await client.close()
+                const result = await ModelUnit.find({}, {metaData:1})
+                console.log(result)
                 resolve(result)
-                       
             }catch(error){
                 console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
                 reject(error);
-            }finally{
-                console.log('END getAllModelsMetaData')
             }
         }) 
     }
