@@ -2,6 +2,7 @@
 node_modules
 /dist
 devInfo/
+devInfo.zip
 db-creation-script.sql
 mysqlpwd.txt
 

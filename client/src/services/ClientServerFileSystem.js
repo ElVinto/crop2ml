@@ -26,6 +26,9 @@ class ClientServerFileSystem {
                 formData.append('fileName', modelMetaDataPart.zipFileName);
                 formData.append('packageName', modelMetaDataPart.packageName);
                 formData.append('uploaderMail', modelMetaDataPart.uploaderMail);
+
+                formData.append('metaDataObject', JSON.stringify(modelMetaDataPart));
+                
                 // const res = await axios.post('fileSystem-services/upload', formData, {
                 //     headers: formData.getHeaders()
                 // });

@@ -78,14 +78,11 @@
 
                 no-add-on-enter
               ></b-form-tags>
-
-
-
             </b-input-group>
 
             <!-- Community model packages -->
             <b-input-group prepend="Model packages" style="margin-top:1em; width:100%; text-align:left; overflow:scroll">
-            <b-form-tags class="form-control" style="background: white;"
+              <b-form-tags class="form-control" style="background: white;"
                 v-model="community.modelPackages"
                 separator=","
                 placeholder="Enter model packages separated by comma"
@@ -99,9 +96,6 @@
             <b-button variant="secondary" @click="submitCommunity()" style="margin-top:1em">
               Update
             </b-button>
-
-
-
           </div>
           <div v-else>
               Please <a href="#/SignIn">sign-in</a>  or <a href="#/register"> register </a> before creating a community
@@ -132,7 +126,6 @@ export default {
       inputImgFile: null,
 
       registeredEmails : [],
-
       packageNames : []
 
     };

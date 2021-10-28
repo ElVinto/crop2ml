@@ -49,12 +49,14 @@ router.post('/uploadZip',  async function(req, res, next) {
     
     console.log('fields')
     console.log(fields)
+
     // TODO parse fields
     // {
     //     tags: 't,r,e,tag2,tag3,tag5',
     //     fileName: 'SQ_Energy_Balance-master.zip',
     //     repositoryName: 'SQ_Energy_Balance-master'
     //   }
+
 
     console.log('files received')
     console.log(JSON.parse(JSON.stringify(files)))
@@ -285,6 +287,14 @@ async function addModelsFrom(dirPath,modelMetaDataPart){
                     packageName: modelMetaDataPart.packageName,
                     uploaderMail: modelMetaDataPart.uploaderMail
                 }
+
+                // TODO
+                 jsonModel["otherMetaData"]=JSON.parse(modelMetaDataPart.metaDataObject)
+                // jsonModel["metaData"]['dirPath']= dirPath;
+                // jsonModel["metaData"]['xmlFName']= xmlFName;
+                // jsonModel["metaData"]['idProperty']= idProperty;
+                // jsonModel["metaData"]['idValue']= idValue;
+                // jsonModel["metaData"]['keywords']= keywords;
 
                 let savedJsonModel = await saveJsonModel(jsonModel)
                 savedJsonModels.push(savedJsonModel)

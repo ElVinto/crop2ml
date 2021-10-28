@@ -393,7 +393,7 @@ export default {
         msg= 'No selected file.zip '
       }
       if(!this.packageZip && this.packageZipSent){
-        msg= 'Model package sent successfully'
+        msg= 'Model sent successfully'
       }
 
       if(this.packageZip){
