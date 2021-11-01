@@ -54,8 +54,6 @@ __backend__ : http://localhost:5000
 __frontend__ : http://localhost:8080
 
 
-mongo "mongodb+srv://crop2mlcluster.6pf0x.mongodb.net/crop2ml" --username devInfoAtlas
-
 collections :
 
 ## keywords
@@ -87,3 +85,16 @@ collections :
 
 ## users
 { "_id" : ObjectId("617aabfb5975cd0015c07c08"), "email" : "vincent.armant@gmail.com", "password" : "$2a$10$CKLHSIVxvEVTc3rm0lYNGu.Rk3p2Ze10UweNsnwwLGD6Xxe2P8.7i", "category" : "user" }
+
+
+
+## mongoDB commands :https://docs.mongodb.com/manual/reference/mongo-shell/
+mongo -u "root" -p "password"
+mongo "mongodb+srv://$user:$password@crop2mlcluster.6pf0x.mongodb.net/dev"
+mongo "mongodb+srv://crop2mlcluster.6pf0x.mongodb.net/crop2ml" --username devInfoAtlas
+show dbs
+use test
+show collections
+db.auth
+coll = db.<collection>
+coll.find()

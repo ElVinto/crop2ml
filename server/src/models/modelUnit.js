@@ -81,7 +81,6 @@ const FunctionSchema = new Schema(
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
 
-
 const OutputSchema = new Schema(
     {
         Attributs:{
@@ -106,7 +105,6 @@ const OutputSchema = new Schema(
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
-
 
 const InputSchema = new Schema(
     {
@@ -139,7 +137,6 @@ const InputSchema = new Schema(
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
 
-
 const DescriptionSchema = new Schema(
     {
         Title: {type: String, required: true},
@@ -152,22 +149,91 @@ const DescriptionSchema = new Schema(
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
 
+const InputLinkSchema = new Schema(
+    {
+        Attributs:{
+            target: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
+            source: {type: String, required:true}, // CDATA #REQUIRED
+        }
+    }
+)
+
+const InternalLinkSchema = new Schema(
+    {
+        Attributs:{
+            target: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
+            source: {type: String, required:true}, // CDATA #REQUIRED
+        }
+    }
+)
+
+const OutputLinkSchema = new Schema(
+    {
+        Attributs:{
+            target: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
+            source: {type: String, required:true}, // CDATA #REQUIRED
+        }
+    }
+)
+
+const CompositionSchema = new Schema(
+    {
+        Model: [{
+            Attributs:{
+                name: {type: String, required:true}, // TODO NMTOKEN #REQUIRED
+                id: {type: String, required:true}, // CDATA #REQUIRED
+                filename: {type: String, required:true},
+            }
+        }],
+        Links: {
+            InputLink: {type: [InputLinkSchema], required: false},
+            InternalLink: {type: [InternalLinkSchema], required: false},
+            OutputLink: {type: [OutputLinkSchema], required: false},
+        },
+    }
+)
+
 const ModelUnitSchema = new Schema(
     {
         Attributs: {
-                name: {type: String, required:[true,'a model name is required']},
-                modelid: { type:String, required:[true,'a modelid is required']},
-                timestep: { type:String, required:[false,'a model timestep is required']},
-                version:{String, required:[false,'a model version is required']}
-            },
-
+            name: {type: String, required:[true,'a model name is required']},
+            id: { type:String, required:[false,'an id is required']},
+            modelid: { type:String, required:[false,'a modelid is required']},
+            /*id: { type:String, required: function() {
+                console.log("valid id : " + (typeof this.modelid) === null)
+                return (typeof this.modelid) === null}},
+            modelid: { type:String, required: function() {
+                console.log("valid modelid : " + (typeof this.id) === null)
+                return (typeof this.id) === null}},*/
+            timestep: { type:String, required:[false,'a model timestep is required']},
+            version:{String, required:[false,'a model version is required']}
+        },
+        Composition: {type: CompositionSchema, required: false},
         Description: {type: DescriptionSchema, require:[true,'a model description is required ']},
-        Inputs: {type: [InputSchema], required:false },
-        Outputs: {type:[OutputSchema], required:false},
+        Inputs: {
+            Input: {type: [InputSchema], required:false},
+        },
+        Outputs: {
+            Output: {type: [OutputSchema], required:false},
+        },
         Function:{type: FunctionSchema, require: false},
         Algorithm:{type: AlgorithmSchema, require: false},
-        Parametersets:{type: [ParametersetSchema], require: true},
-        Testsets:{type: [TestsetSchema], require: true},
+        Parametersets:{
+            Parameterset: {type: [ParametersetSchema], require: true},
+        },
+        Testsets:{
+            Testset: {type: [TestsetSchema], require: true},
+        },
+        metaData : {
+            dirPath: {type: String, required: false},
+            xmlFName: { type:String, required: false},
+            idProperty: {type: String, required: false},
+            idValue: {type: String, required: false},
+            keywords: {type: [String], required: false},
+            tags: {type: [String], required: false},
+            packageName: {type: String, required: false},
+            uploaderMail: {type: String, required: false},
+        }
   },
   {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );

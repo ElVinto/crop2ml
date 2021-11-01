@@ -78,7 +78,6 @@
 <script>
 
 
-
 import CommunityRequests from "../../services/CommunityRequests"
 import ClientServerFileSystem from "../../services/ClientServerFileSystem"
 
@@ -87,7 +86,6 @@ export default {
   name: 'Communities',
 
   components: {
-
   },
 
   props:{
@@ -96,40 +94,19 @@ export default {
 
   data() {
     return {
-
-      
-
       communityList: [],
-      
       communityListLoaded: false,
-
-
-      
-      
     }
   },
 
   async created() {
-
   },
 
   async mounted() {
-    
-    console.log("START mounted Communities")
-
     this.communityList = await CommunityRequests.getAllCommunities()
-
-    // for(c of this.communityList){
-    //   c['imageFile']= ClientServerFileSystem.downloadFile(c.image_path)
-    // }
-
-    console.log('communityList')
-    console.log(this.communityList) 
-
     this.communityListLoaded =true;
 
     try{
-
       await Promise.all(this. communityList.map( async c =>{
         
         let serverFilePath = c.image_path
@@ -147,18 +124,13 @@ export default {
 
         }
         reader.readAsDataURL(file);      
-
       }))
-
-      console.log("END mounted Communities")
     } catch (err) { 
       console.error(err);
     }
-
   },
 
   computed:{
-
   },
 
 
@@ -170,7 +142,6 @@ export default {
       }
       return false
     },
-
 
   },
 

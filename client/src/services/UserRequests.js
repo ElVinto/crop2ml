@@ -10,17 +10,14 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 
 class UserRequests{
 
+    //OK
     static getRegisteredEmails = async () =>{
-        
         return new Promise((resolve, reject) => {
-            
             try { 
-
                 axios.get(url+'user/getRegisteredEmails').then( res =>{
                     console.log(' getRegisteredEmails SUCCESS!!');
                     resolve(res.data)
                 })
-
             } catch (err) { 
                 console.log(' getRegisteredEmails FAILURE!!');
                 console.error(err);
@@ -28,8 +25,6 @@ class UserRequests{
             }
         })
     }
-
-
 }
 
 

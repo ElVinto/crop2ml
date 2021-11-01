@@ -2,95 +2,8 @@ let ModelUnit = require('../models/modelUnit')
 
 class CropModelsServices{
 
-    static async saveModel (jsonModel){
-        console.log('saveJsonModel')
-        return new Promise(async (resolve, reject) => {
-            try{
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("models");
-                
-                // const modelidProperty = typeof jsonModel.Attributs.modelid === 'undefined'? "id" : "modelid"
-                // const modelid =  typeof jsonModel.Attributs.modelid === 'undefined'? jsonModel.Attributs.id : jsonModel.Attributs.modelid
-    
-    
-                let filter ={}
-                filter[`Attributs.${jsonModel.metaData.idProperty}`]= jsonModel.metaData.idValue
-    
-                const replacement = jsonModel
-                const options = { upsert: true, returnNewDocument: true}
-    
-                console.log("insert or replace :  ")
-                console.log(filter)
-    
-                var result = await collection.findOneAndReplace(filter,replacement,options)
-    
-                if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
-                    result.value = jsonModel;
-                }
-                
-                result = JSON.parse(JSON.stringify(result))
-    
-                console.log('result')
-                console.log(result)
-    
-                await client.close()
-                resolve(result)
-                       
-            }catch(error){
-                console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
-                reject(error);
-            }
-        }) 
-      
-    }
-
-    static async saveKeywords (modelMetaData){
-        console.log('saveJsonKeywords')
-        console.log(modelMetaData)
-    
-        return new Promise(async (resolve, reject) => {
-            try{
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                // console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("keywords");
-                
-                for(k of modelMetaData.keywords){
-                    const filter = {keyword: k, modelIdValue: modelMetaData.idValue }
-                    const replacement = {keyword: k, modelIdValue: modelMetaData.idValue }
-                    const options = { upsert: true, returnNewDocument: true}
-                    var result = await collection.findOneAndReplace(filter,replacement,options)
-                    if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
-                        result.value = replacement;
-                    }
-                    console.log('insert : ')
-                    console.log(replacement)
-                    // console.log(result)
-                }
-    
-                await client.close()
-                resolve()
-                       
-            }catch(error){
-                console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
-                reject(error);
-            }
-        }) 
-      
-    }
-    
+    //TODO reuse for more complex search with or condition
+    /*
     static async findJsonModelsBySearchWords(searchWords){
         
         return new Promise(async (resolve, reject) => {
@@ -133,41 +46,14 @@ class CropModelsServices{
                 console.log('END findJsonModelsBySearchWords')
             }
         }) 
-    }
+    }*/
 
-
+    //OK
     static async findAllModels(){
-        
         return new Promise(async (resolve, reject) => {
             try{
-    
-                console.log(' START getAllModels 1')
-    
-                /*const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                console.log(`succesful connection to ${MONGODB_URI}` )
-    */
-                //const collection = client.db("crop2ml").collection("models");
-
-                ModelUnit.find({}, function(err, models){
-                    if(err){
-                        console.log(err)
-                        resolve(err)
-                    } else {
-                        console.log(models)
-                        resolve(models)
-                    }
-                })
-                
-    
-                //const result = await collection.find({}).toArray()
-                
-    
-                //await client.close()
-                //resolve(result)
-                       
+                const result = await ModelUnit.find({})
+                resolve(result)
             } catch(error){
                 console.log(error)
                 reject(error);
@@ -175,47 +61,21 @@ class CropModelsServices{
         }) 
     }
 
+    //OK
     static async findAllModelPackageNames(){
-        
         return new Promise(async (resolve, reject) => {
             try{
-    
-                console.log(' START findAllModelPackageNames')
-    
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("models");
-                
-                const metaDataPackageNames = await collection.find({}).project({"metaData.packageName":1 ,_id:0}).toArray()
-                
- 
-
-                // remove duplicate packqge Names
+                const models = await this.getAllModelsMetaData()
                 let result = []
-                metaDataPackageNames.forEach(m =>{
+                models.forEach(m =>{
                     if(!result.includes(m.metaData.packageName)){
                         result.push(m.metaData.packageName)
                     }
                 })
-                
-    
-                // console.log('result')
-                // console.log(result)
-    
-                await client.close()
                 resolve(result)
-                       
-            }catch(error){
+            } catch(error){
                 console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
                 reject(error);
-            }finally{
-                console.log('END findAllModelPackageNames')
             }
         }) 
     }
@@ -223,8 +83,7 @@ class CropModelsServices{
     static async getAllModelsMetaData(){
         return new Promise(async (resolve, reject) => {
             try{
-                const result = await ModelUnit.find({}, {metaData:1})
-                console.log(result)
+                const result = await ModelUnit.find({}, {metaData: 1, _id: 0})
                 resolve(result)
             }catch(error){
                 console.log(error)
@@ -233,4 +92,5 @@ class CropModelsServices{
         }) 
     }
 }
+
 module.exports = CropModelsServices

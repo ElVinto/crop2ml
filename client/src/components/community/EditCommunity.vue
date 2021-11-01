@@ -128,22 +128,13 @@ export default {
 
   data() {
     return {
-
       inputImgFile: null,
-
       registeredEmails : [],
-
       packageNames : []
-
     };
   },
 
   async mounted() {
-
-    console.log("START mount Edit Community")
-    console.log(this.community)
-
-
     this.inputImgFile = this.community.file
     delete this.community.file
     delete this.community._id
@@ -152,7 +143,6 @@ export default {
 
     this.inputImgFile['name'] = image_path_elmts[image_path_elmts.length -1] ;
 
-
     var reader  = new FileReader();
     reader.onload = function(e)  {
       var image = document.getElementById("displayedImg");
@@ -160,28 +150,13 @@ export default {
     }
     reader.readAsDataURL(this.inputImgFile);
 
-    
-
     this.registeredEmails = await UserRequests.getRegisteredEmails();
-    console.log("registeredEmails")
-    console.log(this.registeredEmails)
-
-
     this.packageNames = await ClientServerJsonModel.findAllModelPackageNames();
-    console.log("packageNames")
-    console.log(this.packageNames)
-
-    console.log("End mount Edit Community")
-
   },
 
   methods: {
 
-
     previewInputImgFile() {
-
-      console.log("START previewInputImgFile")
-
       var file = document.getElementById('inputImgFileForm').files[0];
       var reader  = new FileReader();
       reader.onload = function(e)  {
@@ -189,31 +164,15 @@ export default {
           image.src = e.target.result;
         }
       reader.readAsDataURL(file);
-
-      console.log("END previewInputImgFile")
      },
     
     async submitCommunity(){
-      console.log("START submitCommunity")
-
-      console.log("this.inputImgFile")
-      console.log(this.inputImgFile)
-
-
-      
-
       const communityCreated =  await CommunityRequests.createCommunity(this.inputImgFile,this.community)
       
       console.log("communityCreated")
       console.log(communityCreated)
 
-
       this.$router.push("/Communities")
-
-      console.log("END submitCommunity")
-
-      
-
     },
 
     emailValidator(tag){
@@ -223,13 +182,9 @@ export default {
     packageValidator(tag){
       return this.packageNames.includes(tag)
     }
-
-
   },
 
   watch:{
-   
-    
   }
 
 };

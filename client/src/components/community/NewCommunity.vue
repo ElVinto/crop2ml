@@ -85,33 +85,22 @@
 
 import CommunityRequests from "../../services/CommunityRequests"
 
-// vincent.armant@gmail.com
 
 export default {
   data() {
     return {
-
       name: null,
       description: "",
-
-
       inputImgFile: null,
-
       submitted:false,
-
     };
   },
 
   mounted() {
-    
   },
 
   methods: {
-
-
     previewInputImgFile() {
-
-      console.log("START previewInputImgFile")
 
       var file = document.getElementById('inputImgFileForm').files[0];
       var reader  = new FileReader();
@@ -121,11 +110,9 @@ export default {
         }
       reader.readAsDataURL(file);
 
-      console.log("END previewInputImgFile")
      },
     
     async submitCommunity(){
-      console.log("START submitCommunity")
 
       let image = this.inputImgFile;
       if(image == null){
@@ -135,16 +122,8 @@ export default {
         image =  await this.GetFileBlobUsingURL(FileURL);
         image['lastModifiedDate'] = new Date();
         image['name'] = "community_iconfinder_128px.png";
-
-        console.log("Created Blob")
-        console.log(image);
-
-        
       }
 
-      
-      
-      
       const communityInfo ={
         name: this.name,
         description: this.description,
@@ -153,28 +132,16 @@ export default {
         modelPackages:[]
       }
 
-      console.log("community sent")
-      console.log(communityInfo)
-
       const communityCreated =  await CommunityRequests.createCommunity(image,communityInfo)
-      
-      console.log("communityCreated")
       console.log(communityCreated)
 
       this.submitted =true;
-
       this.$router.push("/Communities")
-
-      console.log("END submitCommunity")
-
-
     },
 
 
     GetFileBlobUsingURL (url) {
-
       return new Promise( (resolve,reject)=>{
-
         try{
           var xhr = new XMLHttpRequest();
           xhr.open("GET", url);
@@ -189,8 +156,6 @@ export default {
         }
         }
       )
-
-
     },
 
     blobToFile (blob, name) {
@@ -204,14 +169,9 @@ export default {
               convertBlob(this.blobToFile(blob, filePathOrUrl));
           });
     },
-
-  
-
   },
 
   watch:{
-   
-    
   }
 
 };

@@ -14,6 +14,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 
 class ClientServerFileSystem {
 
+    //OK
     static sendZip = async (file, modelMetaDataPart) =>{
         
         return new Promise( (resolve, reject) => {
@@ -52,7 +53,7 @@ class ClientServerFileSystem {
         })
     }
 
-    static requestPackageTree (){
+    /*static requestPackageTree (){
         return new Promise((resolve,reject)=>{
             try{
                 axios.post(url + "files/packageTree").then(res => {
@@ -65,7 +66,7 @@ class ClientServerFileSystem {
             }
         })
 
-    }
+    }*/
 
     static dowloadZip(packageName){
         return new Promise(  (resolve, reject) => {
@@ -96,12 +97,10 @@ class ClientServerFileSystem {
 
     static downloadFile(serverFilePath){
         return new Promise(  (resolve, reject) => {
-            console.log('START downloadFile: '+serverFilePath)
-
             try{
                 axios({
                     method: 'post',
-                    url: url+'ServerFileSystemRoutes/downloadFile',
+                    url: url+'files/downloadFile',
                     data: {serverFilePath},
                     responseType: 'blob'
                 }).then( response => {
@@ -110,18 +109,12 @@ class ClientServerFileSystem {
                     console.log('END downloadFile: '+serverFilePath)
 
                     resolve(response.data)
-
-
-                    
                 })
-
             }catch(err){
                 console.log(' packageTree FAILURE!!');
                 console.error(err);
                 reject(err);
             }
-          
-            
         })
     }
     static downloadLargeFile(serverFilePath){

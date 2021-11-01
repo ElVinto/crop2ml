@@ -10,8 +10,8 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 
 class ClientServerJsonModel{
 
-
-    static findJsonModelsBySearchWords = async (searchWords) =>{
+    // TODO reuse for more complex search with or condition
+    /*static findJsonModelsBySearchWords = async (searchWords) =>{
         
         return new Promise((resolve, reject) => {
             
@@ -31,7 +31,7 @@ class ClientServerJsonModel{
             }
         })
 
-    }
+    }*/
 
     //OK
     static findAllJsonModels = async () =>{
@@ -64,7 +64,7 @@ class ClientServerJsonModel{
 
     }
 
-    static findAllKeywords = async () =>{
+    /*static findAllKeywords = async () =>{
         
         return new Promise((resolve, reject) => {
             
@@ -86,7 +86,7 @@ class ClientServerJsonModel{
             }
         })
 
-    }
+    }*/
 
     //OK
     static requestModelTree (){

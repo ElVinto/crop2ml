@@ -623,19 +623,6 @@ export default {
       console.log("END submitFile")
     },
 
-    handleZipUpload(){
-      console.log("START handleZipUpload")
-
-
-      this.packageZip = this.$refs.zip.files[0];
-
-      console.log(" zip file")
-      console.log(this.packageZip)
-
-
-      console.log("END handleZipUpload")
-    },
-
     async submitZip(){
       console.log("START submitFile")
 

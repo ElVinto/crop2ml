@@ -235,20 +235,6 @@ export default {
 
     },
 
-    // TODO remove not used
-    handleZipUpload(){
-      console.log("START handleZipUpload")
-
-      this.packageZip = this.$refs.zip.files[0];
-      
-
-      console.log(" zip file")
-      console.log(this.packageZip)
-
-
-      console.log("END handleZipUpload")
-    },
-
     async submitZip(){
       console.log("START submitZip")
 

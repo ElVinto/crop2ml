@@ -52,7 +52,7 @@ class FilesServices {
     }
 
     //OK
-    static async addModelsFrom(dirPath,modelMetaDataPart){
+    static async addModelsFrom(dirPath, modelMetaDataPart){
         return new Promise(async (resolve,reject)=>{
             try {
                 let xmlFNames =fs.readdirSync(dirPath).filter(fName => fName.includes('.xml'))
@@ -84,12 +84,12 @@ class FilesServices {
                     savedJsonModels.push(savedJsonModel)
     
                     await this.saveJsonKeywords(jsonModel.metaData)
-    
-                    for(var keyword in jsonModel.metaData.keywords){
-                        if(extractedKeywords.indexOf(keyword)===-1){
-                            extractedKeywords.push(keyword)
+                    
+                    jsonModel.metaData.keywords.forEach (k => {
+                        if(extractedKeywords.indexOf(k)===-1){
+                            extractedKeywords.push(k)
                         }
-                    }
+                    })
                 }
                 resolve([savedJsonModels,extractedKeywords])
                 
@@ -108,14 +108,13 @@ class FilesServices {
                 let parser = new xml2js.Parser({
                     attrkey: "Attributs",
                     explicitRoot: false,
-                    rootName: 'Model',
+                    //rootName: 'Model',
                     explicitArray: false,
-                    cdata: true,
+                    //cdata: true,
                 });
                 parser.parseStringPromise(fileData).then(
                     result => {
                         // console.log(xmlFPath)
-                        // console.log(result.Attributs)
                         resolve( result)
                     }
                 )
@@ -130,7 +129,9 @@ class FilesServices {
     static async saveJsonModel (jsonModel){
         return new Promise(async (resolve, reject) => {
             try{
-                const filter = {'Attributs.modelid': jsonModel.metaData.idValue}
+                //const filter = {'Attributs.modelid': jsonModel.metaData.idValue}
+                let filter = {}
+                filter[`Attributs.${jsonModel.metaData.idProperty}`]= jsonModel.metaData.idValue
                 const update = jsonModel
                 const options = { upsert: true, returnNewDocument: true}
                 var result = await ModelUnit.updateOne(filter,update,options)
@@ -138,7 +139,7 @@ class FilesServices {
                 /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
                     result.value = jsonModel;
                 }*/
-                result = JSON.parse(JSON.stringify(result))
+                //result = JSON.parse(JSON.stringify(result))
                 resolve(result)
                        
             }catch(error){
@@ -174,79 +175,6 @@ class FilesServices {
         }) 
       
     }
-    
-    async getAllModels(){
-        
-        return new Promise(async (resolve, reject) => {
-            try{
-    
-                console.log(' START getAllModels 2')
-    
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("models");
-                
-    
-                const result = await collection.find({}).toArray()
-                
-    
-                console.log('result')
-                console.log(result)
-    
-                await client.close()
-                resolve(result)
-                       
-            }catch(error){
-                console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
-                reject(error);
-            }finally{
-                console.log('END getAllModels')
-            }
-        }) 
-    }
-    
-    async getAllModelsMetaData(){
-        
-        return new Promise(async (resolve, reject) => {
-            try{
-    
-                console.log(' START getAllModelsMetaData')
-    
-                const MongoClient = require('mongodb').MongoClient;
-                const uri = MONGODB_URI;
-                const client = new MongoClient(uri, { useNewUrlParser: true , useUnifiedTopology: true });
-                await client.connect()
-                console.log(`succesful connection to ${MONGODB_URI}` )
-    
-                const collection = client.db("crop2ml").collection("models");
-                
-    
-                const result = await collection.find({}).project({metaData:1}).toArray()
-                
-    
-                console.log('result')
-                console.log(result)
-    
-                await client.close()
-                resolve(result)
-                       
-            }catch(error){
-                console.log(error)
-                if( typeof client !== 'undefined')
-                    await client.close()
-                reject(error);
-            }finally{
-                console.log('END getAllModelsMetaData')
-            }
-        }) 
-    }
-
 }
 
 module.exports = FilesServices

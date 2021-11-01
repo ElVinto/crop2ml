@@ -9,6 +9,7 @@ dirTree = require('../../services/DirTree.js');
 
 FilesServices = require('../../services/filesServices.js');
 
+//OK
 router.post('/uploadZip',  async function(req, res, next) {
 
     console.log('START post /uploadZip')
@@ -21,14 +22,15 @@ router.post('/uploadZip',  async function(req, res, next) {
     }
 
     // TODO parse fields
-    // {
-    //     tags: 't,r,e,tag2,tag3,tag5',
-    //     fileName: 'SQ_Energy_Balance-master.zip',
-    //     repositoryName: 'SQ_Energy_Balance-master'
-    //   }
-
+    /*{
+        tags: 'tag_cmz',
+        fileName: 'zip_test.zip',
+        packageName: 'zip_test',
+        uploaderMail: 'charles.moszkowicz@gmail.com'
+      }*/
+    console.log(fields)
     console.log('files received')
-    console.log(JSON.parse(JSON.stringify(files)))
+    console.log(files)
 
     const [firstFileName] = Object.keys(files);
     const firstFile = files[firstFileName]
@@ -50,14 +52,8 @@ router.post('/uploadZip',  async function(req, res, next) {
 
             const [savedJsonModels,extractedKeywords] = await FilesServices.addModelsFrom('data/packages/'+zipPackageName+'/crop2ml',fields)
 
-            // 
-            // get Package Tree
             let tree = dirTree.getDirTree('data/packages/'+zipPackageName)
             tree.name = fields.packageName
-            //   console.log('tree: ')
-            //   console.log(tree)
-
-            // Add all model 
 
             const result = {
                 tree,
@@ -66,7 +62,7 @@ router.post('/uploadZip',  async function(req, res, next) {
 
             console.log('END post /upload');
 
-            res.send(JSON.parse(JSON.stringify(result)));
+            res.send(result);
 
         } catch (error) {
             console.log(error)
@@ -78,7 +74,7 @@ router.post('/uploadZip',  async function(req, res, next) {
 });
 
 
-router.post('/packageTree',  function(req, res, next) {
+/*router.post('/packageTree',  function(req, res, next) {
     console.log('START post /packageTree')
     const packagesPath = './server/data/packages/'
     
@@ -92,7 +88,7 @@ router.post('/packageTree',  function(req, res, next) {
     console.log(tree)
     console.log('END post /packageTree');
     res.send(JSON.parse(JSON.stringify(tree)));
-})
+})*/
 
 
 router.get('/zipFolder',async function(req,res,next){
@@ -107,18 +103,10 @@ router.post('/zipFolder',async function(req,res,next){
     console.log(res)
 })
 
+//OK
 router.post('/downloadFile',async function(req,res,next){
-
-    console.log( 'START /downloadFile ')
-    
-     var filePath = path.resolve(req.body.serverFilePath);
-
-     console.log(filePath)
-
-     console.log( 'END /downloadFile ')
-
-     res.sendFile(filePath)
-
+    var filePath = path.resolve(req.body.serverFilePath);
+    res.sendFile(filePath)
 })
 
 module.exports = router;

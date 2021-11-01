@@ -19,12 +19,13 @@ class CommunityRequests{
                 const formData = new FormData();
                 formData.append(file.name, file );
 
+                console.log("community sent :")
                 console.log(communityInfo)
 
                 for( const k in communityInfo){
                     formData.append(k, JSON.stringify(communityInfo[k]))
                 }
-
+                console.log(formData)
                 axios.post(url+'community/createCommunity', formData, {
                     // headers: formData.getHeaders()
                     headers: {
@@ -32,13 +33,9 @@ class CommunityRequests{
                     }
                 }).then( res =>{
                     console.log(' sendCommunity SUCCESS!!');
-
-                    console.log(' receive ');
                     console.log(res.data);
-
                     resolve(res.data.value)
                 })
-
             } catch (err) { 
                 console.log(' sendCommunity FAILURE!!');
                 console.error(err);
@@ -49,25 +46,17 @@ class CommunityRequests{
 
 
     static getAllCommunities = () =>{
-        
         return new Promise((resolve, reject) => {
-            
             try { 
-                
-                
                 axios.get(url + "community/getAllCommunities").then(res => {
                     resolve(res.data) ;
                 })
-
-                
             } catch (err) { 
                 console.error(err);
                 reject(err);
             }
         })
-
     }
-
 }
 
 
