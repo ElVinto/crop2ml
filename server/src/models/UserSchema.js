@@ -7,7 +7,10 @@ const UserSchema = new Schema(
         password: {type: String, required: true},
         firstName: {type: String, required: false},
         lastName: {type: String, required: false},
-        pseudo: {type: String, required: false},
+        city: {type: String, required: false},
+        country: {type: String, required: false},
+        institution: {type: String, required: false},
+        verified: {type: Boolean, required: true},
         category: {
             type: String,
             required: false,

@@ -20,9 +20,16 @@
 
       <div v-if="$store.getters.getLoggedUserInfo ===null">
 
-      <!-- <b-input-group prepend="First name" style="margin-top:1em">
+      <b-input-group prepend="Email" style="margin-top:1em">
         <b-form-input
-          :placeholder="firstName"
+          v-model="email"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
+
+      <b-input-group prepend="First name" style="margin-top:1em">
+        <b-form-input
           v-model="firstName"
           type="text"
         >
@@ -31,42 +38,14 @@
 
       <b-input-group prepend="Last name" style="margin-top:1em">
         <b-form-input
-          :placeholder="lastName"
           v-model="lastName"
           type="text"
         >
         </b-form-input>
       </b-input-group>
 
-      <b-input-group prepend="Pseudo" style="margin-top:1em">
-        <b-form-input
-          :placeholder="pseudo"
-          v-model="pseudo"
-          type="text"
-        >
-        </b-form-input>
-      </b-input-group> -->
-
-    
-
-      <b-input-group prepend="Email" style="margin-top:1em">
-        <b-form-input
-          :placeholder="email"
-          v-model="email"
-          type="text"
-        >
-        </b-form-input>
-      </b-input-group>
-      <div v-if="emailErrorMsg">
-        <p style="color:red;">
-          {{emailErrorMsg}}
-        </p>
-      </div>
-
-
       <b-input-group prepend="Password" style="margin-top:1em">
         <b-form-input
-          :placeholder="password1"
           v-model="password1"
           type="password"
         >
@@ -75,18 +54,47 @@
 
       <b-input-group prepend="Retype password" style="margin-top:1em">
         <b-form-input
-          :placeholder="password2"
           v-model="password2"
           type="password"
         >
         </b-form-input>
       </b-input-group>
 
+      <div v-if="requiredFieldsErrorMsg">
+        <p style="color:red;">
+          {{requiredFieldsErrorMsg}}
+        </p>
+      </div>
+
       <div v-if="passwordErrorMsg">
         <p style="color:red;">
           {{passwordErrorMsg}}
         </p>
       </div>
+
+      <b-input-group prepend="City" style="margin-top:1em">
+        <b-form-input
+          v-model="city"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
+
+      <b-input-group prepend="Country" style="margin-top:1em">
+        <b-form-input
+          v-model="country"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
+
+      <b-input-group prepend="Institution" style="margin-top:1em">
+        <b-form-input
+          v-model="institution"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
 
       <b-button variant="secondary" @click="register()" style="margin-top:1em">
         Register
@@ -121,91 +129,63 @@ import AuthServices from "../../services/AuthServices";
 export default {
   data() {
     return {
-
-      // firstName:"",
-      // lastName:"",
-      // pseudo:"",
-
+      firstName:"",
+      lastName:"",
+      city:"",
+      country:"",
+      institution:"",
       email: "",
-      emailErrorMsg:"",
-      
+      requiredFieldsErrorMsg:"",
       password1: "",
       password2: "",
       passwordErrorMsg:"",
-
       registerErrorMsg:"",
-
       registerSuccessMsg:"",
-      
     };
   },
 
   mounted() {
-
-    console.log("START mounted register")
-
-    
-
-    console.log("END mounted register")
-    
   },
 
   methods: {
-    
     async register() {
-      console.log('START register')
       try {
-        
-        console.log(`this.email ${this}`)
-
-        if(!this.validEmail()){
-          this.emailErrorMsg = "required email"
-          console.log('!this.validEmail()')
+        if(!this.validForm()){
+          this.requiredFieldsErrorMsg = "some required fields are empty"
+          return
         }
 
         if(!this.validPasswords()){
           this.passwordErrorMsg = "required passwords should be equal"
-          console.log('!this.validPasswords()')
-        }
-
-        if(this.passwordErrorMsg || this.emailErrorMsg){
-          console.log('this.emailErrorMsg: '+this.emailErrorMsg)
-          console.log('this.passwordErrorMsg: '+this.passwordErrorMsg)
-
           return
         }
 
-
         let userRegistrationDetails = {
-          // firstName: this.firstName,
-          // lastName: this.lastName,
-          // pseudo: this.pseudo,
-
+          firstName: this.firstName,
+          lastName: this.lastName,
+          city: this.city,
+          country: this.country,
+          institution: this.insitution,
           email: this.email,
           password: this.password2,
+          verified: true,
           category: "user"
         }
 
-        const registeredUserInfo =await AuthServices.register(userRegistrationDetails)
+        const registeredUserInfo = await AuthServices.register(userRegistrationDetails)
         console.log(registeredUserInfo)
 
         if(registeredUserInfo.errorMsg === undefined ){
           delete userRegistrationDetails.password
           this.$store.commit('setLoggedUserInfo', userRegistrationDetails)
           this.registerSuccessMsg= "Registration successful"
-          console.log('this.$store.state.loggedUserInfo')
-          console.log(this.$store.state.loggedUserInfo)
         }else{
           this.registerErrorMsg = registeredUserInfo.errorMsg;
         }
-        
-        
       } catch (error) {
         console.log(error)
         this.registerErrorMsg = error.message;
         throw(error)
-      }finally{
-        console.log('END register')
       }
     },
 
@@ -213,16 +193,14 @@ export default {
       return this.password1.length>0 && this.password1 === this.password2;
     },
 
-    validEmail(){
-      return this.email.length>0;
+    validForm(){
+      return this.email.length>0 && this.firstName.length>0 && this.lastName.length>0
     },
-
-
   },
 
   watch: {
     email(){
-      this.emailErrorMsg=""
+      this.requiredFieldsErrorMsg=""
       this.registerErrorMsg=""
       this.registerSuccessMsg=""
     },
@@ -235,9 +213,7 @@ export default {
       this.passwordErrorMsg=""
       this.registerSuccessMsg=""
     },
-    
   }
-
 };
 </script>
 
