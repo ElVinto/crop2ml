@@ -19,35 +19,35 @@ class XmlAndJsonFile{
         parser = new xml2js.Parser({
             attrkey: "Attributs",
             explicitRoot: false,
-            rootName:'ModelUnit',
+            rootName:'Model',
             explicitArray:false,
             cdata:true,
         });
     
         let modelUnitJsonObj = await parser.parseStringPromise(fileData)
     
-        // formatParsedArray(modelUnitJsonObj.ModelUnit,'Inputs','Input')
-        // formatParsedArray(modelUnitJsonObj.ModelUnit,'Outputs','Output')
+        // formatParsedArray(modelUnitJsonObj.Model,'Inputs','Input')
+        // formatParsedArray(modelUnitJsonObj.Model,'Outputs','Output')
         
-        // formatParsedArray(modelUnitJsonObj.ModelUnit,'Parametersets','Parameterset')
-        // modelUnitJsonObj.ModelUnit.Parametersets.forEach( e =>{
+        // formatParsedArray(modelUnitJsonObj.Model,'Parametersets','Parameterset')
+        // modelUnitJsonObj.Model.Parametersets.forEach( e =>{
         //     formatParsedArray(e,'Parameterset','Param')
         // })
     
-        // formatParsedArray(modelUnitJsonObj.ModelUnit,'Testsets','Testset')
-        // modelUnitJsonObj.ModelUnit.Testsets.forEach( e =>{
+        // formatParsedArray(modelUnitJsonObj.Model,'Testsets','Testset')
+        // modelUnitJsonObj.Model.Testsets.forEach( e =>{
         //     formatParsedArray(e,'Testset','Test')
         // })
     
-        // modelUnitJsonObj.ModelUnit.Testsets.forEach( testSet =>{
+        // modelUnitJsonObj.Model.Testsets.forEach( testSet =>{
         //     testSet.forEach( test => {
         //         test.forEach( )
         //     })
         // }
-        // modelUnitJsonObj.ModelUnit.Outputs.Output = [modelUnitJsonObj.ModelUnit.Outputs.Output]
+        // modelUnitJsonObj.Model.Outputs.Output = [modelUnitJsonObj.Model.Outputs.Output]
     
     
-        await insertModelUnitInMongoDb(modelUnitJsonObj);
+        await insertModelInMongoDb(modelUnitJsonObj);
         fs.writeFileSync("./server/data/melting.json", JSON.stringify(modelUnitJsonObj));
     
     
@@ -59,11 +59,11 @@ class XmlAndJsonFile{
             attrkey: "Attributs"
             // , headless: true
             , explicitRoot: true
-            , rootName:'ModelUnit'
+            , rootName:'Model'
             , explicitArray: false
             , cdata:true
             , xmldec:{ 'version': '1.0', 'encoding': 'UTF-8' }
-            , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/ModelUnit.dtd'}
+            , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/Model.dtd'}
             })
     
         

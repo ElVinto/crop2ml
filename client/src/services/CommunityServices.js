@@ -8,7 +8,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
     url = 'http://localhost:5000/';
 }
 
-class CommunityRequests{
+class CommunityServices{
 
     static createCommunity = async (file, communityInfo) =>{
         
@@ -60,4 +60,4 @@ class CommunityRequests{
 }
 
 
-export default CommunityRequests
+export default CommunityServices

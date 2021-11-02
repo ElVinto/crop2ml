@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import DBServices from '../services/DBServices_DELETE.js'
+import DBServices from './DBServices_DELETE.js'
 
 Vue.use(Vuex);
 
@@ -25,11 +25,11 @@ export default new Vuex.Store({
 
    getters: { // computed methods
 
-      getModelUnits: (state) => {
+      getModels: (state) => {
          return state.modelUnits;
       },
 
-      getModelUnitIds: (state) => {
+      getModelIds: (state) => {
          const mus= state.modelUnits;
          return mus.keys();
       },
@@ -48,17 +48,17 @@ export default new Vuex.Store({
 
    mutations: { // synchronous  commit of changes of state
 
-      setModelUnits: (state, modelUnits) =>{
+      setModels: (state, modelUnits) =>{
          state.modelUnits = modelUnits;
       },
 
-      addModelUnit: (state, jsonObj) => {
-         const modelid = jsonObj.ModelUnit.Attributs.modelid
+      addModel: (state, jsonObj) => {
+         const modelid = jsonObj.Model.Attributs.modelid
          state.modelUnits.set(modelid,jsonObj)
       },
 
-      deleteModelUnit: (state, jsonObj) => {
-         const modelid = jsonObj.ModelUnit.Attributs.modelid
+      deleteModel: (state, jsonObj) => {
+         const modelid = jsonObj.Model.Attributs.modelid
          state.modelUnits.delete(modelid)
       },
 
@@ -85,25 +85,25 @@ export default new Vuex.Store({
 
    actions: { // assynchronous commit of changes
 
-      async initModelUnits({ state, commit }) {
+      async initModels({ state, commit }) {
 
          return new Promise((resolve, reject) => {
             
             try { 
-               console.log('START initModelUnits')
+               console.log('START initModels')
 
                  
-               DBServices.getModelUnits().then(modelUnits =>{ 
+               DBServices.getModels().then(modelUnits =>{ 
 
                   for(const modelUnit of modelUnits){
-                     commit('addModelUnit', modelUnit)
+                     commit('addModel', modelUnit)
                   }
                   commit('setDataAreLoaded',true)
 
                   console.log('state.modelUnits')
                   console.log(state.modelUnits)
 
-                  console.log('END initModelUnits')
+                  console.log('END initModels')
                   resolve(state.modelUnits)
 
                   
@@ -116,21 +116,21 @@ export default new Vuex.Store({
          })
       },
 
-      async reInitModelUnit({commit},modelid){
+      async reInitModel({commit},modelid){
          return new Promise((resolve, reject) => {
             try { 
-               console.log("START reInitModelUnit "+modelid)
+               console.log("START reInitModel "+modelid)
 
-               DBServices.getModelUnitById(modelid).then(savedModelUnit =>{ 
+               DBServices.getModelById(modelid).then(savedModel =>{ 
                   
-                  if(savedModelUnit.ModelUnit !== undefined){
-                     console.log('savedModelUnit')
-                     console.log(savedModelUnit)
-                     commit('addModelUnit',savedModelUnit)
+                  if(savedModel.Model !== undefined){
+                     console.log('savedModel')
+                     console.log(savedModel)
+                     commit('addModel',savedModel)
                   }
 
-                  console.log("END reInitModelUnit "+modelid)
-                  resolve(savedModelUnit)
+                  console.log("END reInitModel "+modelid)
+                  resolve(savedModel)
                })
 
             } catch (err) { 
@@ -141,43 +141,43 @@ export default new Vuex.Store({
       },
 
 
-      async saveModelUnit({commit},modelUnit){
+      async saveModel({commit},modelUnit){
 
-         console.log("START saveModelUnit")
+         console.log("START saveModel")
          console.log(modelUnit)
 
-         const savedModelUnit = await DBServices.saveModelUnit(modelUnit)
+         const savedModel = await DBServices.saveModel(modelUnit)
 
-         if(savedModelUnit.ModelUnit !== undefined){
-            commit('addModelUnit',savedModelUnit)
+         if(savedModel.Model !== undefined){
+            commit('addModel',savedModel)
          }
          
 
-         console.log(savedModelUnit)
-         console.log("END saveModelUnit")
+         console.log(savedModel)
+         console.log("END saveModel")
 
-         return savedModelUnit;
+         return savedModel;
       },
 
-      async deleteModelUnit({commit},modelUnit){
+      async deleteModel({commit},modelUnit){
 
-         console.log("START STORE deleteModelUnit")
+         console.log("START STORE deleteModel")
          
 
-         const deletedModelUnit = await DBServices.deleteModelUnitById(modelUnit.ModelUnit.Attributs.modelid)
+         const deletedModel = await DBServices.deleteModelById(modelUnit.Model.Attributs.modelid)
 
-         console.log("deletedModelUnit")
-         console.log(deletedModelUnit)
+         console.log("deletedModel")
+         console.log(deletedModel)
 
-         if(deletedModelUnit.ModelUnit !== undefined){
-            commit('deleteModelUnit',deletedModelUnit)
+         if(deletedModel.Model !== undefined){
+            commit('deleteModel',deletedModel)
          }
          
-         console.log(deletedModelUnit)
+         console.log(deletedModel)
 
-         console.log("END STORE deleteModelUnit")
+         console.log("END STORE deleteModel")
 
-         return deletedModelUnit;
+         return deletedModel;
       }
    
    }

@@ -34,7 +34,7 @@
 
 
 
-import ClientServerJsonModel from "../services/ClientServerJsonModel"
+import ModelServices from "../services/ModelServices"
 
 
 export default {
@@ -67,7 +67,7 @@ export default {
       await this.$store.dispatch('initModels');
     }
 
-    this.modelTree = [await ClientServerJsonModel.requestModelTree()]
+    this.modelTree = [await ModelServices.requestModelTree()]
     
     
     console.log('this.modelTree: ')

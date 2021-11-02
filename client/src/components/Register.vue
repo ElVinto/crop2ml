@@ -117,7 +117,7 @@
 </template>
 <script>
 
-import Authentification from "../services/Authentification";
+import AuthServices from "../services/AuthServices";
 export default {
   data() {
     return {
@@ -186,7 +186,7 @@ export default {
           category: "user"
         }
 
-        const registeredUserInfo =await Authentification.register(userRegistrationDetails)
+        const registeredUserInfo =await AuthServices.register(userRegistrationDetails)
         console.log(registeredUserInfo)
 
         if(registeredUserInfo.errorMsg === undefined ){

@@ -78,8 +78,8 @@
 <script>
 
 
-import CommunityRequests from "../../services/CommunityRequests"
-import ClientServerFileSystem from "../../services/ClientServerFileSystem"
+import CommunityServices from "../../services/CommunityServices"
+import FileServices from "../../services/FileServices"
 
 
 export default {
@@ -103,14 +103,14 @@ export default {
   },
 
   async mounted() {
-    this.communityList = await CommunityRequests.getAllCommunities()
+    this.communityList = await CommunityServices.getAllCommunities()
     this.communityListLoaded =true;
 
     try{
       await Promise.all(this. communityList.map( async c =>{
         
         let serverFilePath = c.image_path
-        let file = await ClientServerFileSystem.downloadFile(serverFilePath)
+        let file = await FileServices.downloadFile(serverFilePath)
         c['file']=file
         let idxLastSep = serverFilePath.lastIndexOf('/')
         let fileName = serverFilePath.slice(idxLastSep+1)

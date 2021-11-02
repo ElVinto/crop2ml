@@ -8,7 +8,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
     url = 'http://localhost:5000/';
 }
 
-class UserRequests{
+class UserServices{
 
     //OK
     static getRegisteredEmails = async () =>{
@@ -28,4 +28,4 @@ class UserRequests{
 }
 
 
-export default UserRequests
+export default UserServices

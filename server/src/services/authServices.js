@@ -3,7 +3,7 @@ var generator = require('generate-password');
 const bcrypt = require('bcryptjs');
 const saltRounds =10;
 
-let User = require('../models/user')
+let User = require('../models/UserSchema')
 
 class AuthServices{
 

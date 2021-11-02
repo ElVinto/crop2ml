@@ -26,22 +26,20 @@ app.use(cors());
 
 
 // API
-const mongodbServices = require('./api/routes/mongodb-services');
-app.use('/mongodb-services', mongodbServices);
 
-const files = require('./api/routes/files');
+const files = require('./api/routes/fileRoutes');
 app.use('/files', files);
 
-const cropModels = require('./api/routes/cropModels');
-app.use('/cropmodels', cropModels);
+const cropModels = require('./api/routes/modelRoutes');
+app.use('/models', cropModels);
 
-const community = require('./api/routes/community');
+const community = require('./api/routes/communityRoutes');
 app.use('/community', community);
 
-const auth = require('./api/routes/auth');
+const auth = require('./api/routes/authRoutes');
 app.use('/auth', auth);
 
-const user = require('./api/routes/user');
+const user = require('./api/routes/userRoutes');
 app.use('/user', user);
 
 

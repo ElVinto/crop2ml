@@ -99,7 +99,7 @@
 </template>
 <script>
 
-import Authentification from "../services/Authentification";
+import AuthServices from "../services/AuthServices";
 export default {
   data() {
     return {
@@ -172,11 +172,11 @@ export default {
             // document.getElementById("p").style.display = "none";
             let mailpresent = "true";
             this.$store.commit("initmailpresent", mailpresent);
-            let mailad = await Authentification.mailAddToAuth(loggedUserEmail,this.userInfo.userName)
+            let mailad = await AuthServices.mailAddToAuth(loggedUserEmail,this.userInfo.userName)
             if (mailad) {
-              console.log(" mail added to authentification");
+              console.log(" mail added to AuthServices");
             } else {
-              console.log("WARNING mail NOT added to authentification");
+              console.log("WARNING mail NOT added to AuthServices");
             }
          }else{
            this.msg = "mail inconnu, vérifier que le mail est enregistré dans ApeX Vigne";
@@ -195,7 +195,7 @@ export default {
       }
       
       if(!this.userInfo){
-        this.userInfo = await Authentification.getUserInfo(loggedUserEmail);
+        this.userInfo = await AuthServices.getUserInfo(loggedUserEmail);
       }
       
     },
@@ -209,7 +209,7 @@ export default {
       console.log('this.userInfo')
       console.log(this.userInfo)
 
-      let tmpUserDataObj = new Authentification.MonitoredUser(
+      let tmpUserDataObj = new AuthServices.MonitoredUser(
         this.userInfo.userEMail,
         this.userInfo.userId,
         this.userInfo.userName
@@ -218,27 +218,27 @@ export default {
       console.log('tmpUserDataObj after userInfo')
       console.log(tmpUserDataObj)
 
-      await Authentification.addParcelObservations(tmpUserDataObj);
+      await AuthServices.addParcelObservations(tmpUserDataObj);
 
 
       console.log('tmpUserDataObj after addParcelObservations')
       console.log(tmpUserDataObj)
 
-      await Authentification.addSharedParcelObservations(tmpUserDataObj);
+      await AuthServices.addSharedParcelObservations(tmpUserDataObj);
 
       console.log('tmpUserDataObj after addSharedParcelObservations')
       console.log(tmpUserDataObj)
 
 
-      await Authentification.addInitializedWeekMetrics(tmpUserDataObj);
+      await AuthServices.addInitializedWeekMetrics(tmpUserDataObj);
 
       console.log('tmpUserDataObj after addInitializedWeekMetrics')
       console.log(tmpUserDataObj)
 
 
-      Authentification.addWeeksToUserDataObj(tmpUserDataObj);
-      Authentification.enforceConsistencyOfUserDataObj(tmpUserDataObj);
-      Authentification.sortUserDataObjByYearByWeek(tmpUserDataObj);
+      AuthServices.addWeeksToUserDataObj(tmpUserDataObj);
+      AuthServices.enforceConsistencyOfUserDataObj(tmpUserDataObj);
+      AuthServices.sortUserDataObjByYearByWeek(tmpUserDataObj);
 
       this.$store.commit("initUserDataObj", tmpUserDataObj);
 
@@ -280,7 +280,7 @@ export default {
         // console.log("password");
         // console.log(password);
 
-        this.authorizedToContinue = await Authentification.checkPassword(password, loggedUserEmail)
+        this.authorizedToContinue = await AuthServices.checkPassword(password, loggedUserEmail)
         if (this.authorizedToContinue ) {
            this.message = "mot de passe valide";
           await this.loadUserData(loggedUserEmail)

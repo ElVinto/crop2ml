@@ -1,4 +1,4 @@
-let Community = require('../models/community')
+let Community = require('../models/CommunitySchema')
 
 class CommunityServices{
 

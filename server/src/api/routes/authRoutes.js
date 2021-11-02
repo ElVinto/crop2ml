@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-AuthServices = require('../../services/authServices.js');
+AuthServices = require('../../services/AuthServices.js');
 
 router.post('/register',async function(req, res, next){
 

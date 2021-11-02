@@ -123,7 +123,7 @@
 
 <script>
 
-import Authentification from "../services/Authentification";
+import AuthServices from "../services/AuthServices";
 
 export default {
   name: "App",
@@ -216,7 +216,7 @@ export default {
 
 
 
-        const registeredUserInfo =await Authentification.updateProfile(userProfileDetails)
+        const registeredUserInfo =await AuthServices.updateProfile(userProfileDetails)
         console.log(registeredUserInfo)
 
         if(registeredUserInfo.errorMsg === undefined ){

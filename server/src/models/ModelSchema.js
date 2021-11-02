@@ -193,7 +193,7 @@ const CompositionSchema = new Schema(
     }
 )
 
-const ModelUnitSchema = new Schema(
+const ModelSchema = new Schema(
     {
         Attributs: {
             name: {type: String, required:[true,'a model name is required']},
@@ -238,4 +238,4 @@ const ModelUnitSchema = new Schema(
   {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
 );
 
-module.exports = mongoose.model('ModelUnit', ModelUnitSchema, 'models')
+module.exports = mongoose.model('Model', ModelSchema, 'models')

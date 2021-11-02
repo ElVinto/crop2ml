@@ -76,7 +76,7 @@
 </template>
 <script>
 
-import Authentification from "../services/Authentification";
+import AuthServices from "../services/AuthServices";
 export default {
   data() {
     return {
@@ -100,7 +100,7 @@ export default {
       console.log('START SignIn')
       try {
         
-        const userInfo = await Authentification.signIn(this.email, this.password)
+        const userInfo = await AuthServices.signIn(this.email, this.password)
 
         console.log(userInfo)
 

@@ -139,8 +139,8 @@
 </template>
 <script>
 
-// import ModelUnitServices from "../services/ModelUnitServices"
-import ClientServerFileSystem from "../services/ClientServerFileSystem"
+// import ModelServices from "../services/ModelServices"
+import FileServices from "../services/FileServices"
 
 import { bTreeView } from 'bootstrap-vue-treeview'
 
@@ -200,7 +200,7 @@ export default {
 
     // console.log("START created Catalog")
 
-    // this.modelUnitSchema = ModelUnitServices.buildSchema();
+    // this.modelUnitSchema = ModelServices.buildSchema();
 
     // console.log("this.modelUnitSchema")
     // console.log(this.modelUnitSchema)
@@ -259,7 +259,7 @@ export default {
 
 
       this.submitted =true;
-      const res =  await ClientServerFileSystem.sendZip(this.packageZip,modelMetaDataPart)
+      const res =  await FileServices.sendZip(this.packageZip,modelMetaDataPart)
       this.treeDataReceived = [res.tree]
       this.keywords = res.extractedKeywords
 

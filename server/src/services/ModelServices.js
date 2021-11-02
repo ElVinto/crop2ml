@@ -1,6 +1,6 @@
-let ModelUnit = require('../models/modelUnit')
+let Model = require('../models/ModelSchema')
 
-class CropModelsServices{
+class ModelServices{
 
     //TODO reuse for more complex search with or condition
     /*
@@ -52,7 +52,7 @@ class CropModelsServices{
     static async findAllModels(){
         return new Promise(async (resolve, reject) => {
             try{
-                const result = await ModelUnit.find({})
+                const result = await Model.find({})
                 resolve(result)
             } catch(error){
                 console.log(error)
@@ -80,10 +80,11 @@ class CropModelsServices{
         }) 
     }
     
+    //OK
     static async getAllModelsMetaData(){
         return new Promise(async (resolve, reject) => {
             try{
-                const result = await ModelUnit.find({}, {metaData: 1, _id: 0})
+                const result = await Model.find({}, {metaData: 1, _id: 0})
                 resolve(result)
             }catch(error){
                 console.log(error)
@@ -91,6 +92,73 @@ class CropModelsServices{
             }
         }) 
     }
+
+    static async deleteJsonModelById (modelid){
+
+        return new Promise((resolve, reject) => {
+            try{
+                const mongoose = require('mongoose')
+                mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
+                const db = mongoose.connection;
+                
+                db.on('error', console.error.bind(console, 'connection error:'));
+    
+                db.once('open', async function(){
+    
+                    console.log(`succesful connection to ${MONGODB_HOST}` )
+    
+                    console.log(`delete : {'Model.Attributs.modelid': ${modelid} } `)
+                    result = await Model.findOneAndDelete({'Model.Attributs.modelid': modelid}).exec()
+    
+                    result = JSON.parse(JSON.stringify(result))
+                    
+                    db.close();
+    
+                    console.log(`succesful end connection to ${MONGODB_HOST}` )
+    
+                    resolve(result)
+                });
+                
+            }catch (err) {
+                console.log(err.message)
+                reject(err); 
+            }
+        })   
+    }
+
+    static async deleteJsonModel (model_name){
+
+        return new Promise((resolve, reject) => {
+            try{
+                const mongoose = require('mongoose')
+                mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
+                const db = mongoose.connection;
+                
+                db.on('error', console.error.bind(console, 'connection error:'));
+    
+                db.once('open', async function(){
+    
+                    console.log(`succesful connection to ${MONGODB_HOST}` )
+    
+                    console.log(`delete : {'Model.Attributs.name': ${model_name} } `)
+                    result = await Model.findOneAndDelete({'Model.Attributs.name': model_name}).exec()
+                    
+    
+                    result = JSON.parse(JSON.stringify(result))
+                    
+                    db.close();
+    
+                    console.log(`succesful end connection to ${MONGODB_HOST}` )
+    
+                    resolve(result)
+                });
+                
+            }catch (err) {
+                console.log(err.message)
+                reject(err); 
+            }
+        })   
+    }
 }
 
-module.exports = CropModelsServices
+module.exports = ModelServices

@@ -12,7 +12,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 }
 
 
-class ClientServerFileSystem {
+class FileServices {
 
     //OK
     static sendZip = async (file, modelMetaDataPart) =>{
@@ -152,4 +152,4 @@ class ClientServerFileSystem {
 }
 
 
-export default ClientServerFileSystem;
+export default FileServices;

@@ -72,7 +72,7 @@ export default {
           passwordRequire: pwdRequire,
         }).then( ()=>{
          
-          alert("L'authentification a bien été modifiée, retour à la carte")
+          alert("L'AuthServices a bien été modifiée, retour à la carte")
           
           console.log("Routing to ApexMap");
           this.$router.push("/map");

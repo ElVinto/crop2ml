@@ -7,7 +7,7 @@ var unzipper = require('unzipper')
 var archiver = require('archiver');
 
 const directoryTree = require("directory-tree");
-let ModelUnit = require('../../model/modelUnit')
+let Model = require('../../model/modelUnit')
 
 var mangodb = require('mongodb')
 // const uri = "mongodb+srv://<username>:<password>@<your-cluster-url>/test?retryWrites=true&w=majority"
@@ -57,7 +57,7 @@ router.post('/upload',  async function(req, res, next) {
 
         try{
 
-            console.log('saveXMLModelUnit')
+            console.log('saveXMLModel')
             // let xmlurl =  req.query.xmlurl;
             // console.log(req.query)
             
@@ -74,8 +74,8 @@ router.post('/upload',  async function(req, res, next) {
                 console.log(jsonModel)
     
                 // Save or update JSON object
-                // result = await saveJsonModelUnit(jsonModel)
-                saveJsonModelUnit(jsonModel)
+                // result = await saveJsonModel(jsonModel)
+                saveJsonModel(jsonModel)
                 .then((result) =>{
     
                     // res.send(jsonObj2xmlString(jsonModel))
@@ -301,7 +301,7 @@ async function xmlString2jsonObj(xmlString){
     const parser = new xml2js.Parser({
         attrkey: "Attributs",
         explicitRoot: true,
-        rootName:'ModelUnit',
+        rootName:'Model',
         explicitArray:false,
         cdata: true
     })
@@ -310,10 +310,10 @@ async function xmlString2jsonObj(xmlString){
     return result
 }
 
-async function saveJsonModelUnit (jsonModelUnit){
+async function saveJsonModel (jsonModel){
 
     return new Promise((resolve, reject) => {
-        console.log('saveJsonModelUnit')
+        console.log('saveJsonModel')
         try{
             const mongoose = require('mongoose')
             mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
@@ -326,16 +326,16 @@ async function saveJsonModelUnit (jsonModelUnit){
                 try{
                     console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                    const receivedModelUnit = new ModelUnit(jsonModelUnit)
+                    const receivedModel = new Model(jsonModel)
 
-                    await  receivedModelUnit.validate();
+                    await  receivedModel.validate();
 
-                    model_name = jsonModelUnit.ModelUnit.Attributs.name
+                    model_name = jsonModel.Model.Attributs.name
 
-                    console.log(`insert or update : {'ModelUnit.Attributs.name': ${model_name} } `)
-                    result = await ModelUnit.findOneAndUpdate(
-                            {'ModelUnit.Attributs.name': model_name},
-                            {ModelUnit: jsonModelUnit.ModelUnit},
+                    console.log(`insert or update : {'Model.Attributs.name': ${model_name} } `)
+                    result = await Model.findOneAndUpdate(
+                            {'Model.Attributs.name': model_name},
+                            {Model: jsonModel.Model},
                             {new:true, upsert: true, useFindAndModify: false}
                         ).exec()
                     

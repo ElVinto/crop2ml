@@ -62,7 +62,7 @@ function parseXMLFromHTTP(url){
     const parser = new xml2js.Parser({
         attrkey: "Attributs",
         explicitRoot: false,
-        // rootName:'ModelUnit',
+        // rootName:'Model',
         explicitArray:false,
         cdata: true
     })
@@ -122,7 +122,7 @@ async function xmlString2jsonObj(xmlString){
     const parser = new xml2js.Parser({
         attrkey: "Attributs",
         explicitRoot: true,
-        rootName:'ModelUnit',
+        rootName:'Model',
         explicitArray:false,
         cdata: true
     })
@@ -141,11 +141,11 @@ function jsonObj2xmlString(jsonObj){
         attrkey: "Attributs"
         // , headless: true
         , explicitRoot: true
-        , rootName:'ModelUnit'
+        , rootName:'Model'
         , explicitArray: false
         , cdata:true
         , xmldec:{ 'version': '1.0', 'encoding': 'UTF-8' }
-        , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/ModelUnit.dtd'}
+        , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/Model.dtd'}
         })
     
     xmlString =   builder.buildObject(jsonObj).toString();
@@ -172,15 +172,15 @@ router.get('/json',async function(req, res, next){
 
 // TODO
 
-// findXMLModelUnit
+// findXMLModel
  
 
 
 
-router.get('/saveXMLModelUnit',async function(req, res, next){
+router.get('/saveXMLModel',async function(req, res, next){
 
     try{
-        console.log('/saveXMLModelUnit')
+        console.log('/saveXMLModel')
         let xmlurl =  req.query.xmlurl;
         console.log(req.query)
         
@@ -196,8 +196,8 @@ router.get('/saveXMLModelUnit',async function(req, res, next){
         console.log(jsonModel)
 
         // Save or update JSON object
-        // result = await saveJsonModelUnit(jsonModel)
-        saveJsonModelUnit(jsonModel)
+        // result = await saveJsonModel(jsonModel)
+        saveJsonModel(jsonModel)
             .then((result) =>{
 
                 // res.send(jsonObj2xmlString(jsonModel))
@@ -218,18 +218,18 @@ router.get('/saveXMLModelUnit',async function(req, res, next){
 });
 
 
-router.get('/saveJsonModelUnit',async function(req, res, next){
+router.get('/saveJsonModel',async function(req, res, next){
 
     try{
-        console.log('/saveJsonModelUnit')
+        console.log('/saveJsonModel')
         let model_name =  req.query.name;
 
-        jsonTestModel = await createTestModelUnit(model_name)
+        jsonTestModel = await createTestModel(model_name)
 
         console.log('jsonTestModel')
         console.log(jsonTestModel)
 
-        result = await saveJsonModelUnit(jsonTestModel)
+        result = await saveJsonModel(jsonTestModel)
         res.send(result)
 
     }catch(error){
@@ -239,16 +239,16 @@ router.get('/saveJsonModelUnit',async function(req, res, next){
 
 });
 
-router.post('/saveJsonModelUnit',async function(req, res, next){
+router.post('/saveJsonModel',async function(req, res, next){
 
     try{
-        console.log('Post /saveJsonModelUnit')
+        console.log('Post /saveJsonModel')
 
         let modelUnit =  req.body.modelUnit;
 
         console.log(modelUnit)
 
-        result = await saveJsonModelUnit(modelUnit)
+        result = await saveJsonModel(modelUnit)
         res.send(result)
 
     }catch(error){
@@ -259,16 +259,16 @@ router.post('/saveJsonModelUnit',async function(req, res, next){
 });
 
 
-router.get('/findXMLModelUnit',async function(req, res, next){
+router.get('/findXMLModel',async function(req, res, next){
 
     try{
         let model_name =  req.query.name;
-        jsonModelUnit = await findJsonModelUnit(model_name)
-        if(jsonModelUnit){
-            xmlModelUnit = jsonObj2xmlString(jsonModelUnit)
-            res.send(xmlModelUnit)
+        jsonModel = await findJsonModel(model_name)
+        if(jsonModel){
+            xmlModel = jsonObj2xmlString(jsonModel)
+            res.send(xmlModel)
         }else{
-            res.send(`ModelUnit ${model_name} NOT FOUND, the model has to be recorded first.`)
+            res.send(`Model ${model_name} NOT FOUND, the model has to be recorded first.`)
         }
 
         
@@ -279,15 +279,15 @@ router.get('/findXMLModelUnit',async function(req, res, next){
 
 });
 
-router.get('/findJsonModelUnit',async function(req, res, next){
+router.get('/findJsonModel',async function(req, res, next){
 
     try{
         let model_name =  req.query.name;
-        jsonModelUnit = await findJsonModelUnit(model_name)
-        if(jsonModelUnit){
-            res.send(jsonModelUnit)
+        jsonModel = await findJsonModel(model_name)
+        if(jsonModel){
+            res.send(jsonModel)
         }else{
-            res.send(`ModelUnit ${model_name} NOT FOUND, the model has to be recorded first.`)
+            res.send(`Model ${model_name} NOT FOUND, the model has to be recorded first.`)
         }
 
         
@@ -299,7 +299,7 @@ router.get('/findJsonModelUnit',async function(req, res, next){
 });
 
 
-async function findJsonModelUnit (model_name){
+async function findJsonModel (model_name){
 
     return new Promise((resolve, reject) => {
         try{
@@ -313,10 +313,10 @@ async function findJsonModelUnit (model_name){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
+                const Model = buildMongooseModel(mongoose)
 
-                console.log(`findOne : {'ModelUnit.Attributs.name': '${model_name}' } `)
-                result = await ModelUnit.findOne({'ModelUnit.Attributs.name': model_name },{'_id':0, '__v':0})
+                console.log(`findOne : {'Model.Attributs.name': '${model_name}' } `)
+                result = await Model.findOne({'Model.Attributs.name': model_name },{'_id':0, '__v':0})
                 
                 db.close();
 
@@ -341,15 +341,15 @@ async function findJsonModelUnit (model_name){
     
 }
 
-router.post('/findJsonModelUnitById',async function(req, res, next){
+router.post('/findJsonModelById',async function(req, res, next){
 
     try{
         let modelid =  req.body.modelid;
-        jsonModelUnit = await findJsonModelUnitById(modelid)
-        if(jsonModelUnit){
-            res.send(jsonModelUnit)
+        jsonModel = await findJsonModelById(modelid)
+        if(jsonModel){
+            res.send(jsonModel)
         }else{
-            res.send(`ModelUnit ${modelid} NOT FOUND, the model has to be recorded first.`)
+            res.send(`Model ${modelid} NOT FOUND, the model has to be recorded first.`)
         }
 
         
@@ -361,7 +361,7 @@ router.post('/findJsonModelUnitById',async function(req, res, next){
 });
 
 
-async function findJsonModelUnitById (modelid){
+async function findJsonModelById (modelid){
 
     return new Promise((resolve, reject) => {
         try{
@@ -375,10 +375,10 @@ async function findJsonModelUnitById (modelid){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
+                const Model = buildMongooseModel(mongoose)
 
-                console.log(`findOne : {'ModelUnit.Attributs.modelid': '${modelid}' } `)
-                result = await ModelUnit.findOne({'ModelUnit.Attributs.modelid': modelid },{'_id':0, '__v':0})
+                console.log(`findOne : {'Model.Attributs.modelid': '${modelid}' } `)
+                result = await Model.findOne({'Model.Attributs.modelid': modelid },{'_id':0, '__v':0})
                 
                 db.close();
 
@@ -406,14 +406,14 @@ async function findJsonModelUnitById (modelid){
 
 
 
-router.get('/findAllJsonModelUnits',async function(req, res, next){
+router.get('/findAllJsonModels',async function(req, res, next){
 
     try{
-        jsonModelUnits = await findAllJsonModelUnits()
-        if(jsonModelUnits){
-            res.send(jsonModelUnits)
+        jsonModels = await findAllJsonModels()
+        if(jsonModels){
+            res.send(jsonModels)
         }else{
-            res.send(`No ModelUnit has been found`)
+            res.send(`No Model has been found`)
         }
         
     }catch(error){
@@ -424,7 +424,7 @@ router.get('/findAllJsonModelUnits',async function(req, res, next){
 });
 
 
-async function findAllJsonModelUnits (){
+async function findAllJsonModels (){
 
     return new Promise((resolve, reject) => {
         try{
@@ -438,11 +438,11 @@ async function findAllJsonModelUnits (){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
+                const Model = buildMongooseModel(mongoose)
 
                 console.log(`find : {} `)
-                // result = await ModelUnit.find({},{'ModelUnit.Attributs.name': 1, 'ModelUnit.Attributs.modelid':1})
-                result = await ModelUnit.find({})
+                // result = await Model.find({},{'Model.Attributs.name': 1, 'Model.Attributs.modelid':1})
+                result = await Model.find({})
                 
                 db.close();
 
@@ -469,14 +469,14 @@ async function findAllJsonModelUnits (){
 
 
 
-router.get('/findAllJsonModelUnitSummaries',async function(req, res, next){
+router.get('/findAllJsonModelSummaries',async function(req, res, next){
 
     try{
-        jsonModelUnits = await findAllJsonModelUnitSummaries()
-        if(jsonModelUnits){
-            res.send(jsonModelUnits)
+        jsonModels = await findAllJsonModelSummaries()
+        if(jsonModels){
+            res.send(jsonModels)
         }else{
-            res.send(`No ModelUnit has been found`)
+            res.send(`No Model has been found`)
         }
         
     }catch(error){
@@ -487,7 +487,7 @@ router.get('/findAllJsonModelUnitSummaries',async function(req, res, next){
 });
 
 
-async function findAllJsonModelUnitSummaries (){
+async function findAllJsonModelSummaries (){
 
     return new Promise((resolve, reject) => {
         try{
@@ -501,10 +501,10 @@ async function findAllJsonModelUnitSummaries (){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
+                const Model = buildMongooseModel(mongoose)
 
                 console.log(`find : {} `)
-                result = await ModelUnit.find({},{'ModelUnit.Attributs.name': 1, 'ModelUnit.Attributs.modelid':1})
+                result = await Model.find({},{'Model.Attributs.name': 1, 'Model.Attributs.modelid':1})
                 
                 db.close();
 
@@ -531,12 +531,12 @@ async function findAllJsonModelUnitSummaries (){
 
 
 
-router.get('/deleteJsonModelUnit',async function(req, res, next){
+router.get('/deleteJsonModel',async function(req, res, next){
 
     try{
 
         let model_name =  req.query.name;
-        result = await deleteJsonModelUnit(model_name)
+        result = await deleteJsonModel(model_name)
         res.send(result)
 
     }catch(error){
@@ -546,7 +546,7 @@ router.get('/deleteJsonModelUnit',async function(req, res, next){
 
 });
 
-async function deleteJsonModelUnit (model_name){
+async function deleteJsonModel (model_name){
 
     return new Promise((resolve, reject) => {
         try{
@@ -560,10 +560,10 @@ async function deleteJsonModelUnit (model_name){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
+                const Model = buildMongooseModel(mongoose)
 
-                console.log(`delete : {'ModelUnit.Attributs.name': ${model_name} } `)
-                result = await ModelUnit.findOneAndDelete({'ModelUnit.Attributs.name': model_name}).exec()
+                console.log(`delete : {'Model.Attributs.name': ${model_name} } `)
+                result = await Model.findOneAndDelete({'Model.Attributs.name': model_name}).exec()
                 
 
                 result = JSON.parse(JSON.stringify(result))
@@ -583,17 +583,17 @@ async function deleteJsonModelUnit (model_name){
 }
 
 
-router.post('/deleteJsonModelUnitById',async function(req, res, next){
+router.post('/deleteJsonModelById',async function(req, res, next){
 
     try{
 
-        console.log("START post deleteJsonModelUnitById")
+        console.log("START post deleteJsonModelById")
 
         let modelid =  req.body.modelid;
-        result = await deleteJsonModelUnitById(modelid)
+        result = await deleteJsonModelById(modelid)
 
 
-        console.log("END post deleteJsonModelUnitById")
+        console.log("END post deleteJsonModelById")
 
         res.send(result)
 
@@ -607,7 +607,7 @@ router.post('/deleteJsonModelUnitById',async function(req, res, next){
 });
 
 
-async function deleteJsonModelUnitById (modelid){
+async function deleteJsonModelById (modelid){
 
     return new Promise((resolve, reject) => {
         try{
@@ -621,10 +621,10 @@ async function deleteJsonModelUnitById (modelid){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
+                const Model = buildMongooseModel(mongoose)
 
-                console.log(`delete : {'ModelUnit.Attributs.modelid': ${modelid} } `)
-                result = await ModelUnit.findOneAndDelete({'ModelUnit.Attributs.modelid': modelid}).exec()
+                console.log(`delete : {'Model.Attributs.modelid': ${modelid} } `)
+                result = await Model.findOneAndDelete({'Model.Attributs.modelid': modelid}).exec()
 
                 result = JSON.parse(JSON.stringify(result))
                 
@@ -646,10 +646,10 @@ async function deleteJsonModelUnitById (modelid){
 // TODO update to post querry
 
 
-async function saveJsonModelUnit (jsonModelUnit){
+async function saveJsonModel (jsonModel){
 
     return new Promise((resolve, reject) => {
-        console.log('saveJsonModelUnit')
+        console.log('saveJsonModel')
         try{
             const mongoose = require('mongoose')
             mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
@@ -662,18 +662,18 @@ async function saveJsonModelUnit (jsonModelUnit){
                 try{
                     console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                    const ModelUnit = buildMongooseModelUnit(mongoose)
+                    const Model = buildMongooseModel(mongoose)
 
-                    const receivedModelUnit = new ModelUnit(jsonModelUnit)
+                    const receivedModel = new Model(jsonModel)
 
-                    await  receivedModelUnit.validate();
+                    await  receivedModel.validate();
 
-                    model_name = jsonModelUnit.ModelUnit.Attributs.name
+                    model_name = jsonModel.Model.Attributs.name
 
-                    console.log(`insert or update : {'ModelUnit.Attributs.name': ${model_name} } `)
-                    result = await ModelUnit.findOneAndUpdate(
-                            {'ModelUnit.Attributs.name': model_name},
-                            {ModelUnit: jsonModelUnit.ModelUnit},
+                    console.log(`insert or update : {'Model.Attributs.name': ${model_name} } `)
+                    result = await Model.findOneAndUpdate(
+                            {'Model.Attributs.name': model_name},
+                            {Model: jsonModel.Model},
                             {new:true, upsert: true, useFindAndModify: false}
                         ).exec()
                     
@@ -698,10 +698,10 @@ async function saveJsonModelUnit (jsonModelUnit){
 }
     
 
-function buildMongooseModelUnit(mongoose){
+function buildMongooseModel(mongoose){
 
-    if(mongoose.modelNames().find(e => e==='ModelUnit')){
-        return mongoose.model('ModelUnit')
+    if(mongoose.modelNames().find(e => e==='Model')){
+        return mongoose.model('Model')
     }
 
     const OutputValueSchema = new mongoose.Schema({
@@ -866,9 +866,9 @@ function buildMongooseModelUnit(mongoose){
         {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
     );
 
-    const ModelUnitSchema = new mongoose.Schema(
+    const ModelSchema = new mongoose.Schema(
         {
-            ModelUnit:{
+            Model:{
                 Attributs: {
                         name: {type: String, required:[true,'a model name is required']},
                         modelid: { type:String, required:[true,'a modelid is required']},
@@ -888,14 +888,14 @@ function buildMongooseModelUnit(mongoose){
       {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
     );
 
-    return mongoose.model('ModelUnit', ModelUnitSchema,'modelunits')
+    return mongoose.model('Model', ModelSchema,'modelunits')
       
 }
 
-async function createTestModelUnit(model_name){
+async function createTestModel(model_name){
 
     return new Promise( async (resolve, reject) => {
-        console.log('createTestModelUnit')
+        console.log('createTestModel')
         try{
             const mongoose = require('mongoose')
             mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
@@ -907,10 +907,10 @@ async function createTestModelUnit(model_name){
 
                 console.log(`succesful connection to ${MONGODB_HOST}` )
 
-                const ModelUnit = buildMongooseModelUnit(mongoose)
+                const Model = buildMongooseModel(mongoose)
 
-                const m = new  ModelUnit({
-                        ModelUnit:{
+                const m = new  Model({
+                        Model:{
                             Attributs :{ name: model_name ,modelid: `${model_name} X` },
                             Description :{Attributs:{Title: "test model", Authors: "A1 A2"}},
                             Inputs: [ {Input: {Attributs: {name: model_name+".i1"}}}, {Input: {Attributs: {name: model_name+".i2"}}}  ],
@@ -920,7 +920,7 @@ async function createTestModelUnit(model_name){
                 
                 db.close();
 
-                console.log('TestModelUnit')
+                console.log('TestModel')
                 console.log(m)
 
                 resolve(m)
@@ -934,16 +934,16 @@ async function createTestModelUnit(model_name){
     
 }
 
-async function createTestModelUnitAndSave(model_name){
+async function createTestModelAndSave(model_name){
     return new Promise(async (resolve, reject) => {
         try{
-            const ModelUnit = buildMongooseModelUnit(mongoose)
+            const Model = buildMongooseModel(mongoose)
 
 
-            m = await createTestModelUnit(model_name)
+            m = await createTestModel(model_name)
             m.save()
 
-            saved_m = await ModelUnit.find({ 'ModelUnit.Attributs.name': 'm1'})
+            saved_m = await Model.find({ 'Model.Attributs.name': 'm1'})
 
             resolve(saved_m);
         }catch(err){
@@ -1013,21 +1013,21 @@ router.get('/model',async function(req, res, next){
 /*
     Todo
     
-    + saveXmlModelUnit(urlXml)
+    + saveXmlModel(urlXml)
 
         + xml2json(xmlString)
 
-        + saveJsonModelUnit(jsonObj)
+        + saveJsonModel(jsonObj)
             check if exists in DB
             if not validate and save
 
         + 
 
-    + saveJsonModelUnit(json)
+    + saveJsonModel(json)
 
-    + getJsonModelUnit(Modelnames)
+    + getJsonModel(Modelnames)
 
-    + getXmlModelUnit(Modelnames)
+    + getXmlModel(Modelnames)
 
         + json2xml()
 
@@ -1043,35 +1043,35 @@ async function  parseXMLFromFile(){
     parser = new xml2js.Parser({
         attrkey: "Attributs",
         explicitRoot: false,
-        rootName:'ModelUnit',
+        rootName:'Model',
         explicitArray:false,
         cdata:true,
     });
 
     let modelUnitJsonObj = await parser.parseStringPromise(fileData)
 
-    // formatParsedArray(modelUnitJsonObj.ModelUnit,'Inputs','Input')
-    // formatParsedArray(modelUnitJsonObj.ModelUnit,'Outputs','Output')
+    // formatParsedArray(modelUnitJsonObj.Model,'Inputs','Input')
+    // formatParsedArray(modelUnitJsonObj.Model,'Outputs','Output')
     
-    // formatParsedArray(modelUnitJsonObj.ModelUnit,'Parametersets','Parameterset')
-    // modelUnitJsonObj.ModelUnit.Parametersets.forEach( e =>{
+    // formatParsedArray(modelUnitJsonObj.Model,'Parametersets','Parameterset')
+    // modelUnitJsonObj.Model.Parametersets.forEach( e =>{
     //     formatParsedArray(e,'Parameterset','Param')
     // })
 
-    // formatParsedArray(modelUnitJsonObj.ModelUnit,'Testsets','Testset')
-    // modelUnitJsonObj.ModelUnit.Testsets.forEach( e =>{
+    // formatParsedArray(modelUnitJsonObj.Model,'Testsets','Testset')
+    // modelUnitJsonObj.Model.Testsets.forEach( e =>{
     //     formatParsedArray(e,'Testset','Test')
     // })
 
-    // modelUnitJsonObj.ModelUnit.Testsets.forEach( testSet =>{
+    // modelUnitJsonObj.Model.Testsets.forEach( testSet =>{
     //     testSet.forEach( test => {
     //         test.forEach( )
     //     })
     // }
-    // modelUnitJsonObj.ModelUnit.Outputs.Output = [modelUnitJsonObj.ModelUnit.Outputs.Output]
+    // modelUnitJsonObj.Model.Outputs.Output = [modelUnitJsonObj.Model.Outputs.Output]
 
 
-    await insertModelUnitInMongoDb(modelUnitJsonObj);
+    await insertModelInMongoDb(modelUnitJsonObj);
     fs.writeFileSync("./server/data/melting.json", JSON.stringify(modelUnitJsonObj));
 
 
@@ -1083,11 +1083,11 @@ async function  parseXMLFromFile(){
         attrkey: "Attributs"
         // , headless: true
         , explicitRoot: true
-        , rootName:'ModelUnit'
+        , rootName:'Model'
         , explicitArray: false
         , cdata:true
         , xmldec:{ 'version': '1.0', 'encoding': 'UTF-8' }
-        , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/ModelUnit.dtd'}
+        , doctype: {'sysID': 'https://raw.githubusercontent.com/AgriculturalModelExchangeInitiative/crop2ml/master/Model.dtd'}
         })
 
     
@@ -1134,7 +1134,7 @@ function formatXml(xmlString,tagsToRem=[]) {
     return sb.toString()
 }
 
-async function insertModelUnitInMongoDb(model){
+async function insertModelInMongoDb(model){
     
         const client = await mangodb.MongoClient.connect(uri, { useNewUrlParser: true , useUnifiedTopology: true});
         const itemsDriver =  client.db("crop2ml").collection("models");
@@ -1169,15 +1169,15 @@ router.get('/schema',async function(req, res, next){
 
 async function cleanAndAddDocs(mongoose){
 
-    const ModelUnit = buildMongooseModelUnit(mongoose)
+    const Model = buildMongooseModel(mongoose)
 
-    console.log(` nb docs before  cleanAndAddDocs ${await ModelUnit.find({}).countDocuments() } `)
+    console.log(` nb docs before  cleanAndAddDocs ${await Model.find({}).countDocuments() } `)
 
-    await ModelUnit.deleteMany({});
+    await Model.deleteMany({});
 
 
-    m1 = new  ModelUnit({
-            ModelUnit:{
+    m1 = new  Model({
+            Model:{
                 Attributs :{ name: "m1" },
                 Description :{Attributs:{Title: "T1", Authors: "A1 A2"}},
                 Inputs: [ {Input: {Attributs: {name:"m1.i1"}}}, {Input: {Attributs: {name:"m1.i2"}}}  ],
@@ -1192,8 +1192,8 @@ async function cleanAndAddDocs(mongoose){
 
 
 
-    m2 = new  ModelUnit({
-            ModelUnit:{
+    m2 = new  Model({
+            Model:{
                 Attributs :{ name: "m2" },
                 Description :{Attributs:{Title: "T2", Authors: "A1 A2"}},
                 Inputs: [ {Input: {Attributs: {name:"m2.i1"}}}, {Input: {Attributs: {name:"m2.i2"}}}  ],
@@ -1203,22 +1203,22 @@ async function cleanAndAddDocs(mongoose){
     
     await m2.save()
 
-    console.log(` nb docs after cleanAndAddDocs ${await ModelUnit.find({}).countDocuments()}`)
+    console.log(` nb docs after cleanAndAddDocs ${await Model.find({}).countDocuments()}`)
 
     result =[]
 
     
 
     
-    result.push({q1: {'ModelUnit.Attributs.name': 'm1'}})
-    result.push({result_q1: await ModelUnit.find({ 'ModelUnit.Attributs.name': 'm1'})})
+    result.push({q1: {'Model.Attributs.name': 'm1'}})
+    result.push({result_q1: await Model.find({ 'Model.Attributs.name': 'm1'})})
 
-    console.log(` q2: {'ModelUnit.Inputs.Input.Attributs.name': 'm2.i1'} `)
-    console.log(` result : ${await ModelUnit.find({ 'ModelUnit.Inputs.Input.Attributs.name': /i1/} )} `)
+    console.log(` q2: {'Model.Inputs.Input.Attributs.name': 'm2.i1'} `)
+    console.log(` result : ${await Model.find({ 'Model.Inputs.Input.Attributs.name': /i1/} )} `)
 
     
 
-    // const result = await ModelUnit.find({})
+    // const result = await Model.find({})
 
     return result
 }
@@ -1226,16 +1226,16 @@ async function cleanAndAddDocs(mongoose){
 async function testQuery(mongoose){
 
     
-    const ModelUnit = buildMongooseModelUnit(mongoose)
+    const Model = buildMongooseModel(mongoose)
 
-    const nb = await ModelUnit.find({'Attributs.name': /^m/}).countDocuments()
+    const nb = await Model.find({'Attributs.name': /^m/}).countDocuments()
     console.log(` nb docs ${nb}`)
 
-    // await ModelUnit.deleteMany({});
+    // await Model.deleteMany({});
 
-    console.log(` nb docs  ${await ModelUnit.find({}).countDocuments()}`)
+    console.log(` nb docs  ${await Model.find({}).countDocuments()}`)
 
-    m1 = new  ModelUnit( 
+    m1 = new  Model( 
         {
             Attribut :{
                 name: "m1"
@@ -1325,7 +1325,7 @@ async function createSchema(mongoose){
     
     });
 
-    const ModelUnitSchema = new mongoose.Schema({
+    const ModelSchema = new mongoose.Schema({
        Attributs: {
             name: String,
             // modelid: String,
@@ -1339,10 +1339,10 @@ async function createSchema(mongoose){
       },{_id:false});
 
 
-    const ModelUnit = mongoose.model('ModelUnit', ModelUnitSchema)
+    const Model = mongoose.model('Model', ModelSchema)
     
 
-    m1 = new  ModelUnit( 
+    m1 = new  Model( 
         {
             Attributs :{
                 name: "m1"
@@ -1381,7 +1381,7 @@ async function createSchema(mongoose){
 
     await m1.save()
 
-    m2 = new  ModelUnit( 
+    m2 = new  Model( 
         {
             Attributs :{
                 name: "m2"
@@ -1401,7 +1401,7 @@ async function createSchema(mongoose){
 
     await m2.save()
 
-    const result = await ModelUnit.find({})
+    const result = await Model.find({})
 
     return JSON.stringify(result)
 
@@ -1413,7 +1413,7 @@ async function createSchema(mongoose){
     Unused
     Ex.
         transform Input[{att: , v: }{att: , v: }] to [{Input:{att: , v: }}, {Input:{att: , v: }}]
-        formatParsedArray(modelUnitJsonObj.ModelUnit,'Inputs','Input')
+        formatParsedArray(modelUnitJsonObj.Model,'Inputs','Input')
  */
 function formatParsedArray(parsedObj,arrayKey,elmtKey){
     if(Array.isArray(parsedObj[arrayKey]))

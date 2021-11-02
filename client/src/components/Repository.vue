@@ -726,7 +726,7 @@
 import { bTreeView } from 'bootstrap-vue-treeview'
 // import StarRating from 'vue-star-rating'
 
-import ClientServerJsonModel from "../services/ClientServerJsonModel"
+import ModelServices from "../services/ModelServices"
 
 import ModelPreview from './ModelPreview'
 
@@ -783,7 +783,7 @@ export default {
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-    this.modelTree = [await ClientServerJsonModel.requestModelTree()]
+    this.modelTree = [await ModelServices.requestModelTree()]
 
     console.log('this.modelTree: ')
     console.log(this.modelTree)
@@ -855,7 +855,7 @@ export default {
       this.submittedSearch=true ;
 
       // TODO reuse for more complex search with or condition
-      // const modelIdValues =  await ClientServerJsonModel.findJsonModelsBySearchWords([this.selectedWord]);
+      // const modelIdValues =  await ModelServices.findJsonModelsBySearchWords([this.selectedWord]);
       
       if(typeof this.$store.state.keywordsObj[this.selectedWord] !=='undefined'){
         this.searchResults.fromKeywords=this.$store.state.keywordsObj[this.selectedWord];

@@ -1,13 +1,13 @@
 var express = require('express');
 var router = express.Router();
 
-CropModelsServices = require('../../services/CropModelsServices.js');
+ModelServices = require('../../services/ModelServices.js');
 
 //TODO reuse for more complex search with or condition
 /*
 router.post('/findJsonModelsBySearchWords',async function(req, res, next){
     try {
-        jsonModelIds = await CropModelsServices.findJsonModelsBySearchWords(req.body.searchWords)
+        jsonModelIds = await ModelServices.findJsonModelsBySearchWords(req.body.searchWords)
         if(jsonModelIds){
             res.send(jsonModelIds)
         }else{
@@ -22,7 +22,7 @@ router.post('/findJsonModelsBySearchWords',async function(req, res, next){
 //OK
 router.post('/findAllJsonModels',async function(req, res, next){
     try {
-        const jsonModels = await CropModelsServices.findAllModels()
+        const jsonModels = await ModelServices.findAllModels()
         if(jsonModels){
             res.send(jsonModels)
         }else{
@@ -37,7 +37,7 @@ router.post('/findAllJsonModels',async function(req, res, next){
 //OK
 router.get('/findAllModelPackageNames',async function(req, res, next){
     try{
-        const modelPackageNames = await CropModelsServices.findAllModelPackageNames()
+        const modelPackageNames = await ModelServices.findAllModelPackageNames()
         if(modelPackageNames){
             res.send(modelPackageNames)
         }else{
@@ -52,7 +52,7 @@ router.get('/findAllModelPackageNames',async function(req, res, next){
 /*router.post('/findAllKeywords',async function(req, res, next){
 
     try{
-        jsonModels = await CropModelsServices.findAllModels()
+        jsonModels = await ModelServices.findAllModels()
         if(jsonModels){
             res.send(jsonModels)
         }else{
@@ -70,7 +70,7 @@ router.get('/findAllModelPackageNames',async function(req, res, next){
 //OK
 router.post('/modelTree',  async function(req, res, next) {
 
-    const modelsMetaData = await CropModelsServices.getAllModelsMetaData();
+    const modelsMetaData = await ModelServices.getAllModelsMetaData();
     let tree = {
         name: 'models',
         children:[]
@@ -98,6 +98,44 @@ router.post('/modelTree',  async function(req, res, next) {
     }
     res.send(tree);
 })
+
+router.get('/deleteJsonModel',async function(req, res, next){
+
+    try{
+
+        let model_name =  req.query.name;
+        result = await deleteJsonModel(model_name)
+        res.send(result)
+
+    }catch(error){
+        console.log(error)
+        res.send(error.toString())
+    }
+
+});
+
+router.post('/deleteJsonModelById',async function(req, res, next){
+
+    try{
+
+        console.log("START post deleteJsonModelById")
+
+        let modelid =  req.body.modelid;
+        result = await deleteJsonModelById(modelid)
+
+
+        console.log("END post deleteJsonModelById")
+
+        res.send(result)
+
+        
+
+    }catch(error){
+        console.log(error)
+        res.send(error.toString())
+    }
+
+});
 
 
 module.exports = router;

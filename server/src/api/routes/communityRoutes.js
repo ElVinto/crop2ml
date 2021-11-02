@@ -4,7 +4,7 @@ var formidable = require('formidable');
 var path = require('path');
 var mv = require('mv')
 
-CommunityServices = require('../../services/communityServices.js');
+CommunityServices = require('../../services/CommunityServices.js');
 
 //OK
 router.post('/createCommunity',  async function(req, res, next) {

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import ClientServerJsonModel from '../services/ClientServerJsonModel.js'
+import ModelServices from '../services/ModelServices.js'
 
 Vue.use(Vuex);
 
@@ -148,7 +148,7 @@ export default new Vuex.Store({
                console.log('START initModels')
 
                  
-               ClientServerJsonModel.findAllJsonModels().then(models =>{ 
+               ModelServices.findAllJsonModels().then(models =>{ 
 
                   for(const model of models){
                      commit('addModel', model)
@@ -175,7 +175,7 @@ export default new Vuex.Store({
             try { 
                console.log("START reInitmodel "+modelid)
 
-               ClientServerJsonModel.getmodelById(modelid).then(savedmodel =>{ 
+               ModelServices.getmodelById(modelid).then(savedmodel =>{ 
                   
                   if(savedmodel.model !== undefined){
                      console.log('savedmodel')
@@ -200,7 +200,7 @@ export default new Vuex.Store({
          console.log("START savemodel")
          console.log(model)
 
-         const savedmodel = await ClientServerJsonModel.savemodel(model)
+         const savedmodel = await ModelServices.savemodel(model)
 
          if(savedmodel.model !== undefined){
             commit('addmodel',savedmodel)
@@ -218,7 +218,7 @@ export default new Vuex.Store({
          console.log("START STORE deletemodel")
          
 
-         const deletedmodel = await ClientServerJsonModel.deletemodelById(model.model.Attributs.modelid)
+         const deletedmodel = await ModelServices.deletemodelById(model.model.Attributs.modelid)
 
          console.log("deletedmodel")
          console.log(deletedmodel)
@@ -242,7 +242,7 @@ export default new Vuex.Store({
             try { 
                console.log('START initKeywords')
 
-               ClientServerJsonModel.findAllJsonModels().then(models =>{ 
+               ModelServices.findAllJsonModels().then(models =>{ 
 
                   for(const model of models){
                      commit('addModel', model)

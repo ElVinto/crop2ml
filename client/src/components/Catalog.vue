@@ -79,7 +79,7 @@
               <b-list-group-item 
                 v-for="modelid in $store.state.modelUnits.keys()"
                 v-bind:key="modelid"
-                v-on:click="selectModelUnitById(modelid)"
+                v-on:click="selectModelById(modelid)"
               >
                 {{ modelid}}
               </b-list-group-item>
@@ -94,9 +94,9 @@
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> List of model units <span class="caret"></span> </button>
                 <ul class="dropdown-menu scrollable-menu" role="menu">
                   <li class="btn"
-                    v-for="modelid in $store.getters.getModelUnits.keys()"
+                    v-for="modelid in $store.getters.getModels.keys()"
                     v-bind:key="modelid"
-                    v-on:click="selectModelUnitById(modelid)"
+                    v-on:click="selectModelById(modelid)"
                   >
                     {{ modelid}}
                   </li>
@@ -112,7 +112,7 @@
         </div>
       </div>
 
-      <div id="modelContent" v-if="selectedModelUnitId"  class="col-sm-9"  >
+      <div id="modelContent" v-if="selectedModelId"  class="col-sm-9"  >
           
           <div id="modelIdAndActions" class="row">
             <div class="col-md-3">
@@ -123,7 +123,7 @@
             </div >
 
             <div class="col-md-6">
-              <h2 style="text-align:center;">{{ `${selectedModelUnitId}`}} </h2>
+              <h2 style="text-align:center;">{{ `${selectedModelId}`}} </h2>
             </div>
 
             <div class="col-md-3">
@@ -163,26 +163,26 @@
 
           <br>
 
-          <div id="ModelUnitAttributs" > 
+          <div id="ModelAttributs" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitAttributs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitAttributs')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelAttributs')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelAttributs')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitAttributs">
+            <div v-if="expandedModelAttributs">
               <div id="AttributList" 
                 class="input-group mb-3"
-                v-for="(v,k) in selectedModelUnit.ModelUnit.Attributs"
+                v-for="(v,k) in selectedModel.Model.Attributs"
                 v-bind:key="k"
               >
                 <div class="input-group-prepend"  style="width:100%;" >
                   <span class="input-group-text" id="basic-addon2">
                     {{ k }}
                   </span>
-                  <input class="form-control" v-model="selectedModelUnit.ModelUnit.Attributs[k]" :placeholder=v  >
+                  <input class="form-control" v-model="selectedModel.Model.Attributs[k]" :placeholder=v  >
                 </div>
               </div>
             </div>
@@ -201,14 +201,14 @@
             <div v-if="expandedDescription">
               <div id="DescriptionList" 
                 class="input-group mb-3"
-                v-for="(v,k) in selectedModelUnit.ModelUnit.Description"
+                v-for="(v,k) in selectedModel.Model.Description"
                 v-bind:key="k"
               >
                 <div class="input-group-prepend" style="width:100%;" >
                   <span class="input-group-text" >
                     {{ k }}
                   </span>
-                  <input class="form-control" v-model="selectedModelUnit.ModelUnit.Description[k]" :placeholder=v   >
+                  <input class="form-control" v-model="selectedModel.Model.Description[k]" :placeholder=v   >
                 </div>
               </div>
             </div>
@@ -227,14 +227,14 @@
             <div v-if="expandedAlgorithm">
               <div id="AlgorithmAttributList" 
                 class="input-group mb-3"
-                v-for="(v,k) in selectedModelUnit.ModelUnit.Algorithm.Attributs"
+                v-for="(v,k) in selectedModel.Model.Algorithm.Attributs"
                 v-bind:key="k"
               >
                 <div class="input-group-prepend" style="width:100%;" >
                   <span class="input-group-text" >
                     {{ k }}
                   </span>
-                  <input class="form-control" v-model="selectedModelUnit.ModelUnit.Algorithm.Attributs[k]" :placeholder=v   >
+                  <input class="form-control" v-model="selectedModel.Model.Algorithm.Attributs[k]" :placeholder=v   >
                 </div>
               </div>
 
@@ -253,13 +253,13 @@
 
           </div>
 
-          <div id="ModelUnitInputs" > 
+          <div id="ModelInputs" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitInputs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitInputs')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelInputs')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelInputs')}} 
             </button>
-            <div v-if="expandedModelUnitInputs">
-              <button type="button" class="btn btn-link" v-on:click="addModelUnitInput()" style="text-align:left" > 
+            <div v-if="expandedModelInputs">
+              <button type="button" class="btn btn-link" v-on:click="addModelInput()" style="text-align:left" > 
                 add input
               </button>
             </div>
@@ -268,13 +268,13 @@
             <br>
             <br>
             
-            <div v-if="expandedModelUnitInputs">
+            <div v-if="expandedModelInputs">
 
               
 
               <div id="InputList" 
                 class="input-group mb-3"
-                v-for="(inputObj,inputIdx) in selectedModelUnit.ModelUnit.Inputs[0].Input"
+                v-for="(inputObj,inputIdx) in selectedModel.Model.Inputs[0].Input"
                 v-bind:key="inputIdx"
               >
                 <p>{{`${inputObj.Attributs.name}`}}</p>
@@ -289,7 +289,7 @@
                     <span class="input-group-text" id="basic-addon2">
                       {{ inputObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Inputs[0].Input[inputIdx].Attributs[inputObjAttKey]" :placeholder=inputObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Model.Inputs[0].Input[inputIdx].Attributs[inputObjAttKey]" :placeholder=inputObjAttVal  >
                   </div>
               
                 </div>
@@ -299,19 +299,19 @@
 
           </div>
 
-          <div id="ModelUnitOutputs" > 
+          <div id="ModelOutputs" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitOutputs')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitOutputs')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelOutputs')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelOutputs')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitOutputs">
+            <div v-if="expandedModelOutputs">
               <div id="OutputList" 
                 class="input-group mb-3"
-                v-for="(outputObj,outputIdx) in selectedModelUnit.ModelUnit.Outputs[0].Output"
+                v-for="(outputObj,outputIdx) in selectedModel.Model.Outputs[0].Output"
                 v-bind:key="outputIdx"
               >
                 <p>{{`${outputObj.Attributs.name}`}}</p>
@@ -326,7 +326,7 @@
                     <span class="input-group-text" id="basic-addon2">
                       {{ outputObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Outputs[0].Output[outputIdx].Attributs[outputObjAttKey]" :placeholder=outputObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Model.Outputs[0].Output[outputIdx].Attributs[outputObjAttKey]" :placeholder=outputObjAttVal  >
                   </div>
               
                 </div>
@@ -337,19 +337,19 @@
           </div>
 
           <!-- TODO CHECK THE form -->
-          <div id="ModelUnitParametersets" > 
+          <div id="ModelParametersets" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitParametersets')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitParametersets')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelParametersets')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelParametersets')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitParametersets">
+            <div v-if="expandedModelParametersets">
               <div id="ParametersetList" 
                 class="input-group mb-3"
-                v-for="(paramsetObj,paramsetIdx) in selectedModelUnit.ModelUnit.Parametersets[0].Parameterset"
+                v-for="(paramsetObj,paramsetIdx) in selectedModel.Model.Parametersets[0].Parameterset"
                 v-bind:key="paramsetIdx"
               >
                 <p>{{`${paramsetObj.Attributs.name}`}}</p>
@@ -364,7 +364,7 @@
                     <span class="input-group-text" >
                       {{ paramsetObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Parametersets[0].Parameterset[paramsetIdx].Attributs[paramsetObjAttKey]" :placeholder=paramsetObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Model.Parametersets[0].Parameterset[paramsetIdx].Attributs[paramsetObjAttKey]" :placeholder=paramsetObjAttVal  >
                   </div>
               
                 </div>
@@ -380,7 +380,7 @@
                     <span class="input-group-text" >
                       {{ paramObjVal.Attributs.name }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Parametersets[0].Parameterset[paramsetIdx].Param[paramObjKey]._" :placeholder=paramObjVal._ >
+                    <input class="form-control" v-model="selectedModel.Model.Parametersets[0].Parameterset[paramsetIdx].Param[paramObjKey]._" :placeholder=paramObjVal._ >
                   </div>
               
                 </div>
@@ -391,19 +391,19 @@
           </div>
 
           <!-- TODO -->
-          <div id="ModelUnitTestsets" > 
+          <div id="ModelTestsets" > 
 
-            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelUnitTestsets')" style="white-space:pre; width:100%;" > 
-              {{formatLabel('ModelUnitTestsets')}} 
+            <button type="button" class="btn btn-secondary" v-on:click="flip('expandedModelTestsets')" style="white-space:pre; width:100%;" > 
+              {{formatLabel('ModelTestsets')}} 
             </button>
 
             <br>
             <br>
             
-            <div v-if="expandedModelUnitTestsets">
+            <div v-if="expandedModelTestsets">
               <div id="TestsetList" 
                 class="input-group mb-3"
-                v-for="(testsetObj,testsetIdx) in selectedModelUnit.ModelUnit.Testsets[0].Testset"
+                v-for="(testsetObj,testsetIdx) in selectedModel.Model.Testsets[0].Testset"
                 v-bind:key="testsetIdx"
               >
                 <p>{{`${testsetObj.Attributs.name}`}}</p>
@@ -418,7 +418,7 @@
                     <span class="input-group-text" >
                       {{ testsetObjAttKey }}
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Attributs[testsetObjAttKey]" :placeholder=testsetObjAttVal  >
+                    <input class="form-control" v-model="selectedModel.Model.Testsets[0].Testset[testsetIdx].Attributs[testsetObjAttKey]" :placeholder=testsetObjAttVal  >
                   </div>
               
                 </div>
@@ -434,7 +434,7 @@
                     <span class="input-group-text" >
                       name
                     </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Test[testObjKey].Attributs.name" :placeholder=testObjVal.Attributs.name >
+                    <input class="form-control" v-model="selectedModel.Model.Testsets[0].Testset[testsetIdx].Test[testObjKey].Attributs.name" :placeholder=testObjVal.Attributs.name >
                   </div>
                   
                   <br>
@@ -449,7 +449,7 @@
                       <span class="input-group-text" >
                         {{testInputObjVal.Attributs.name}}
                       </span>
-                    <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Test[testObjKey].InputValue[testInputObjKey]._" :placeholder=testInputObjVal._ >
+                    <input class="form-control" v-model="selectedModel.Model.Testsets[0].Testset[testsetIdx].Test[testObjKey].InputValue[testInputObjKey]._" :placeholder=testInputObjVal._ >
                     </div>
                   </div>
 
@@ -464,7 +464,7 @@
                       <span class="input-group-text" >
                         {{testOutputObjVal.Attributs.name}}
                       </span>
-                      <input class="form-control" v-model="selectedModelUnit.ModelUnit.Testsets[0].Testset[testsetIdx].Test[testObjKey].OutputValue[testOutputObjKey]._" :placeholder=testOutputObjVal._ >
+                      <input class="form-control" v-model="selectedModel.Model.Testsets[0].Testset[testsetIdx].Test[testObjKey].OutputValue[testOutputObjKey]._" :placeholder=testOutputObjVal._ >
                     </div>
 
                   </div>
@@ -488,8 +488,8 @@
 </template>
 <script>
 
-// import ModelUnitServices from "../services/ModelUnitServices"
-import FileSystemServices from "../services/ClientServerFileSystem"
+// import ModelServices from "../services/ModelServices"
+import FileSystemServices from "../services/FileServices"
 import StarRating from 'vue-star-rating'
 
 
@@ -508,27 +508,27 @@ export default {
 
         errorMsg : "",
 
-        selectedModelUnitId: null,
+        selectedModelId: null,
 
-        selectedModelUnit:{},
+        selectedModel:{},
 
         modelUnitSchema :{},
 
 
-        expandedModelUnitAttributs :false,
+        expandedModelAttributs :false,
         
         expandedDescription :false,
 
         expandedAlgorithm :false,
 
 
-        expandedModelUnitInputs :false,
+        expandedModelInputs :false,
 
-        expandedModelUnitOutputs :false,
+        expandedModelOutputs :false,
 
-        expandedModelUnitParametersets: false,
+        expandedModelParametersets: false,
 
-        expandedModelUnitTestsets :false,
+        expandedModelTestsets :false,
 
         currentRating: "No Rating",
         currentSelectedRating: "No Current Rating",
@@ -547,7 +547,7 @@ export default {
 
     // console.log("START created Catalog")
 
-    // this.modelUnitSchema = ModelUnitServices.buildSchema();
+    // this.modelUnitSchema = ModelServices.buildSchema();
 
     // console.log("this.modelUnitSchema")
     // console.log(this.modelUnitSchema)
@@ -560,7 +560,7 @@ export default {
     console.log("START mounted Catalog")
 
     if (!this.$store.getters.getDataAreLoaded) {
-      await this.$store.dispatch('initModelUnits');
+      await this.$store.dispatch('initModels');
     }
 
     console.log("END mounted Catalog")
@@ -568,12 +568,12 @@ export default {
 
   computed:{
 
-      // selectedModelUnit: function (){
-      //   return this.$store.getters.getModelUnits.get(this.selectedModelUnitId)
+      // selectedModel: function (){
+      //   return this.$store.getters.getModels.get(this.selectedModelId)
       // }
 
       // modelUnitIds () {
-      //   return this.$store.getters.getModelUnits.keys()
+      //   return this.$store.getters.getModels.keys()
       // }
   },
 
@@ -603,13 +603,13 @@ export default {
       console.log("json received: ")
       console.log(jsonModel.data)
 
-      this.$store.commit('addModelUnit',jsonModel.data);
+      this.$store.commit('addModel',jsonModel.data);
 
-      console.log('this.$store.getters.getModelUnits')
-      console.log(this.$store.getters.getModelUnits)
+      console.log('this.$store.getters.getModels')
+      console.log(this.$store.getters.getModels)
 
       
-      this.selectModelUnitById(jsonModel.data.ModelUnit.Attributs.modelid)
+      this.selectModelById(jsonModel.data.Model.Attributs.modelid)
 
       console.log("END submitFile")
     },
@@ -643,7 +643,7 @@ export default {
       console.log(response)
 
       // TODO add model unit for each model
-      // this.$store.commit('addModelUnit',jsonModel.data);
+      // this.$store.commit('addModel',jsonModel.data);
 
       console.log("END submitZip")
     },
@@ -652,9 +652,9 @@ export default {
       console.log("START saveModel")
 
       this.errorMsg =""
-      const res =  await this.$store.dispatch('saveModelUnit',this.selectedModelUnit);
+      const res =  await this.$store.dispatch('saveModel',this.selectedModel);
 
-      if(res.ModelUnit === undefined){
+      if(res.Model === undefined){
         this.errorMsg = res;
       }
 
@@ -669,18 +669,18 @@ export default {
 
       // TODO case of new empty model
       
-      const res = await this.$store.dispatch('reInitModelUnit',this.selectedModelUnitId);
+      const res = await this.$store.dispatch('reInitModel',this.selectedModelId);
 
-      if(res.ModelUnit !== undefined){
-        this.selectedModelUnit = this.$store.getters.getModelUnits.get(this.selectedModelUnitId)
+      if(res.Model !== undefined){
+        this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
       }else{
         this.errorMsg = res;
       }
       
       
       
-      console.log('this.selectedModelUnit')
-      console.log(this.selectedModelUnit)
+      console.log('this.selectedModel')
+      console.log(this.selectedModel)
 
       console.log("END reInitModel")
     },
@@ -691,19 +691,19 @@ export default {
 
       this.errorMsg =""
 
-      const deletedModelUnit = await this.$store.dispatch('deleteModelUnit',this.selectedModelUnit);
+      const deletedModel = await this.$store.dispatch('deleteModel',this.selectedModel);
 
-      console.log('deletedModelUnit')
-      console.log(deletedModelUnit)
+      console.log('deletedModel')
+      console.log(deletedModel)
 
-      this.selectedModelUnitId= null
+      this.selectedModelId= null
 
-      this.selectedModelUnit={}
+      this.selectedModel={}
 
       console.log("END deleteModel")
     },
 
-    addModelUnitInput(){
+    addModelInput(){
 
     },
 
@@ -720,8 +720,8 @@ export default {
 
       switch (paramName) {
 
-        case 'ModelUnitAttributs': 
-          return `${this.sign(this.expandedModelUnitAttributs)} Attributs` ;
+        case 'ModelAttributs': 
+          return `${this.sign(this.expandedModelAttributs)} Attributs` ;
         
         case 'Description': 
           return `${this.sign(this.expandedDescription)} ${paramName}` ;
@@ -729,17 +729,17 @@ export default {
         case 'Algorithm': 
           return `${this.sign(this.expandedAlgorithm)} ${paramName}` ; 
 
-        case 'ModelUnitInputs': 
-          return `${this.sign(this.expandedModelUnitInputs)} Inputs` ;
+        case 'ModelInputs': 
+          return `${this.sign(this.expandedModelInputs)} Inputs` ;
         
-        case 'ModelUnitOutputs': 
-          return `${this.sign(this.expandedModelUnitOutputs)} Outputs` ;
+        case 'ModelOutputs': 
+          return `${this.sign(this.expandedModelOutputs)} Outputs` ;
         
-        case 'ModelUnitParametersets': 
-          return `${this.sign(this.expandedModelUnitParametersets)} Parametersets` ;
+        case 'ModelParametersets': 
+          return `${this.sign(this.expandedModelParametersets)} Parametersets` ;
 
-        case 'ModelUnitTestsets': 
-          return `${this.sign(this.expandedModelUnitTestset)} Testsets` ;
+        case 'ModelTestsets': 
+          return `${this.sign(this.expandedModelTestset)} Testsets` ;
       
         default:
           break;
@@ -747,9 +747,9 @@ export default {
 
     },
 
-    selectModelUnitById: function (modelid){
-      this.selectedModelUnitId = modelid;
-      this.selectedModelUnit = this.$store.getters.getModelUnits.get(this.selectedModelUnitId)
+    selectModelById: function (modelid){
+      this.selectedModelId = modelid;
+      this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
     },
 
     showCurrentRating: function(rating) {

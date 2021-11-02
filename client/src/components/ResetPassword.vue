@@ -55,7 +55,7 @@
 </template>
 <script>
 
-import Authentification from "../services/Authentification";
+import AuthServices from "../services/AuthServices";
 export default {
   data() {
     return {
@@ -114,7 +114,7 @@ export default {
           password: this.password2,
         }
 
-        const userInfo =await Authentification.resetPassword(resetPasswordDetails)
+        const userInfo =await AuthServices.resetPassword(resetPasswordDetails)
         console.log(userInfo)
 
         if(typeof userInfo.errorMsg !== 'undefined' ){

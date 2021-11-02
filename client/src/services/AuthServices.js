@@ -8,17 +8,17 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
     url = 'http://localhost:5000/';
 }
 
-class Authentification {
+class AuthServices {
 
     static register(userRegistrationDetails) {
-        console.log("START Authentification.register");
+        console.log("START AuthServices.register");
         console.log(userRegistrationDetails);
         
         return new Promise((resolve, reject) => {
             try {
                 axios.post(url + "auth/register", userRegistrationDetails).then(res => {
                     
-                    console.log("Authentification.END register");
+                    console.log("AuthServices.END register");
                     
                     resolve(res.data);
                 })
@@ -28,14 +28,14 @@ class Authentification {
     }
 
     static updateProfile(profileDetails) {
-        console.log("START Authentification.updateProfile");
+        console.log("START AuthServices.updateProfile");
         console.log(profileDetails);
         
         return new Promise((resolve, reject) => {
             try {
                 axios.post(url + "auth/updateProfile", profileDetails).then(res => {
                     
-                    console.log("Authentification.END updateProfile");
+                    console.log("AuthServices.END updateProfile");
                     
                     resolve(res.data);
                 })
@@ -88,4 +88,4 @@ class Authentification {
 
 
 }
-export default Authentification;
+export default AuthServices;

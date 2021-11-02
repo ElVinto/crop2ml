@@ -116,9 +116,9 @@
 <script>
 
 
-import CommunityRequests from "../../services/CommunityRequests"
-import UserRequests from "../../services/UserRequests"
-import ClientServerJsonModel from "../../services/ClientServerJsonModel"
+import CommunityServices from "../../services/CommunityServices"
+import UserServices from "../../services/UserServices"
+import ModelServices from "../../services/ModelServices"
 
 export default {
 
@@ -150,8 +150,8 @@ export default {
     }
     reader.readAsDataURL(this.inputImgFile);
 
-    this.registeredEmails = await UserRequests.getRegisteredEmails();
-    this.packageNames = await ClientServerJsonModel.findAllModelPackageNames();
+    this.registeredEmails = await UserServices.getRegisteredEmails();
+    this.packageNames = await ModelServices.findAllModelPackageNames();
   },
 
   methods: {
@@ -167,7 +167,7 @@ export default {
      },
     
     async submitCommunity(){
-      const communityCreated =  await CommunityRequests.createCommunity(this.inputImgFile,this.community)
+      const communityCreated =  await CommunityServices.createCommunity(this.inputImgFile,this.community)
       
       console.log("communityCreated")
       console.log(communityCreated)

@@ -1,4 +1,4 @@
-class ModelUnitServices{
+class ModelServices{
 
     static buildSchema(){
 
@@ -151,9 +151,9 @@ class ModelUnitServices{
                 Abstract: {type: String, required: true}
             }
 
-        const ModelUnitSchema = 
+        const ModelSchema = 
             {
-                ModelUnit:{
+                Model:{
                     Attributs: {
                             name: {type: String, required: true},
                             modelid: { type:String, required: true},
@@ -170,7 +170,7 @@ class ModelUnitServices{
                     Testsets:{type: [TestsetSchema], require: true},
                 }
         };
-        return ModelUnitSchema
+        return ModelSchema
     }
 
     static buildNewSchema(){
@@ -300,9 +300,9 @@ class ModelUnitServices{
                 Abstract: 'String',
             }
 
-        const ModelUnitSchema = 
+        const ModelSchema = 
             {
-                ModelUnit:{
+                Model:{
                     Attributs: {
                             name: 'String',
                             modelid: 'String',
@@ -319,8 +319,8 @@ class ModelUnitServices{
                     Testsets: [TestsetSchema]
                 }
         };
-        return ModelUnitSchema
+        return ModelSchema
     }
 }
 
-export default ModelUnitServices;
+export default ModelServices;

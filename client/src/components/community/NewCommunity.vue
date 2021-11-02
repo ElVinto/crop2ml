@@ -83,7 +83,7 @@
 <script>
 
 
-import CommunityRequests from "../../services/CommunityRequests"
+import CommunityServices from "../../services/CommunityServices"
 
 
 export default {
@@ -132,7 +132,7 @@ export default {
         modelPackages:[]
       }
 
-      const communityCreated =  await CommunityRequests.createCommunity(image,communityInfo)
+      const communityCreated =  await CommunityServices.createCommunity(image,communityInfo)
       console.log(communityCreated)
 
       this.submitted =true;

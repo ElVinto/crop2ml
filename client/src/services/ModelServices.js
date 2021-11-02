@@ -8,7 +8,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
     url = 'http://localhost:5000/';
 }
 
-class ClientServerJsonModel{
+class ModelServices{
 
     // TODO reuse for more complex search with or condition
     /*static findJsonModelsBySearchWords = async (searchWords) =>{
@@ -72,7 +72,7 @@ class ClientServerJsonModel{
                 // let body ={
                 //     modelType: 'modelUnits',
                 // }
-                // axios.post(url + "mongodb-services/findAllJsonModels", body).then(res => {
+                // axios.post(url + "models/findAllJsonModels", body).then(res => {
                 //     resolve(res.data) ;
                 // })
                 axios.post(url + "cropmodels/findAllKeywords").then(res => {
@@ -110,7 +110,7 @@ class ClientServerJsonModel{
                 let body ={
                     modelid: modelid,
                 }
-                axios.post(url + "mongodb-services/findJsonModelById", body).then(res => {
+                axios.post(url + "models/findJsonModelById", body).then(res => {
                     resolve(res.data) ;
                 })
                 
@@ -129,7 +129,7 @@ class ClientServerJsonModel{
                 let body ={
                     modelUnit: modelUnit,
                 }
-                axios.post(url + "mongodb-services/saveJsonModel", body).then(res => {
+                axios.post(url + "models/saveJsonModel", body).then(res => {
                     resolve(res.data) ;
                 })
                 
@@ -147,7 +147,7 @@ class ClientServerJsonModel{
                 let body ={
                     modelid: modelid,
                 }
-                axios.post(url + "mongodb-services/deleteJsonModelById", body).then(res => {
+                axios.post(url + "models/deleteJsonModelById", body).then(res => {
                     resolve(res.data) ;
                 })
                 
@@ -159,4 +159,4 @@ class ClientServerJsonModel{
     }
 }
 
-export default ClientServerJsonModel
+export default ModelServices

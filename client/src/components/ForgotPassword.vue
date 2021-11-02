@@ -47,7 +47,7 @@
 </template>
 <script>
 
-import Authentification from "../services/Authentification";
+import AuthServices from "../services/AuthServices";
 export default {
   data() {
     return {
@@ -69,7 +69,7 @@ export default {
       console.log('START forgotPassword')
       try {
         
-        this.forgotPasswordMsg = await Authentification.forgotPassword(this.email)
+        this.forgotPasswordMsg = await AuthServices.forgotPassword(this.email)
         
       } catch (error) { 
         this.error = error.message;
