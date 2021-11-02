@@ -74,8 +74,8 @@ router.post('/upload',  async function(req, res, next) {
                 console.log(jsonModel)
     
                 // Save or update JSON object
-                // result = await saveJsonModel(jsonModel)
-                saveJsonModel(jsonModel)
+                // result = await saveModel(jsonModel)
+                saveModel(jsonModel)
                 .then((result) =>{
     
                     // res.send(jsonObj2xmlString(jsonModel))
@@ -310,10 +310,10 @@ async function xmlString2jsonObj(xmlString){
     return result
 }
 
-async function saveJsonModel (jsonModel){
+async function saveModel (jsonModel){
 
     return new Promise((resolve, reject) => {
-        console.log('saveJsonModel')
+        console.log('saveModel')
         try{
             const mongoose = require('mongoose')
             mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});

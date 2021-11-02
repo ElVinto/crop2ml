@@ -49,7 +49,7 @@ class ModelServices{
     }*/
 
     //OK
-    static async findAllModels(){
+    static async getAllModels(){
         return new Promise(async (resolve, reject) => {
             try{
                 const result = await Model.find({})
@@ -62,7 +62,7 @@ class ModelServices{
     }
 
     //OK
-    static async findAllModelPackageNames(){
+    static async getAllModelsPackageNames(){
         return new Promise(async (resolve, reject) => {
             try{
                 const models = await this.getAllModelsMetaData()
@@ -93,32 +93,46 @@ class ModelServices{
         }) 
     }
 
-    static async deleteJsonModelById (modelid){
+    //OK
+    static async saveModel (jsonModel){
+        return new Promise(async (resolve, reject) => {
+            try{
+                //const filter = {'Attributs.modelid': jsonModel.metaData.idValue}
+                let filter = {}
+                filter[`Attributs.${jsonModel.metaData.idProperty}`]= jsonModel.metaData.idValue
+                const update = jsonModel
+                const options = { upsert: true, returnNewDocument: true}
+                var result = await Model.updateOne(filter,update,options)
+                //CMZ comment
+                /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
+                    result.value = jsonModel;
+                }*/
+                //result = JSON.parse(JSON.stringify(result))
+                resolve(result)
+                    
+            }catch(error){
+                console.log(error)
+                reject(error);
+            }
+        }) 
+    }
 
+    static async getModelById (modelid){
         return new Promise((resolve, reject) => {
             try{
-                const mongoose = require('mongoose')
-                mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
-                const db = mongoose.connection;
-                
-                db.on('error', console.error.bind(console, 'connection error:'));
-    
-                db.once('open', async function(){
-    
-                    console.log(`succesful connection to ${MONGODB_HOST}` )
-    
-                    console.log(`delete : {'Model.Attributs.modelid': ${modelid} } `)
-                    result = await Model.findOneAndDelete({'Model.Attributs.modelid': modelid}).exec()
-    
-                    result = JSON.parse(JSON.stringify(result))
-                    
-                    db.close();
-    
-                    console.log(`succesful end connection to ${MONGODB_HOST}` )
-    
-                    resolve(result)
-                });
-                
+                result = await Model.findOne({'Model.Attributs.modelid': modelid },{'_id':0, '__v':0}) //TODO CMZ : modelid ou id ?
+                resolve(result)
+            }catch (err) { 
+                reject(err); 
+            }
+        })
+    }
+
+    static async deleteModelById (modelid){
+        return new Promise((resolve, reject) => {
+            try{
+                result = await Model.findOneAndDelete({'Attributs.modelid': modelid}).exec() //TODO CMZ : modelid ou id ?
+                resolve(result)
             }catch (err) {
                 console.log(err.message)
                 reject(err); 
@@ -126,38 +140,27 @@ class ModelServices{
         })   
     }
 
-    static async deleteJsonModel (model_name){
-
-        return new Promise((resolve, reject) => {
+    //OK. But saved keywords in keywords collection are never retrieved for now, so useless.
+    static async saveKeywords (modelMetaData){
+        return new Promise(async (resolve, reject) => {
             try{
-                const mongoose = require('mongoose')
-                mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
-                const db = mongoose.connection;
-                
-                db.on('error', console.error.bind(console, 'connection error:'));
-    
-                db.once('open', async function(){
-    
-                    console.log(`succesful connection to ${MONGODB_HOST}` )
-    
-                    console.log(`delete : {'Model.Attributs.name': ${model_name} } `)
-                    result = await Model.findOneAndDelete({'Model.Attributs.name': model_name}).exec()
+                modelMetaData.keywords.forEach(async(k) => {
+                    const filter = {keyword: k, modelIdValue: modelMetaData.idValue }
+                    const update = {keyword: k, modelIdValue: modelMetaData.idValue }
+                    const options = { upsert: true, returnNewDocument: true}
                     
-    
-                    result = JSON.parse(JSON.stringify(result))
-                    
-                    db.close();
-    
-                    console.log(`succesful end connection to ${MONGODB_HOST}` )
-    
-                    resolve(result)
-                });
-                
-            }catch (err) {
-                console.log(err.message)
-                reject(err); 
+                    await Keyword.updateOne(filter,update,options)
+                    //CMZ comment
+                    /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
+                        result.value = replacement;
+                    }*/
+                })
+                resolve()    
+            }catch(error){
+                console.log(error)
+                reject(error);
             }
-        })   
+        }) 
     }
 }
 

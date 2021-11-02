@@ -148,7 +148,7 @@ export default new Vuex.Store({
                console.log('START initModels')
 
                  
-               ModelServices.findAllJsonModels().then(models =>{ 
+               ModelServices.getAllModels().then(models =>{ 
 
                   for(const model of models){
                      commit('addModel', model)
@@ -170,12 +170,12 @@ export default new Vuex.Store({
          })
       },
 
-      async reInitmodel({commit},modelid){
+      async reInitModel({commit},modelid){
          return new Promise((resolve, reject) => {
             try { 
                console.log("START reInitmodel "+modelid)
 
-               ModelServices.getmodelById(modelid).then(savedmodel =>{ 
+               ModelServices.getModelById(modelid).then(savedmodel =>{ 
                   
                   if(savedmodel.model !== undefined){
                      console.log('savedmodel')
@@ -195,7 +195,7 @@ export default new Vuex.Store({
       },
 
 
-      async savemodel({commit},model){
+      async saveModel({commit},model){
 
          console.log("START savemodel")
          console.log(model)
@@ -213,12 +213,12 @@ export default new Vuex.Store({
          return savedmodel;
       },
 
-      async deletemodel({commit},model){
+      async deleteModel({commit},model){
 
          console.log("START STORE deletemodel")
          
 
-         const deletedmodel = await ModelServices.deletemodelById(model.model.Attributs.modelid)
+         const deletedmodel = await ModelServices.deleteModelById(model.model.Attributs.modelid)
 
          console.log("deletedmodel")
          console.log(deletedmodel)
@@ -235,14 +235,14 @@ export default new Vuex.Store({
       },
 
 
-      initKeywords({ state, commit }){
+      /*initKeywords({ state, commit }){
 
          return new Promise((resolve, reject) => {
             
             try { 
                console.log('START initKeywords')
 
-               ModelServices.findAllJsonModels().then(models =>{ 
+               ModelServices.getAllModels().then(models =>{ 
 
                   for(const model of models){
                      commit('addModel', model)
@@ -263,12 +263,7 @@ export default new Vuex.Store({
             }
          })
 
-      },
-
-
-
-      
-
+      },*/
    
    }
 });

@@ -151,7 +151,7 @@ export default {
     reader.readAsDataURL(this.inputImgFile);
 
     this.registeredEmails = await UserServices.getRegisteredEmails();
-    this.packageNames = await ModelServices.findAllModelPackageNames();
+    this.packageNames = await ModelServices.getAllModelsPackageNames();
   },
 
   methods: {

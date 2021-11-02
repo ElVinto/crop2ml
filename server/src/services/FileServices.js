@@ -6,8 +6,7 @@ var fs = require('fs');
 var xml2js = require('xml2js');
 const directoryTree = require("directory-tree");
 
-let Model = require('../models/ModelSchema')
-let Keyword = require('../models/KeywordSchema')
+ModelServices = require('./ModelServices.js');
 
 class FileServices {
 
@@ -31,7 +30,7 @@ class FileServices {
         archive.finalize();
         });
     }
-  
+    
     /**
      * 
      * @param {String} source 
@@ -52,7 +51,7 @@ class FileServices {
     }
 
     //OK
-    static async addModelsFrom(dirPath, modelMetaDataPart){
+    static async computeExtractedData(dirPath, modelMetaDataPart){
         return new Promise(async (resolve,reject)=>{
             try {
                 let xmlFNames =fs.readdirSync(dirPath).filter(fName => fName.includes('.xml'))
@@ -80,10 +79,10 @@ class FileServices {
                         uploaderMail: modelMetaDataPart.uploaderMail
                     }
                     console.log(jsonModel)
-                    let savedJsonModel = await this.saveJsonModel(jsonModel)
+                    let savedJsonModel = await ModelServices.saveModel(jsonModel)
                     savedJsonModels.push(savedJsonModel)
     
-                    await this.saveJsonKeywords(jsonModel.metaData)
+                    await ModelServices.saveKeywords(jsonModel.metaData)
                     
                     jsonModel.metaData.keywords.forEach (k => {
                         if(extractedKeywords.indexOf(k)===-1){
@@ -124,57 +123,6 @@ class FileServices {
         })
     
     }
-    
-    //OK
-    static async saveJsonModel (jsonModel){
-        return new Promise(async (resolve, reject) => {
-            try{
-                //const filter = {'Attributs.modelid': jsonModel.metaData.idValue}
-                let filter = {}
-                filter[`Attributs.${jsonModel.metaData.idProperty}`]= jsonModel.metaData.idValue
-                const update = jsonModel
-                const options = { upsert: true, returnNewDocument: true}
-                var result = await Model.updateOne(filter,update,options)
-                //CMZ comment
-                /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
-                    result.value = jsonModel;
-                }*/
-                //result = JSON.parse(JSON.stringify(result))
-                resolve(result)
-                       
-            }catch(error){
-                console.log(error)
-                reject(error);
-            }
-        }) 
-      
-    }
-    
-    //OK
-    static async saveJsonKeywords (modelMetaData){
-        return new Promise(async (resolve, reject) => {
-            try{
-                modelMetaData.keywords.forEach(async(k) => {
-                    const filter = {keyword: k, modelIdValue: modelMetaData.idValue }
-                    const update = {keyword: k, modelIdValue: modelMetaData.idValue }
-                    const options = { upsert: true, returnNewDocument: true}
-                    
-                    await Keyword.updateOne(filter,update,options)
-                    //CMZ comment
-                    /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
-                        result.value = replacement;
-                    }*/
-                })
-
-                resolve()
-                       
-            }catch(error){
-                console.log(error)
-                reject(error);
-            }
-        }) 
-      
-    }
 
     /*
     dirTree: {
@@ -203,28 +151,6 @@ class FileServices {
         displayedDirTree = this.retainExtensions(pathDirTree,['.xml'])
         return displayedDirTree;
     }
-
-
-    static clean (argDirTree, nvDirTree){
-        nvDirTree['name']= argDirTree.name
-
-        if(argDirTree.children){
-            nvDirTree['children'] = []
-            for(let argDirTreeChild of argDirTree.children ){
-
-                // console.log(argDirTreeChild)
-                let nvTreeNode = {};
-                nvDirTree['children'].push(nvTreeNode)
-                this.clean(argDirTreeChild,nvTreeNode)
-
-                // nvDirTree['children'].push({})
-                // this.clean(argDirTreeChild,nvDirTree['children'][nvDirTree['children'].length-1])
-                
-            }
-            return 
-        }
-    }
-
 
     static retainExtensions(argDirTree, extensions ){
         if(argDirTree.type ==='file' ){
@@ -255,6 +181,27 @@ class FileServices {
             
         }
     }
+
+     /*static clean (argDirTree, nvDirTree){
+        nvDirTree['name']= argDirTree.name
+
+        if(argDirTree.children){
+            nvDirTree['children'] = []
+            for(let argDirTreeChild of argDirTree.children ){
+
+                // console.log(argDirTreeChild)
+                let nvTreeNode = {};
+                nvDirTree['children'].push(nvTreeNode)
+                this.clean(argDirTreeChild,nvTreeNode)
+
+                // nvDirTree['children'].push({})
+                // this.clean(argDirTreeChild,nvDirTree['children'][nvDirTree['children'].length-1])
+                
+            }
+            return 
+        }
+    }*/
+
 }
 
 module.exports = FileServices

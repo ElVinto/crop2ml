@@ -76,7 +76,7 @@
 </template>
 <script>
 
-import AuthServices from "../services/AuthServices";
+import AuthServices from "../../services/AuthServices";
 export default {
   data() {
     return {

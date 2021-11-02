@@ -20,9 +20,9 @@ router.post('/findJsonModelsBySearchWords',async function(req, res, next){
 });*/
 
 //OK
-router.post('/findAllJsonModels',async function(req, res, next){
+router.post('/getAllModels',async function(req, res, next){
     try {
-        const jsonModels = await ModelServices.findAllModels()
+        const jsonModels = await ModelServices.getAllModels()
         if(jsonModels){
             res.send(jsonModels)
         }else{
@@ -35,9 +35,25 @@ router.post('/findAllJsonModels',async function(req, res, next){
 });
 
 //OK
-router.get('/findAllModelPackageNames',async function(req, res, next){
+router.post('/getModelById',async function(req, res, next){
     try{
-        const modelPackageNames = await ModelServices.findAllModelPackageNames()
+        const modelid =  req.body.modelid;
+        const jsonModel = await getModelById(modelid)
+        if(jsonModel){
+            res.send(jsonModel)
+        }else{
+            res.send(`Model ${modelid} NOT FOUND, the model has to be recorded first.`)
+        }
+    }catch(error){
+        console.log(error)
+        res.send(error.toString())
+    }
+});
+
+//OK
+router.get('/getAllModelsPackageNames',async function(req, res, next){
+    try{
+        const modelPackageNames = await ModelServices.getAllModelsPackageNames()
         if(modelPackageNames){
             res.send(modelPackageNames)
         }else{
@@ -49,27 +65,8 @@ router.get('/findAllModelPackageNames',async function(req, res, next){
     }
 });
 
-/*router.post('/findAllKeywords',async function(req, res, next){
-
-    try{
-        jsonModels = await ModelServices.findAllModels()
-        if(jsonModels){
-            res.send(jsonModels)
-        }else{
-            res.send(`No model has been found`)
-        }
-        
-    }catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }
-
-});*/
-
-
 //OK
-router.post('/modelTree',  async function(req, res, next) {
-
+router.post('/getModelsTree',  async function(req, res, next) {
     const modelsMetaData = await ModelServices.getAllModelsMetaData();
     let tree = {
         name: 'models',
@@ -99,43 +96,32 @@ router.post('/modelTree',  async function(req, res, next) {
     res.send(tree);
 })
 
-router.get('/deleteJsonModel',async function(req, res, next){
-
+router.post('/deleteModelById',async function(req, res, next){
     try{
-
-        let model_name =  req.query.name;
-        result = await deleteJsonModel(model_name)
+        const modelid =  req.body.modelid;
+        result = await ModelServices.deleteModelById(modelid)
         res.send(result)
-
     }catch(error){
         console.log(error)
         res.send(error.toString())
     }
-
 });
 
-router.post('/deleteJsonModelById',async function(req, res, next){
+/*router.post('/findAllKeywords',async function(req, res, next){
 
     try{
-
-        console.log("START post deleteJsonModelById")
-
-        let modelid =  req.body.modelid;
-        result = await deleteJsonModelById(modelid)
-
-
-        console.log("END post deleteJsonModelById")
-
-        res.send(result)
-
+        jsonModels = await ModelServices.getAllModels()
+        if(jsonModels){
+            res.send(jsonModels)
+        }else{
+            res.send(`No model has been found`)
+        }
         
-
     }catch(error){
         console.log(error)
         res.send(error.toString())
     }
 
-});
-
+});*/
 
 module.exports = router;

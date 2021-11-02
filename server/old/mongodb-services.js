@@ -213,8 +213,8 @@ router.get('/json',async function(req, res, next){
         console.log(jsonModel)
 
         // Save or update JSON object
-        // result = await saveJsonModel(jsonModel)
-        saveJsonModel(jsonModel)
+        // result = await saveModel(jsonModel)
+        saveModel(jsonModel)
             .then((result) =>{
 
                 // res.send(jsonObj2xmlString(jsonModel))
@@ -256,8 +256,8 @@ router.get('/json',async function(req, res, next){
         console.log(jsonModel)
 
         // Save or update JSON object
-        // result = await saveJsonModel(jsonModel)
-        saveJsonModel(jsonModel)
+        // result = await saveModel(jsonModel)
+        saveModel(jsonModel)
             .then((result) =>{
 
                 // res.send(jsonObj2xmlString(jsonModel))
@@ -278,17 +278,17 @@ router.get('/json',async function(req, res, next){
 });
 
 
-router.get('/saveJsonModel',async function(req, res, next){
+router.get('/saveModel',async function(req, res, next){
 
     try{
-        console.log('/saveJsonModel')
+        console.log('/saveModel')
         let model_name =  req.query.name;
 
         jsonTestModel = createTestModel(model_name)
 
         console.log(jsonTestModel)
 
-        result = await saveJsonModel(jsonTestModel)
+        result = await saveModel(jsonTestModel)
         res.send(result)
 
     }catch(error){
@@ -298,16 +298,16 @@ router.get('/saveJsonModel',async function(req, res, next){
 
 });*/
 
-/*router.post('/saveJsonModel',async function(req, res, next){
+/*router.post('/saveModel',async function(req, res, next){
 
     try{
-        console.log('Post /saveJsonModel')
+        console.log('Post /saveModel')
 
         let modelUnit =  req.body.modelUnit;
 
         console.log(modelUnit)
 
-        result = await saveJsonModel(modelUnit)
+        result = await saveModel(modelUnit)
         res.send(result)
 
     }catch(error){
@@ -392,10 +392,10 @@ router.get('/saveJsonModel',async function(req, res, next){
 
 
 
-/*router.get('/findAllJsonModelSummaries',async function(req, res, next){
+/*router.get('/getAllModelsummaries',async function(req, res, next){
 
     try{
-        jsonModels = await findAllJsonModelSummaries()
+        jsonModels = await getAllModelsummaries()
         if(jsonModels){
             res.send(jsonModels)
         }else{
@@ -410,7 +410,7 @@ router.get('/saveJsonModel',async function(req, res, next){
 });*/
 
 
-/*async function findAllJsonModelSummaries (){
+/*async function getAllModelsummaries (){
 
     return new Promise((resolve, reject) => {
         try{
@@ -465,8 +465,8 @@ router.get('/saveJsonModel',async function(req, res, next){
 
 // TODO update to post querry
 
-/*async function saveJsonModel (jsonModel){
-    console.log('saveJsonModel')
+/*async function saveModel (jsonModel){
+    console.log('saveModel')
     return new Promise(async (resolve, reject) => {
         try{
             const MongoClient = require('mongodb').MongoClient;
@@ -510,7 +510,7 @@ router.get('/saveJsonModel',async function(req, res, next){
 }*/
 
 
-async function saveJsonModel (jsonModel){
+async function saveModel (jsonModel){
     console.log(jsonModel.Attributs.name)
     let model = await Model.findOneAndUpdate(
         {'Attributs.name': jsonModel.Attributs.name},
@@ -520,7 +520,7 @@ async function saveJsonModel (jsonModel){
     console.log(model)
     /*
     return new Promise((resolve, reject) => {
-        console.log('saveJsonModel')
+        console.log('saveModel')
         try{
             const mongoose = require('mongoose')
             // mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true}); 
@@ -657,13 +657,13 @@ const _xmlModelUrls={
 
         + xml2json(xmlString)
 
-        + saveJsonModel(jsonObj)
+        + saveModel(jsonObj)
             check if exists in DB
             if not validate and save
 
         + 
 
-    + saveJsonModel(json)
+    + saveModel(json)
 
     + getJsonModel(Modelnames)
 

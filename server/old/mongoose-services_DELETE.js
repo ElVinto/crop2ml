@@ -196,8 +196,8 @@ router.get('/saveXMLModel',async function(req, res, next){
         console.log(jsonModel)
 
         // Save or update JSON object
-        // result = await saveJsonModel(jsonModel)
-        saveJsonModel(jsonModel)
+        // result = await saveModel(jsonModel)
+        saveModel(jsonModel)
             .then((result) =>{
 
                 // res.send(jsonObj2xmlString(jsonModel))
@@ -218,10 +218,10 @@ router.get('/saveXMLModel',async function(req, res, next){
 });
 
 
-router.get('/saveJsonModel',async function(req, res, next){
+router.get('/saveModel',async function(req, res, next){
 
     try{
-        console.log('/saveJsonModel')
+        console.log('/saveModel')
         let model_name =  req.query.name;
 
         jsonTestModel = await createTestModel(model_name)
@@ -229,7 +229,7 @@ router.get('/saveJsonModel',async function(req, res, next){
         console.log('jsonTestModel')
         console.log(jsonTestModel)
 
-        result = await saveJsonModel(jsonTestModel)
+        result = await saveModel(jsonTestModel)
         res.send(result)
 
     }catch(error){
@@ -239,16 +239,16 @@ router.get('/saveJsonModel',async function(req, res, next){
 
 });
 
-router.post('/saveJsonModel',async function(req, res, next){
+router.post('/saveModel',async function(req, res, next){
 
     try{
-        console.log('Post /saveJsonModel')
+        console.log('Post /saveModel')
 
         let modelUnit =  req.body.modelUnit;
 
         console.log(modelUnit)
 
-        result = await saveJsonModel(modelUnit)
+        result = await saveModel(modelUnit)
         res.send(result)
 
     }catch(error){
@@ -341,90 +341,18 @@ async function findJsonModel (model_name){
     
 }
 
-router.post('/findJsonModelById',async function(req, res, next){
-
-    try{
-        let modelid =  req.body.modelid;
-        jsonModel = await findJsonModelById(modelid)
-        if(jsonModel){
-            res.send(jsonModel)
-        }else{
-            res.send(`Model ${modelid} NOT FOUND, the model has to be recorded first.`)
-        }
-
-        
-    }catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }
-
-});
-
-
-async function findJsonModelById (modelid){
-
-    return new Promise((resolve, reject) => {
-        try{
-            const mongoose = require('mongoose')
-            mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
-            const db = mongoose.connection;
-            
-            db.on('error', console.error.bind(console, 'connection error:'));
-
-            db.once('open', async function(){
-
-                console.log(`succesful connection to ${MONGODB_HOST}` )
-
-                const Model = buildMongooseModel(mongoose)
-
-                console.log(`findOne : {'Model.Attributs.modelid': '${modelid}' } `)
-                result = await Model.findOne({'Model.Attributs.modelid': modelid },{'_id':0, '__v':0})
-                
-                db.close();
-
-                // console.log('\n result: ')
-                // console.log(result)
-
-                // console.log('\n JSON.stringify(result)')
-                // console.log(JSON.stringify(result))
-
-                // console.log('\n JSON.parse(JSON.stringify(result))')
-                // console.log(JSON.parse(JSON.stringify(result)))
-
-                result = JSON.parse(JSON.stringify(result))
-
-                resolve(result)
-            });
-            
-        }catch (err) { 
-            reject(err); 
-        }
-    })
-    
-}
 
 
 
 
-router.get('/findAllJsonModels',async function(req, res, next){
-
-    try{
-        jsonModels = await findAllJsonModels()
-        if(jsonModels){
-            res.send(jsonModels)
-        }else{
-            res.send(`No Model has been found`)
-        }
-        
-    }catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }
-
-});
 
 
-async function findAllJsonModels (){
+
+
+
+
+
+async function getAllModels (){
 
     return new Promise((resolve, reject) => {
         try{
@@ -469,10 +397,10 @@ async function findAllJsonModels (){
 
 
 
-router.get('/findAllJsonModelSummaries',async function(req, res, next){
+router.get('/getAllModelsummaries',async function(req, res, next){
 
     try{
-        jsonModels = await findAllJsonModelSummaries()
+        jsonModels = await getAllModelsummaries()
         if(jsonModels){
             res.send(jsonModels)
         }else{
@@ -487,7 +415,7 @@ router.get('/findAllJsonModelSummaries',async function(req, res, next){
 });
 
 
-async function findAllJsonModelSummaries (){
+async function getAllModelsummaries (){
 
     return new Promise((resolve, reject) => {
         try{
@@ -646,10 +574,10 @@ async function deleteJsonModelById (modelid){
 // TODO update to post querry
 
 
-async function saveJsonModel (jsonModel){
+async function saveModel (jsonModel){
 
     return new Promise((resolve, reject) => {
-        console.log('saveJsonModel')
+        console.log('saveModel')
         try{
             const mongoose = require('mongoose')
             mongoose.connect(MONGODB_HOST,{useNewUrlParser:true , useUnifiedTopology: true});
@@ -1017,13 +945,13 @@ router.get('/model',async function(req, res, next){
 
         + xml2json(xmlString)
 
-        + saveJsonModel(jsonObj)
+        + saveModel(jsonObj)
             check if exists in DB
             if not validate and save
 
         + 
 
-    + saveJsonModel(json)
+    + saveModel(json)
 
     + getJsonModel(Modelnames)
 

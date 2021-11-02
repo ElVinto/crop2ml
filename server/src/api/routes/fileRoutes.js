@@ -45,11 +45,11 @@ router.post('/uploadZip',  async function(req, res, next) {
             const packagesPath = 'data/packages/'
             const extractionMsg = await FileServices.extractZip(zippath,packagesPath)
             console.log(extractionMsg)
-            const newPackageNames =fs.readdirSync(packagesPath)
-            console.log('newPackageNames')
-            console.log(newPackageNames)
+            //const newPackageNames =fs.readdirSync(packagesPath)
+            //console.log('newPackageNames')
+            //console.log(newPackageNames)
 
-            const [savedJsonModels,extractedKeywords] = await FileServices.addModelsFrom('data/packages/'+zipPackageName+'/crop2ml',fields)
+            const [savedJsonModels,extractedKeywords] = await FileServices.computeExtractedData('data/packages/'+zipPackageName+'/crop2ml',fields)
 
             let tree = FileServices.getDirTree('data/packages/'+zipPackageName)
             tree.name = fields.packageName
@@ -58,16 +58,12 @@ router.post('/uploadZip',  async function(req, res, next) {
                 tree,
                 extractedKeywords
             }
-
             console.log('END post /upload');
-
             res.send(result);
-
         } catch (error) {
             console.log(error)
             res.send(error.message);
         }
-
       });
   });
 });

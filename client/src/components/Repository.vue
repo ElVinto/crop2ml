@@ -783,7 +783,7 @@ export default {
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-    this.modelTree = [await ModelServices.requestModelTree()]
+    this.modelTree = [await ModelServices.getModelsTree()]
 
     console.log('this.modelTree: ')
     console.log(this.modelTree)

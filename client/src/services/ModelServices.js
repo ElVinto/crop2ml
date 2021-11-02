@@ -34,10 +34,10 @@ class ModelServices{
     }*/
 
     //OK
-    static findAllJsonModels = async () =>{
+    static getAllModels = async () =>{
         return new Promise((resolve, reject) => {
             try { 
-                axios.post(url + "cropmodels/findAllJsonModels").then(res => {
+                axios.post(url + "models/getAllModels").then(res => {
                     resolve(res.data) ;
                 })
             } catch (err) { 
@@ -47,21 +47,18 @@ class ModelServices{
         })
     }
 
-    static findAllModelPackageNames = async () =>{
-        
+    //OK
+    static getAllModelsPackageNames = async () =>{
         return new Promise((resolve, reject) => {
-            
             try { 
-                axios.get(url + "cropmodels/findAllModelPackageNames").then(res => {
+                axios.get(url + "models/getAllModelsPackageNames").then(res => {
                     resolve(res.data) ;
                 })
-
             } catch (err) { 
                 console.error(err);
                 reject(err);
             }
         })
-
     }
 
     /*static findAllKeywords = async () =>{
@@ -72,7 +69,7 @@ class ModelServices{
                 // let body ={
                 //     modelType: 'modelUnits',
                 // }
-                // axios.post(url + "models/findAllJsonModels", body).then(res => {
+                // axios.post(url + "models/getAllModels", body).then(res => {
                 //     resolve(res.data) ;
                 // })
                 axios.post(url + "cropmodels/findAllKeywords").then(res => {
@@ -89,10 +86,10 @@ class ModelServices{
     }*/
 
     //OK
-    static requestModelTree (){
+    static getModelsTree (){
         return new Promise((resolve,reject)=>{
             try{
-                axios.post(url + "cropmodels/modelTree").then(res => {
+                axios.post(url + "models/getModelsTree").then(res => {
                     resolve(res.data) ;
                 })
             }catch(err){
@@ -110,7 +107,7 @@ class ModelServices{
                 let body ={
                     modelid: modelid,
                 }
-                axios.post(url + "models/findJsonModelById", body).then(res => {
+                axios.post(url + "models/getModelById", body).then(res => {
                     resolve(res.data) ;
                 })
                 
@@ -121,7 +118,6 @@ class ModelServices{
         })
     }
 
-
     static async saveModel (modelUnit){
         return new Promise((resolve, reject) => {
             
@@ -129,7 +125,7 @@ class ModelServices{
                 let body ={
                     modelUnit: modelUnit,
                 }
-                axios.post(url + "models/saveJsonModel", body).then(res => {
+                axios.post(url + "models/saveModel", body).then(res => {
                     resolve(res.data) ;
                 })
                 
@@ -147,7 +143,7 @@ class ModelServices{
                 let body ={
                     modelid: modelid,
                 }
-                axios.post(url + "models/deleteJsonModelById", body).then(res => {
+                axios.post(url + "models/deleteModelById", body).then(res => {
                     resolve(res.data) ;
                 })
                 
