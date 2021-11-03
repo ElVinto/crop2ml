@@ -1,4 +1,5 @@
 let Model = require('../models/ModelSchema')
+let Keyword = require('../models/KeywordSchema')
 
 class ModelServices{
 
@@ -118,9 +119,9 @@ class ModelServices{
     }
 
     static async getModelById (modelid){
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try{
-                result = await Model.findOne({'Model.Attributs.modelid': modelid },{'_id':0, '__v':0}) //TODO CMZ : modelid ou id ?
+                var result = await Model.findOne({'Model.Attributs.modelid': modelid },{'_id':0, '__v':0}) //TODO CMZ : modelid ou id ?
                 resolve(result)
             }catch (err) { 
                 reject(err); 
@@ -129,9 +130,9 @@ class ModelServices{
     }
 
     static async deleteModelById (modelid){
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try{
-                result = await Model.findOneAndDelete({'Attributs.modelid': modelid}).exec() //TODO CMZ : modelid ou id ?
+                var result = await Model.findOneAndDelete({'Attributs.modelid': modelid}).exec() //TODO CMZ : modelid ou id ?
                 resolve(result)
             }catch (err) {
                 console.log(err.message)

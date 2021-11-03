@@ -51,7 +51,7 @@ class FileServices {
     }
 
     //OK
-    static async computeExtractedData(dirPath, modelMetaDataPart){
+    static async computeExtractedData(dirPath, fields){
         return new Promise(async (resolve,reject)=>{
             try {
                 let xmlFNames =fs.readdirSync(dirPath).filter(fName => fName.includes('.xml'))
@@ -68,17 +68,8 @@ class FileServices {
                     keywords = keywords.concat(jsonModel.Description.Institution.split(' ').filter(s => s.length && !keywords.includes(s) ))
                     keywords = keywords.concat(idValue.split('.').filter(s => s.length>0  && !keywords.includes(s)))
     
-                    jsonModel["metaData"]={
-                        dirPath,
-                        xmlFName,
-                        idProperty,
-                        idValue,
-                        keywords,
-                        tags: modelMetaDataPart.tags.split(','),
-                        packageName: modelMetaDataPart.packageName,
-                        uploaderMail: modelMetaDataPart.uploaderMail
-                    }
-                    jsonModel["otherMetaData"]=JSON.parse(modelMetaDataPart.metaDataObject) //TODO CMZ : keasako ?
+                    jsonModel["metaData"]=JSON.parse(fields.metaData)
+                    jsonModel["metaData"]={...jsonModel["metaData"], dirPath, xmlFName, idProperty, idValue, keywords}
                     console.log(jsonModel)
                     let savedJsonModel = await ModelServices.saveModel(jsonModel)
                     savedJsonModels.push(savedJsonModel)

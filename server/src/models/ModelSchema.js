@@ -230,9 +230,16 @@ const ModelSchema = new Schema(
             idProperty: {type: String, required: false},
             idValue: {type: String, required: false},
             keywords: {type: [String], required: false},
-            tags: {type: [String], required: false},
+            zipFileName: {type: String, required: false},
             packageName: {type: String, required: false},
+            modelType: {type: String, required: false},
+            largerModelPackageNames: {type: [String], required: false},
+            linkedCommunity: {type: String, required: false},
             uploaderMail: {type: String, required: false},
+            administratorMails: {type: [String], required: false},
+            editorsMails: {type: [String], required: false},
+            maintainerMails: {type: [String], required: false},
+            tags: {type: [String], required: false},
         }
   },
   {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options

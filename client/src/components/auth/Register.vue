@@ -74,6 +74,7 @@
 
       <b-input-group prepend="City" style="margin-top:1em">
         <b-form-input
+          placeholder="(optional)"
           v-model="city"
           type="text"
         >
@@ -82,6 +83,7 @@
 
       <b-input-group prepend="Country" style="margin-top:1em">
         <b-form-input
+          placeholder="(optional)"
           v-model="country"
           type="text"
         >
@@ -90,6 +92,7 @@
 
       <b-input-group prepend="Institution" style="margin-top:1em">
         <b-form-input
+          placeholder="(optional)"
           v-model="institution"
           type="text"
         >
@@ -126,6 +129,7 @@
 <script>
 
 import AuthServices from "../../services/AuthServices";
+
 export default {
   data() {
     return {
@@ -149,38 +153,45 @@ export default {
 
   methods: {
     async register() {
+      this.requiredFieldsErrorMsg = ""
+      this.passwordErrorMsg = ""
+      this.registerErrorMsg = ""
+      this.registerSuccessMsg = ""
+      let goOn = true
       try {
         if(!this.validForm()){
           this.requiredFieldsErrorMsg = "some required fields are empty"
-          return
+          goOn = false
         }
 
         if(!this.validPasswords()){
           this.passwordErrorMsg = "required passwords should be equal"
-          return
+          goOn = false
         }
+
+        if (!goOn)
+          return
 
         let userRegistrationDetails = {
           firstName: this.firstName,
           lastName: this.lastName,
           city: this.city,
           country: this.country,
-          institution: this.insitution,
+          institution: this.institution,
           email: this.email,
           password: this.password2,
           verified: true,
           category: "user"
         }
 
-        const registeredUserInfo = await AuthServices.register(userRegistrationDetails)
-        console.log(registeredUserInfo)
+        const res = await AuthServices.register(userRegistrationDetails)
 
-        if(registeredUserInfo.errorMsg === undefined ){
+        if(res.errorMsg === undefined ){
           delete userRegistrationDetails.password
           this.$store.commit('setLoggedUserInfo', userRegistrationDetails)
           this.registerSuccessMsg= "Registration successful"
         }else{
-          this.registerErrorMsg = registeredUserInfo.errorMsg;
+          this.registerErrorMsg = res.errorMsg;
         }
       } catch (error) {
         console.log(error)
@@ -200,18 +211,24 @@ export default {
 
   watch: {
     email(){
-      this.requiredFieldsErrorMsg=""
-      this.registerErrorMsg=""
-      this.registerSuccessMsg=""
+      if (this.validForm())
+        this.requiredFieldsErrorMsg=""
     },
-
+    firstName(){
+      if (this.validForm())
+        this.requiredFieldsErrorMsg=""
+    },
+    lastName(){
+      if (this.validForm())
+        this.requiredFieldsErrorMsg=""
+    },
     password1(){
-      this.passwordErrorMsg=""
-      this.registerSuccessMsg=""
+      if (this.validPasswords())
+        this.passwordErrorMsg=""
     },
     password2(){
-      this.passwordErrorMsg=""
-      this.registerSuccessMsg=""
+      if (this.validPasswords())
+        this.passwordErrorMsg=""
     },
   }
 };

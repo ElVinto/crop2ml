@@ -325,10 +325,10 @@
 <script>
 
 // import ModelUnitServices from "../services/ModelUnitServices"
-import ClientServerFileSystem from "../services/ClientServerFileSystem"
-import ClientServerJsonModel from "../services/ClientServerJsonModel"
-import UserRequests from "../services/UserRequests"
-import CommunityRequests from "../services/CommunityRequests"
+import ClientServerFileSystem from "../services/FileServices"
+import ClientServerJsonModel from "../services/ModelServices"
+import UserRequests from "../services/UserServices"
+import CommunityRequests from "../services/CommunityServices"
 
 import { bTreeView } from 'bootstrap-vue-treeview'
 

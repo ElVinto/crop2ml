@@ -23,14 +23,7 @@ class FileServices {
 
                 const formData = new FormData();
                 formData.append(file.name, file );
-                formData.append('tags', modelMetaDataPart.tags);
-                formData.append('fileName', modelMetaDataPart.zipFileName);
-                formData.append('packageName', modelMetaDataPart.packageName);
-                formData.append('uploaderMail', modelMetaDataPart.uploaderMail);
-                formData.append('metaDataObject', JSON.stringify(modelMetaDataPart)); //TODO CMZ kesako ?
-                // const res = await axios.post('fileSystem-services/upload', formData, {
-                //     headers: formData.getHeaders()
-                // });
+                formData.append('metaData', JSON.stringify(modelMetaDataPart));
 
                 axios.post(url+'files/uploadZip', formData, {
                     // headers: formData.getHeaders()

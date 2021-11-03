@@ -26,7 +26,7 @@ class AuthServices{
                     let newUser = new User(userRegistrationDetails)
                     let res = await newUser.save()
                     delete res.password
-                    resolve(newRegisteredUser)
+                    resolve(newUser)
                 }
             } catch(error){
                 console.log(error)
