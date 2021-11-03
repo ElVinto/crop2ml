@@ -22,7 +22,7 @@ class FileServices {
             try { 
 
                 const formData = new FormData();
-                formData.append(file.name, file );
+                formData.append(file.name, file);
                 formData.append('metaData', JSON.stringify(modelMetaDataPart));
 
                 axios.post(url+'files/uploadZip', formData, {

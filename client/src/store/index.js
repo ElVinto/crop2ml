@@ -83,9 +83,6 @@ export default new Vuex.Store({
          
          return modelIds.sort()
       }
-
-
-
    },
 
    mutations: { // synchronous  commit of changes of state

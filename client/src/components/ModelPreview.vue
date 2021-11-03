@@ -1,15 +1,11 @@
 <template>
-
   <div id ="modelPreview" v-if="$store.getters.getDataAreLoaded"  >
-
     <b-card 
         :header="selectedModel.metaData.idValue"
         header-bg-variant="secondary"
         header-text-variant="white"
         class="text-left"
     > 
-
-        
         <b-row no-gutters>
             <b-col lg="3" >
                 <b-card-img src="images/modeling_iconfinder_128px.png" style="max-width:100px"   alt="Model Preview" ></b-card-img>
@@ -23,25 +19,16 @@
                 </p>
             </b-col>
         </b-row>
-
-        
     </b-card>
-
   </div>
-  
 </template>
+
 <script>
-
-
-
-import ModelServices from "../services/ModelServices"
-
 
 export default {
   name: 'ModelPreview',
 
   components: {
-
   },
 
   props:{
@@ -50,52 +37,29 @@ export default {
 
   data() {
     return {
-
-      
     }
   },
 
   async created() {
-
   },
 
   async mounted() {
-    
-    console.log("START mounted Catalog")
-
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-
-    this.modelTree = [await ModelServices.getModelsTree()]
-    
-    
-    console.log('this.modelTree: ')
-    console.log(this.modelTree)
-
-    console.log("END mounted Catalog")
-
   },
 
   computed:{
-
   },
 
-
   methods: {
-
   },
 
   watch:{
   },
-
 }
 </script>
 
 <style scoped>
-
-
-
-
 
 </style>
