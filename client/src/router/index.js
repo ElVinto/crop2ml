@@ -6,6 +6,7 @@ import Catalog from '../components/Catalog';
 import Repository from '../components/Repository';
 import Submit from '../components/Submit';
 import Update from '../components/Update';
+import Update from '../components/Update';
 import Profile from '../components/Profile';
 import LegalMentions from '../components/LegalMentions.vue';
 

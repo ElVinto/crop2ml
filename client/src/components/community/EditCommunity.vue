@@ -78,9 +78,6 @@
 
                 no-add-on-enter
               ></b-form-tags>
-
-
-
             </b-input-group>
 
             <!-- Community model packages -->
@@ -99,9 +96,6 @@
             <b-button variant="secondary" @click="submitCommunity()" style="margin-top:1em">
               Update
             </b-button>
-
-
-
           </div>
           <div v-else>
               Please <a href="#/SignIn">sign-in</a>  or <a href="#/register"> register </a> before creating a community

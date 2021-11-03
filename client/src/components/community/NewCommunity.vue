@@ -51,8 +51,6 @@
               accept=".jpg, .png, .gif"
               @change="previewInputImgFile()"
               >
-              
-
             </b-form-file>
 
             <b-input-group style="padding-top: 1em; " prepend="Uploader email">

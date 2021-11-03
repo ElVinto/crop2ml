@@ -255,6 +255,11 @@
 
           </div>
 
+          
+            
+          
+
+
           <div style="padding-top: 1em;" v-if="packageNameIsValid">
             <b-button variant="secondary"  v-on:click="submitZip()">Submit model</b-button>
           </div>
@@ -319,10 +324,11 @@
 </template>
 <script>
 
-import ModelServices from "../services/ModelServices"
-import FileServices from "../services/FileServices"
-import UserServices from "../services/UserServices"
-import CommunityServices from "../services/CommunityServices"
+// import ModelUnitServices from "../services/ModelUnitServices"
+import ClientServerFileSystem from "../services/ClientServerFileSystem"
+import ClientServerJsonModel from "../services/ClientServerJsonModel"
+import UserRequests from "../services/UserRequests"
+import CommunityRequests from "../services/CommunityRequests"
 
 import { bTreeView } from 'bootstrap-vue-treeview'
 
@@ -347,6 +353,7 @@ export default {
         submitted: false,
 
         treeDataReceived :null,
+
         modelTypeSelected : 'Main',
         modelTypeOptions: [
             {value: 'Main', text: 'Main'},
@@ -374,6 +381,7 @@ export default {
 
         maintainers:[],
         selectedMaintainer: null,
+
       }
     },
 
@@ -385,7 +393,7 @@ export default {
         msg= 'No selected file.zip '
       }
       if(!this.packageZip && this.packageZipSent){
-        msg= 'Model package sent successfully'
+        msg= 'Model sent successfully'
       }
 
       if(this.packageZip){
@@ -404,7 +412,7 @@ export default {
 
     // console.log("START created Catalog")
 
-    // this.modelUnitSchema = ModelServices.buildSchema();
+    // this.modelUnitSchema = ModelUnitServices.buildSchema();
 
     // console.log("this.modelUnitSchema")
     // console.log(this.modelUnitSchema)
@@ -420,11 +428,11 @@ export default {
       await this.$store.dispatch('initModels');
     }
 
-    this.registeredEmails = await UserServices.getRegisteredEmails();
+    this.registeredEmails = await UserRequests.getRegisteredEmails();
 
-    this.registeredPackageNames = await ModelServices.getAllModelsPackageNames();
+    this.registeredPackageNames = await ClientServerJsonModel.findAllModelPackageNames();
 
-    let communityList = await CommunityServices.getAllCommunities()
+    let communityList = await CommunityRequests.getAllCommunities()
 
     this.communityNames = communityList.map(c => c.name)
 
@@ -496,7 +504,7 @@ export default {
 
 
       this.submitted =true;
-      const res =  await FileServices.sendZip(this.packageZip,modelMetaDataPart)
+      const res =  await ClientServerFileSystem.sendZip(this.packageZip,modelMetaDataPart)
       this.treeDataReceived = [res.tree]
       this.keywords = res.extractedKeywords
 

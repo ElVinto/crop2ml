@@ -269,7 +269,6 @@
 
                   </div>
 
-                  
                   <!-- <div class="input-group mb-3" style="overflow:scroll">
                     <div class="input-group-prepend" style="width:100%; text-align:left; overflow:scroll">
                         <span class="input-group-text" >
@@ -278,22 +277,23 @@
                         <textarea class="form-control"  disabled v-model="selectedModel.Description['Abstract']" id="textarea-plaintext" rows=3></textarea>
                     </div>
                   </div> -->
-                  <b-input-group prepend="Abstract" style=" width:100%; text-align:left; overflow:scroll">
+                  
+                    <b-input-group prepend="Abstract" style=" width:100%; text-align:left; overflow:scroll">
 
-                      <textarea disabled class="form-control" v-model="selectedModel.Description['Abstract']" style="background: white;">
-                
-                    </textarea>
-                  </b-input-group>
+                        <textarea disabled class="form-control" v-model="selectedModel.Description['Abstract']" style="background: white;">
+                  
+                      </textarea>
+                    </b-input-group>
 
-                  <b-input-group prepend="Reference" style="margin-top:1em; width:100%; text-align:left; overflow:scroll">
+                    <b-input-group prepend="Reference" style="margin-top:1em; width:100%; text-align:left; overflow:scroll">
 
-                      <textarea disabled class="form-control" v-model="selectedModel.Description['Reference']" style="background: white;">
-                
-                    </textarea>
-                  </b-input-group>
+                        <textarea disabled class="form-control" v-model="selectedModel.Description['Reference']" style="background: white;">
+                  
+                      </textarea>
+                    </b-input-group>
                   
                   <br>
-
+(??)
                 </div>
 
               </div>

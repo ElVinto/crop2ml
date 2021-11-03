@@ -4,5 +4,8 @@ mapclient
 .DS_Store
 .env
 devInfo
+devInfo.zip
 /database/*
 */data/*
+server/public/js/*
+server/public/css/*
