@@ -78,6 +78,7 @@ class FileServices {
                         packageName: modelMetaDataPart.packageName,
                         uploaderMail: modelMetaDataPart.uploaderMail
                     }
+                    jsonModel["otherMetaData"]=JSON.parse(modelMetaDataPart.metaDataObject) //TODO CMZ : keasako ?
                     console.log(jsonModel)
                     let savedJsonModel = await ModelServices.saveModel(jsonModel)
                     savedJsonModels.push(savedJsonModel)

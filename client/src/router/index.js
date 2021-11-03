@@ -5,7 +5,8 @@ import Welcome from '../components/Welcome';
 import Catalog from '../components/Catalog';
 import Repository from '../components/Repository';
 import Submit from '../components/Submit';
-import Profile from '../components/auth/Profile';
+import Update from '../components/Update';
+import Profile from '../components/Profile';
 import LegalMentions from '../components/LegalMentions.vue';
 
 import SignIn from '../components/auth/SignIn';
@@ -47,6 +48,12 @@ export default new Router({
       path: '/Submit',
       name: 'Submit',
       component: Submit
+    },
+
+    {
+      path: '/Update',
+      name: 'Update',
+      component: Update
     },
 
     {

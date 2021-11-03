@@ -23,7 +23,7 @@
         <b-nav-item-dropdown text="Models" >
           <b-dropdown-item href="#/Repository">Repository</b-dropdown-item>
           <b-dropdown-item href="#/Submit">Submit</b-dropdown-item>
-          <b-dropdown-item href="#">Create</b-dropdown-item>
+          <!-- <b-dropdown-item href="#/Update">Update</b-dropdown-item> -->
           <b-dropdown-item href="#/Communities">Communities</b-dropdown-item>
         </b-nav-item-dropdown>
 

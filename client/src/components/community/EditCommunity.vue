@@ -85,7 +85,7 @@
 
             <!-- Community model packages -->
             <b-input-group prepend="Model packages" style="margin-top:1em; width:100%; text-align:left; overflow:scroll">
-            <b-form-tags class="form-control" style="background: white;"
+              <b-form-tags class="form-control" style="background: white;"
                 v-model="community.modelPackages"
                 separator=","
                 placeholder="Enter model packages separated by comma"
