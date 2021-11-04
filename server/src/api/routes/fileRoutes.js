@@ -8,8 +8,15 @@ var fs = require('fs');
 
 FileServices = require('../../services/FileServices.js');
 
+router.get('/data',async function(req,res,next){
+    // const foldername = req.query.folder;
+    var filePath = path.resolve(req.body.serverFilePath);
+    res = await FileServices.zipDirectory('./server/data/xml','./server/data/zipped/xml.zip')
+    console.log(res)
+})
+
 //OK
-router.post('/uploadZip',  async function(req, res, next) {
+router.post('/uploadZip', async function(req, res, next) {
 
     console.log('START post /uploadZip')
 
@@ -41,7 +48,7 @@ router.post('/uploadZip',  async function(req, res, next) {
                 throw err;
 
             try {
-                const zipPackageName =  firstFileName.replace('.zip','')
+                const packageName =  firstFileName.replace('.zip','')
                 const packagesPath = 'data/packages/'
                 const extractionMsg = await FileServices.extractZip(zippath,packagesPath)
                 console.log(extractionMsg)
@@ -49,9 +56,9 @@ router.post('/uploadZip',  async function(req, res, next) {
                 //console.log('newPackageNames')
                 //console.log(newPackageNames)
 
-                const [savedJsonModels,extractedKeywords] = await FileServices.computeExtractedData('data/packages/'+zipPackageName+'/crop2ml',fields)
+                const [savedJsonModels,extractedKeywords] = await FileServices.computeExtractedData('data/packages/'+packageName,fields)
 
-                let tree = FileServices.getDirTree('data/packages/'+zipPackageName)
+                let tree = FileServices.getDirTree('data/packages/'+packageName)
                 tree.name = fields.packageName
 
                 const result = {

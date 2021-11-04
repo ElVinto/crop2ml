@@ -12,7 +12,7 @@
         >
           <b-card-img 
             id = "displayedImg"
-            src="images/community_iconfinder_128px.png" 
+            :src="getPicturePath(community.picture)" 
             style="max-width: 150px" 
             alt="Community"
             top>
@@ -113,6 +113,7 @@
 import CommunityServices from "../../services/CommunityServices"
 import UserServices from "../../services/UserServices"
 import ModelServices from "../../services/ModelServices"
+const path = require('path');
 
 export default {
 
@@ -161,11 +162,19 @@ export default {
      },
     
     async submitCommunity(){
+      let image = this.inputImgFile;
+      let imageName;
+      if (image != null){
+        var extension = "." + image.name.split('.').pop();
+        var name = path.basename(image.name, extension)
+        imageName = name + Date.now() + extension
+      } else {
+        imageName = "community_iconfinder_128px.png"
+      }
+      this.community.picture = imageName
       const communityCreated =  await CommunityServices.createCommunity(this.inputImgFile,this.community)
-      
-      console.log("communityCreated")
       console.log(communityCreated)
-
+      
       this.$router.push("/Communities")
     },
 
@@ -175,7 +184,11 @@ export default {
 
     packageValidator(tag){
       return this.packageNames.includes(tag)
-    }
+    },
+
+    getPicturePath(picture){
+      return 'http://localhost:5000/community_images/' + picture
+    },
   },
 
   watch:{

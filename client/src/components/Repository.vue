@@ -332,6 +332,12 @@
 
                 </div>
               </b-tab>
+
+              <b-tab title="Pictures">
+                <b-card v-for="picture in selectedModel.metaData.pictures" :key="picture">
+                  <b-card-img :src="getPicturePath(picture)"/>
+                </b-card>
+              </b-tab>
             </b-tabs>
           </div>
 
@@ -539,6 +545,10 @@ export default {
         }
         
       }
+    },
+
+    getPicturePath(picture){
+      return 'http://localhost:5000/packages/' + this.selectedModel.metaData.packageName + '/doc/images/' + picture
     },
 
     hasAlgorithm(){

@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var formidable = require('formidable');
 var path = require('path');
-var mv = require('mv')
+var fs = require('fs');
 
 CommunityServices = require('../../services/CommunityServices.js');
 
@@ -14,24 +14,28 @@ router.post('/createCommunity',  async function(req, res, next) {
         return res.status(400).json({ error: err.message });
         }
 
-        const [firstFileName] = Object.keys(files);
-        const firstFile = files[firstFileName]
-        const oldpath = path.resolve(firstFile.path);
-        const new_relative_path = 'data/community_images/' + firstFileName
-        const newpath = path.resolve(new_relative_path);
-
-        mv(oldpath, newpath, async function(err) {  
-            if (err)
-                throw err;
+        try {
+            let file = files["picture"]
+            if (file != null) {
+                const oldpath = path.resolve(file.path);
+                const new_relative_path = 'data/community_images/' + JSON.parse(fields.picture)
+                const newpath = path.resolve(new_relative_path);
+                fs.rename(oldpath, newpath, function (err) {
+                    if (err) throw err
+                    console.log('Successfully renamed - AKA moved!')
+                })
+            }
+        } catch(error){
+            console.log(error)
+        } finally {
             try {
-                fields['image_path']= JSON.stringify(new_relative_path)
                 const result = await CommunityServices.saveCommunity(fields)
                 res.send(result);
             } catch (error) {
                 console.log(error)
                 res.send(error.message);
             }
-        });
+        }
   });
 });
 

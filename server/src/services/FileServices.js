@@ -54,11 +54,15 @@ class FileServices {
     static async computeExtractedData(dirPath, fields){
         return new Promise(async (resolve,reject)=>{
             try {
-                let xmlFNames =fs.readdirSync(dirPath).filter(fName => fName.includes('.xml'))
+                let crop2mlFolder = dirPath + '/crop2ml'
+                let picturesFolder = dirPath + '/doc/images'
                 let savedJsonModels =[]
                 let extractedKeywords =[]
+
+                let pictures = fs.readdirSync(picturesFolder)
+                let xmlFNames =fs.readdirSync(crop2mlFolder).filter(fName => fName.includes('.xml'))
                 for(let xmlFName of xmlFNames ){
-                    let jsonModel = await this.xmlFile2jsonModel(dirPath+'/'+xmlFName)
+                    let jsonModel = await this.xmlFile2jsonModel(crop2mlFolder+'/'+xmlFName)
     
                     let idProperty = typeof jsonModel.Attributs.modelid === 'undefined'? "id" : "modelid"
                     let idValue =  typeof jsonModel.Attributs.modelid === 'undefined'? jsonModel.Attributs.id : jsonModel.Attributs.modelid
@@ -69,7 +73,7 @@ class FileServices {
                     keywords = keywords.concat(idValue.split('.').filter(s => s.length>0  && !keywords.includes(s)))
     
                     jsonModel["metaData"]=JSON.parse(fields.metaData)
-                    jsonModel["metaData"]={...jsonModel["metaData"], dirPath, xmlFName, idProperty, idValue, keywords}
+                    jsonModel["metaData"]={...jsonModel["metaData"], dirPath, xmlFName, idProperty, idValue, keywords, pictures}
                     console.log(jsonModel)
                     let savedJsonModel = await ModelServices.saveModel(jsonModel)
                     savedJsonModels.push(savedJsonModel)
@@ -82,6 +86,7 @@ class FileServices {
                         }
                     })
                 }
+
                 resolve([savedJsonModels,extractedKeywords])
                 
             } catch (error) {

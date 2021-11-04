@@ -82,7 +82,7 @@
 
 
 import CommunityServices from "../../services/CommunityServices"
-
+const path = require('path');
 
 export default {
   data() {
@@ -99,7 +99,6 @@ export default {
 
   methods: {
     previewInputImgFile() {
-
       var file = document.getElementById('inputImgFileForm').files[0];
       var reader  = new FileReader();
       reader.onload = function(e)  {
@@ -107,24 +106,23 @@ export default {
           image.src = e.target.result;
         }
       reader.readAsDataURL(file);
-
      },
     
     async submitCommunity(){
-
       let image = this.inputImgFile;
-      if(image == null){
-
-        var FileURL="images/community_iconfinder_128px.png"
-
-        image =  await this.GetFileBlobUsingURL(FileURL);
-        image['lastModifiedDate'] = new Date();
-        image['name'] = "community_iconfinder_128px.png";
+      let imageName;
+      if (image != null){
+        var extension = "." + image.name.split('.').pop();
+        var name = path.basename(image.name, extension)
+        imageName = name + Date.now() + extension
+      } else {
+        imageName = "community_iconfinder_128px.png"
       }
 
       const communityInfo ={
         name: this.name,
         description: this.description,
+        picture: imageName,
         createdBy: this.$store.getters.getLoggedUserInfo.email,
         administrators: [this.$store.getters.getLoggedUserInfo.email],
         modelPackages:[]

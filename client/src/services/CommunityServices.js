@@ -11,33 +11,24 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 class CommunityServices{
 
     static createCommunity = async (file, communityInfo) =>{
-        
         return new Promise((resolve, reject) => {
-            
             try { 
-
                 const formData = new FormData();
-                formData.append(file.name, file );
+                formData.append("picture", file);
 
-                console.log("community sent :")
-                console.log(communityInfo)
-
-                for( const k in communityInfo){
+                for(const k in communityInfo){
                     formData.append(k, JSON.stringify(communityInfo[k]))
                 }
-                console.log(formData)
+                
                 axios.post(url+'community/createCommunity', formData, {
                     // headers: formData.getHeaders()
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 }).then( res =>{
-                    console.log(' sendCommunity SUCCESS!!');
-                    console.log(res.data);
                     resolve(res.data.value)
                 })
             } catch (err) { 
-                console.log(' sendCommunity FAILURE!!');
                 console.error(err);
                 reject(err);
             }

@@ -28,7 +28,7 @@
           <hr>
           <b-row no-gutters>
               <b-col lg="3" >
-                  <b-card-img :id="'img-'+c._id" src="images/community_iconfinder_128px.png" style="max-heigth:100px; max-width:100px"   alt="Community Preview" ></b-card-img>
+                  <b-card-img :src="getPicturePath(c.picture)" style="max-heigth:100px; max-width:100px"   alt="Community Preview" ></b-card-img>
               </b-col>
               <b-col lg="9" class="text-left" style="font-size:0.75em;">
                   
@@ -79,7 +79,6 @@
 
 
 import CommunityServices from "../../services/CommunityServices"
-import FileServices from "../../services/FileServices"
 
 
 export default {
@@ -106,8 +105,8 @@ export default {
     this.communityList = await CommunityServices.getAllCommunities()
     this.communityListLoaded =true;
 
-    try{
-      await Promise.all(this. communityList.map( async c =>{
+    /*try{
+      await Promise.all(this.communityList.map( async c =>{
         
         let serverFilePath = c.image_path
         let file = await FileServices.downloadFile(serverFilePath)
@@ -117,17 +116,15 @@ export default {
 
         var reader = new FileReader();
         reader.onload = function(e)  {
-
           var image = document.querySelector(`#img-${c._id}`);
           image.src = e.target.result;
           image.title = fileName;
-
         }
         reader.readAsDataURL(file);      
       }))
     } catch (err) { 
       console.error(err);
-    }
+    }*/
   },
 
   computed:{
@@ -135,6 +132,10 @@ export default {
 
 
   methods: {
+
+    getPicturePath(picture){
+      return 'http://localhost:5000/community_images/' + picture
+    },
 
     userCanEdit(c){
       if(this.$store.getters.getLoggedUserInfo){

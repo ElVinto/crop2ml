@@ -240,6 +240,7 @@ const ModelSchema = new Schema(
             editorsMails: {type: [String], required: false},
             maintainerMails: {type: [String], required: false},
             tags: {type: [String], required: false},
+            pictures: {type: [String], required: false},
         }
   },
   {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options

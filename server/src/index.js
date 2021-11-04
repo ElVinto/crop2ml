@@ -54,14 +54,15 @@ const server = app.listen(port, () => {
 
 // Handle production in Heroku
 // CMZ comment
-// if(process.env.NODE_ENV === 'production'){
-//     // Static folder 
-//     app.use(express.static(__dirname+'/public'));// __dirname means . (i.e., current directory)
-
-//     // Handle Single Page application
-//     // for any other routes redirect it to index.html
-//     app.get(/.*/,(req,res)=> res.sendFile(__dirname+'/public/index.html'));
-// }
+//if(process.env.NODE_ENV === 'production'){
+    // Static folder 
+    app.use('/static', express.static(__dirname+'/../public'));// __dirname means . (i.e., current directory)
+    app.use('/community_images', express.static(__dirname+'/../data/community_images'));
+    app.use('/packages', express.static(__dirname+'/../data/packages'));
+    // Handle Single Page application
+    // for any other routes redirect it to index.html
+    app.get(/.*/,(req,res)=> res.sendFile(__dirname+'/../public/index.html'));
+//}
 
 /* CMZ : get from boilerplate
 // Find 404 and hand over to error handler

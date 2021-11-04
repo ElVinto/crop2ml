@@ -8,7 +8,7 @@ const CommunitySchema = new Schema(
         createdBy: {type: String, required: false},
         administrators: {type: [String], required: false},
         modelPackages: {type: [String], required: false},
-        image_path: {type: String, required: false},
+        picture: {type: String, required: false},
     }
 );
 
