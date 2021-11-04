@@ -208,8 +208,8 @@
                 </b-table-simple>
               </b-tab>
               
-              <b-tab title="Description" active>
-                <b-table-simple class="text-left" :responsive="true" :small="true" :striped="true" :hover="true">
+              <b-tab title="Description">
+                <b-table-simple class="text-left" :responsive="true" :striped="true" :hover="true">
                   <b-tbody>
                       <b-tr v-for="(v,k) in selectedModel.Description" v-bind:key="k">
                           <b-td style='font-weight:bold;'>{{ k }}</b-td>
@@ -219,8 +219,8 @@
                 </b-table-simple>
               </b-tab>
 
-              <b-tab title="Algorithm" active>
-                <b-table-simple v-if="hasAlgorithm()" class="text-left" :responsive="true" :small="true" :striped="true" :hover="true">
+              <b-tab title="Algorithm">
+                <b-table-simple v-if="hasAlgorithm()" class="text-left" :responsive="true" :striped="true" :hover="true">
                   <b-tbody>
                       <b-tr v-for="(v,k) in selectedModel.Algorithm.Attributs" v-bind:key="k">
                           <b-td style='font-weight:bold;'>{{ k }}</b-td>
@@ -230,19 +230,19 @@
                 </b-table-simple>
               </b-tab>
 
-              <b-tab title="Inputs" active>
+              <b-tab title="Inputs">
                 <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
-                  <b-table class="text-left" :responsive="true" :small="true" :striped="true" :hover="true" :items="toItems(selectedModel.Inputs.Input)"></b-table>
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Inputs.Input)"></b-table>
                 </div>
               </b-tab>
 
-              <b-tab title="Outputs" active>
+              <b-tab title="Outputs">
                 <div v-if="toArrayIfNeeded(selectedModel.Outputs.Output)">
-                  <b-table class="text-left" :responsive="true" :small="true" :striped="true" :hover="true" :items="toItems(selectedModel.Outputs.Output)"></b-table>
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Outputs.Output)"></b-table>
                 </div>
               </b-tab>
 
-              <b-tab title="Parameters" active>
+              <b-tab title="Parameters">
                 <div v-if="toArrayIfNeeded(selectedModel.Parametersets.Parameterset)">
 
                   <b-card
@@ -257,8 +257,8 @@
                     <p style="text-align:left;">
                       {{ paramsetObj.Attributs.uri}}
                     </p>
-                    <p style="text-align:left; font-weight:bold">Parameters</p>
-                    <b-table-simple class="text-left" :responsive="true" :small="true" :striped="true" :hover="true">
+                    <p style="text-align:left; text-decoration: underline">Parameters</p>
+                    <b-table-simple class="text-left" :responsive="true" :striped="true" :hover="true">
                       <b-tbody>
                           <b-tr v-for="(paramObjVal,paramObjKey) in paramsetObj.Param" v-bind:key="paramObjKey">
                               <b-td style='font-weight:bold;'>{{ paramObjVal.Attributs.name }}</b-td>
@@ -271,7 +271,7 @@
                 </div>
               </b-tab>
 
-              <b-tab title="Tests" active>
+              <b-tab title="Tests">
                 <div v-if="toArrayIfNeeded(selectedModel.Testsets.Testset)">
 
                   <b-card
@@ -290,53 +290,41 @@
                       {{ testsetObj.Attributs.uri}}
                     </p>
 
-                    <p style="text-align:left; font-weight:bold">Tests :</p>
+                    <p style="text-align:left; text-decoration: underline">Tests :</p>
                     <b-card style="width: 100%;"
                       id="Test" 
                       class="input-group mb-3"
                       v-for="(testObj,testObjKey) of toArrayIfNeeded(testsetObj.Test)"
                       v-bind:key="testObjKey"
                     >
-                      <p style="text-align:left">{{`Test name: ${testObj.Attributs.name}`}}</p>
-                      <div v-if="toArrayIfNeeded(testObj.InputValue)">
-                        <p style="text-align:left"> Input values: </p>
-                        
-                        <div id="TestInputs" 
-                        class="input-group mb-3"
-                        v-for="(testObjInputVal,testInputObjKey) of toArrayIfNeeded(testObj.InputValue)"
-                        v-bind:key="testInputObjKey"
-                        >
-                          <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                            <span class="input-group-text" >
-                              {{testObjInputVal.Attributs.name}}
-                            </span>
-                          <span class="form-control" >
-                            {{testObjInputVal._}}
-                          </span>
-                          </div>
+                      <p style="text-align:left; font-weight:bold">{{`Test name : ${testObj.Attributs.name}`}}</p>
 
-                        </div>
+                      <div v-if="toArrayIfNeeded(testObj.InputValue)">
+                        <p style="text-align:left; text-decoration: underline">Input values :</p>
+                        
+                        <b-table-simple class="text-left" :responsive="true" :striped="true" :hover="true">
+                          <b-tbody>
+                              <b-tr v-for="(testObjInputVal,testInputObjKey) of toArrayIfNeeded(testObj.InputValue)"
+                                    v-bind:key="testInputObjKey">
+                                  <b-td style='font-weight:bold;'>{{ testObjInputVal.Attributs.name }}</b-td>
+                                  <b-td>{{ testObjInputVal._}}</b-td>
+                              </b-tr>
+                          </b-tbody>
+                        </b-table-simple>
                       </div>
                       <br>
                       <div v-if="toArrayIfNeeded(testObj.OutputValue)">
-                        <p style="text-align:left"> Output values: </p>
+                        <p style="text-align:left; text-decoration: underline">Output values :</p>
                         
-                        <div id="TestOutputs" 
-                        class="input-group mb-3"
-                        v-for="(testObjOutputVal,testOutputObjKey) of toArrayIfNeeded(testObj.OutputValue)"
-                        v-bind:key="testOutputObjKey"
-                        >
-                          
-                          <div class="input-group-prepend"  style="width:100%; text-align:left; overflow:scroll;"  >
-                            <span class="input-group-text" >
-                              {{testObjOutputVal.Attributs.name}}
-                            </span>
-                          <span class="form-control" >
-                            {{testObjOutputVal._}}
-                          </span> 
-                          </div>
-
-                        </div>
+                        <b-table-simple class="text-left" :responsive="true" :striped="true" :hover="true">
+                          <b-tbody>
+                              <b-tr v-for="(testObjOutputVal,testOutputObjKey) of toArrayIfNeeded(testObj.OutputValue)"
+                                    v-bind:key="testOutputObjKey">
+                                  <b-td style='font-weight:bold;'>{{ testObjOutputVal.Attributs.name }}</b-td>
+                                  <b-td>{{ testObjOutputVal._}}</b-td>
+                              </b-tr>
+                          </b-tbody>
+                        </b-table-simple>
                       </div>
 
                     </b-card>
