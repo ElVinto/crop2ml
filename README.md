@@ -91,10 +91,11 @@ collections :
 ## mongoDB commands :https://docs.mongodb.com/manual/reference/mongo-shell/
 mongo -u "root" -p "password"
 mongo "mongodb+srv://$user:$password@crop2mlcluster.6pf0x.mongodb.net/dev"
-mongo "mongodb+srv://crop2mlcluster.6pf0x.mongodb.net/crop2ml" --username devInfoAtlas
+mongosh "mongodb+srv://crop2mlcluster.6pf0x.mongodb.net/crop2ml" --username devInfoAtlas
 show dbs
 use test
 show collections
 db.auth
 coll = db.<collection>
-coll.find()
+coll.find({})
+coll.insert({"email":"charles.moszkowicz@gmail.com"})

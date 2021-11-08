@@ -89,7 +89,7 @@ class FileServices {
         })
     }
 
-    static downloadFile(serverFilePath){
+    /*static downloadFile(serverFilePath){
         return new Promise(  (resolve, reject) => {
             try{
                 axios({
@@ -110,15 +110,15 @@ class FileServices {
                 reject(err);
             }
         })
-    }
-    static downloadLargeFile(serverFilePath){
+    }*/
+    
+    
+    /*static downloadLargeFile(serverFilePath){
         return new Promise(  (resolve, reject) => {
             console.log('START Downloading file: '+serverFilePath)
 
             // const url = 'https://unsplash.com/photos/AaEQmoufHLk/download?force=true'
-            
 
-            
             axios({
                 method: 'post',
                 url: url+'files/downloadFile',
@@ -142,7 +142,7 @@ class FileServices {
           
             
         })
-    }
+    }*/
 }
 
 

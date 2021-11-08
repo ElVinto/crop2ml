@@ -11,10 +11,8 @@ const UserSchema = new Schema(
         country: {type: String, required: false},
         institution: {type: String, required: false},
         verified: {type: Boolean, required: true},
-        category: {
-            type: String,
-            required: false,
-            enum:['user']
+        authCode: {type: String, required: false},
+        category: {type: String, required: false, enum:['user']
         }, 
     }
 );

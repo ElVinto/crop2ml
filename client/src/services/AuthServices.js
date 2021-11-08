@@ -44,10 +44,7 @@ class AuthServices {
         })
     }
 
-
-
     static signIn(email, password) {
-        
         let body = { email, password}
         return new Promise((resolve, reject) => {
             try {
@@ -60,7 +57,6 @@ class AuthServices {
     }
 
     static forgotPassword(email) {
-        
         return new Promise((resolve, reject) => {
             try {
                 let body = { email}
@@ -73,13 +69,24 @@ class AuthServices {
     }
 
     static resetPassword(resetPasswordDetails) {
-        
         return new Promise((resolve, reject) => {
             try {
                 axios.post(url + "auth/resetPassword", resetPasswordDetails).then(res => {
                     resolve(res.data);
                 })
 
+            } catch (err) { reject(err); }
+        })
+    }
+
+    static sendVerificationCode(email) {
+        return new Promise((resolve, reject) => {
+            try {
+                let body = { email }
+                axios.post(url + "auth/sendVerificationCode", body).then(res => {
+                    resolve(res.data);
+                })
+                
             } catch (err) { reject(err); }
         })
     }

@@ -122,14 +122,13 @@ export default {
         }
         reader.readAsDataURL(file);      
       }))
-    } catch (err) { 
+    } catch (err) {
       console.error(err);
     }*/
   },
 
   computed:{
   },
-
 
   methods: {
 
