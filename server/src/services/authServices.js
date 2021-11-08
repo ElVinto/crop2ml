@@ -83,7 +83,7 @@ class AuthServices{
                 const filter = {email: userSignInDetails.email}
                 let storedUserInfo = await User.findOne(filter)
                 if(storedUserInfo !== null){
-                    // const signInPasswordHash =bcrypt.hashSync(userSignInDetails.password,saltRounds)
+                    // const signInPasswordHash = bcrypt.hashSync(userSignInDetails.password,saltRounds)
                     if(bcrypt.compareSync(userSignInDetails.password, storedUserInfo.password)){
                         delete storedUserInfo.password;
                         delete storedUserInfo._id;
@@ -96,7 +96,7 @@ class AuthServices{
                 }
             } catch(error){
                 console.log(error)
-                reject(error);
+                resolve({errorMsg: "Error while signing in"});
             }
         }) 
     }

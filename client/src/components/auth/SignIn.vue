@@ -63,11 +63,12 @@
       
       </div>
       <div v-else>
-          You are signed in as: {{$store.getters.getLoggedUserInfo.email}}
+        Login successful <br>
+        You are signed in as: {{$store.getters.getLoggedUserInfo.email}} <br>
+        <b-button variant="secondary" @click="$router.push('/')" style="margin-top:1em">
+          Home page
+        </b-button>
       </div>
-      
-      
-
 
     </b-card>
   </center>
@@ -82,11 +83,8 @@ export default {
     return {
       email: "",
       password: "",
-
       signInErrorMsg:"",
-
       userInfo: null
-      
     };
   },
 
@@ -95,29 +93,18 @@ export default {
   },
 
   methods: {
-    
     async signIn() {
-      console.log('START SignIn')
       try {
-        
         const userInfo = await AuthServices.signIn(this.email, this.password)
-
-        console.log(userInfo)
-
         if(userInfo.errorMsg === undefined){
           this.$store.commit('setLoggedUserInfo', userInfo)
         }else{
           this.signInErrorMsg = userInfo.errorMsg
         }
-        
-        
       } catch (error) { 
         this.error = error.message;
-      }finally{
-        console.log('END SignIn')
       }
     },
-
   },
 
   watch:{
@@ -128,15 +115,10 @@ export default {
     password(){
       this.signInErrorMsg=""
     },
-    
   }
-
 };
 </script>
 
 <style scoped>
-.fake{
-  text-align: left;
-}
 
 </style>

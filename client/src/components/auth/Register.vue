@@ -261,8 +261,5 @@ export default {
 </script>
 
 <style scoped>
-.fake{
-  text-align: left;
-}
 
 </style>
