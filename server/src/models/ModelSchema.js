@@ -243,7 +243,7 @@ const ModelSchema = new Schema(
             pictures: {type: [String], required: false},
         }
   },
-  {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} // options
+  {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true,timestamps: true} // options
 );
 
 module.exports = mongoose.model('Model', ModelSchema, 'models')

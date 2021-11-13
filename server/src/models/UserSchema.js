@@ -12,9 +12,10 @@ const UserSchema = new Schema(
         institution: {type: String, required: false},
         verified: {type: Boolean, required: true},
         authCode: {type: String, required: false},
-        category: {type: String, required: false, enum:['user']
+        category: {type: String, required: false, enum:['user'],
         }, 
-    }
+    },
+    {timestamps: true}
 );
 
 module.exports = mongoose.model('User', UserSchema, 'users')

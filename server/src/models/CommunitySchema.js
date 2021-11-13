@@ -9,7 +9,8 @@ const CommunitySchema = new Schema(
         administrators: {type: [String], required: false},
         modelPackages: {type: [String], required: false},
         picture: {type: String, required: false},
-    }
+    },
+    {timestamps: true}
 );
 
 module.exports = mongoose.model('Community', CommunitySchema, 'communities')

@@ -57,18 +57,6 @@
           </b-form-input>
         </b-input-group>
 
-        <div v-if="requiredFieldsErrorMsg">
-          <p style="color:red;">
-            {{requiredFieldsErrorMsg}}
-          </p>
-        </div>
-
-        <div v-if="passwordErrorMsg">
-          <p style="color:red;">
-            {{passwordErrorMsg}}
-          </p>
-        </div>
-
         <b-input-group prepend="City" style="margin-top:1em">
           <b-form-input
             placeholder="(optional)"
@@ -95,6 +83,29 @@
           >
           </b-form-input>
         </b-input-group>
+
+        <div style="margin-top:1em">
+          <a href="/#legalMentions" target="_blank">Terms of use</a>
+        </div>
+        <b-input-group>
+          <b-input-group-prepend is-text>
+              <b-form-checkbox v-model="termsAccepted" class="mr-n2">
+              </b-form-checkbox>
+          </b-input-group-prepend>
+          <b-form-input disabled placeholder="Accept terms of use" style="background:white" ></b-form-input>
+        </b-input-group>
+
+        <div v-if="requiredFieldsErrorMsg">
+          <p style="color:red;">
+            {{requiredFieldsErrorMsg}}
+          </p>
+        </div>
+
+        <div v-if="passwordErrorMsg">
+          <p style="color:red;">
+            {{passwordErrorMsg}}
+          </p>
+        </div>
 
         <div v-if="this.alreadyRegistered && this.verified" style="margin-top:1em">
           <p style="color:red;">
@@ -146,6 +157,7 @@ export default {
       authCode:"",
       registrationDone: false,
       registrationInProgress: false,
+      termsAccepted: false
     };
   },
 
@@ -210,7 +222,7 @@ export default {
     },
 
     validForm(){
-      return this.email.length>0 && this.firstName.length>0 && this.lastName.length>0
+      return this.email.length>0 && this.firstName.length>0 && this.lastName.length>0 && this.termsAccepted
     },
 
     async validateRegistration(data){
