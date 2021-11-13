@@ -81,6 +81,12 @@ export default new Router({
     },
 
     {
+      path: '/ValidateRegistration',
+      name: 'ValidateRegistration',
+      component: Register
+    },
+
+    {
       path: '/Profile',
       name: 'Profile',
       component: Profile

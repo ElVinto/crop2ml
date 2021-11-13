@@ -10,36 +10,32 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 
 class AuthServices {
 
-    static register(userRegistrationDetails) {
-        console.log("START AuthServices.register");
-        console.log(userRegistrationDetails);
-        
+    static register(data) {
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "auth/register", userRegistrationDetails).then(res => {
-                    
-                    console.log("AuthServices.END register");
-                    
+                axios.post(url + "auth/register", data).then(res => {
                     resolve(res.data);
                 })
-
             } catch (err) { reject(err); }
         })
     }
 
-    static updateProfile(profileDetails) {
-        console.log("START AuthServices.updateProfile");
-        console.log(profileDetails);
-        
+    static validateRegistration(data) {
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "auth/updateProfile", profileDetails).then(res => {
-                    
-                    console.log("AuthServices.END updateProfile");
-                    
+                axios.post(url + "auth/validateRegistration", data).then(res => {
                     resolve(res.data);
                 })
+            } catch (err) { reject(err); }
+        })
+    }
 
+    static updateProfile(data) {
+        return new Promise((resolve, reject) => {
+            try {
+                axios.post(url + "auth/updateProfile", data).then(res => {
+                    resolve(res.data);
+                })
             } catch (err) { reject(err); }
         })
     }
@@ -78,21 +74,5 @@ class AuthServices {
             } catch (err) { reject(err); }
         })
     }
-
-    static sendVerificationCode(email) {
-        return new Promise((resolve, reject) => {
-            try {
-                let body = { email }
-                axios.post(url + "auth/sendVerificationCode", body).then(res => {
-                    resolve(res.data);
-                })
-                
-            } catch (err) { reject(err); }
-        })
-    }
-
-
-
-
 }
 export default AuthServices;

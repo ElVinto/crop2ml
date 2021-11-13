@@ -15,7 +15,7 @@
 
       <h3>Register</h3>
 
-      <div v-if="$store.getters.getLoggedUserInfo ===null">
+      <div v-if="!registrationInProgress && !registrationDone">
 
         <b-input-group prepend="Email" style="margin-top:1em">
           <b-form-input
@@ -104,38 +104,18 @@
           </p>
         </div>
 
-        <div v-if="this.alreadyRegistered && !this.verified" style="margin-top:1em">
-          <p style="color:orange;">
-            User already registered but not verified. Is it you ?<br>
-            If so, please click bellow to receive a verification code by email.
-            <b-button v-if="!authCodeSent" variant="secondary" @click="sendAuthCode()" style="margin-top:1em">
-              Send me a code
-            </b-button>
-            <b-input-group v-if="authCodeSent" prepend="Code" style="margin-top:1em">
-              <b-form-input
-                v-model="authCode"
-                type="text"
-              >
-              </b-form-input>
-              <br>
-              <div v-if="this.verifError" style="margin-top:1em">
-                <p style="color:red;">
-                  Wrong code
-                </p>
-              </div>
-            </b-input-group>
-          </p>
-        </div>
-
-        <b-button variant="secondary" @click="register()" style="margin-top:1em">
+        <b-button v-else variant="secondary" @click="register()" style="margin-top:1em">
           Register
         </b-button>
     </div>
-    <div v-else style="margin-top:1em">
+    <div v-else-if="registrationInProgress && !registrationDone" style="margin-top:1em">
+      Registration almost finished ! <br>
+      Please click on the link you must have received by e-mail.<br>
+    </div>
+    <div v-else-if="registrationDone"  style="margin-top:1em">
       Registration successful <br>
-      You are signed in as: {{$store.getters.getLoggedUserInfo.email}} <br>
-      <b-button variant="secondary" @click="$router.push('/')" style="margin-top:1em">
-        Home page
+      <b-button variant="secondary" @click="$router.push('/SignIn')" style="margin-top:1em">
+        Sign in
       </b-button>
     </div>
 
@@ -164,12 +144,19 @@ export default {
       alreadyRegistered: false,
       verified: false,
       authCode:"",
-      authCodeSent: false,
-      verifError: false,
+      registrationDone: false,
+      registrationInProgress: false,
     };
   },
 
   mounted() {
+    if (this.$route.name == "ValidateRegistration") {
+      let data = {
+        authCode: this.$route.query.authCode,
+        email: this.$route.query.email
+      }
+      this.validateRegistration(data)
+    }
   },
 
   methods: {
@@ -194,7 +181,7 @@ export default {
         if (!goOn)
           return
 
-        let userRegistrationDetails = {
+        let data = {
           firstName: this.firstName,
           lastName: this.lastName,
           city: this.city,
@@ -203,16 +190,13 @@ export default {
           email: this.email,
           password: this.password2,
           category: "user",
-          authCode: this.authCode
         }
 
-        const res = await AuthServices.register(userRegistrationDetails)
+        const res = await AuthServices.register(data)
         this.alreadyRegistered = res.alreadyRegistered
         this.verified = res.verified
-        this.verifError = res.verifError
-        if(res.registrationDone){
-          delete userRegistrationDetails.password
-          this.$store.commit('setLoggedUserInfo', userRegistrationDetails)
+        if(res.registrationInProgress){
+          this.registrationInProgress = true
         }
       } catch (error) {
         console.log(error)
@@ -229,9 +213,11 @@ export default {
       return this.email.length>0 && this.firstName.length>0 && this.lastName.length>0
     },
 
-    sendAuthCode(){
-      this.authCodeSent = true
-      AuthServices.sendVerificationCode(this.email)
+    async validateRegistration(data){
+      const res = await AuthServices.validateRegistration(data)
+      if(res.registrationDone){
+        this.registrationDone = true
+      }
     }
   },
 

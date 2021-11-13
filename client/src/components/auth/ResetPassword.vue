@@ -69,6 +69,7 @@ export default {
 
   mounted() {
     this.authCode = this.$route.query.authCode
+    // TODO CMZ : manque l'email du user dans la requete pour le récupérer ici non ?
   },
 
   methods: {
@@ -79,7 +80,7 @@ export default {
           this.passwordErrorMsg = "required passwords should be equal"
           return
         }
-
+        
         let resetPasswordDetails = {
           authCode: this.authCode,
           password: this.password2,
@@ -122,8 +123,5 @@ export default {
 </script>
 
 <style scoped>
-.fake{
-  text-align: left;
-}
 
 </style>

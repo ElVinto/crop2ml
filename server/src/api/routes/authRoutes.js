@@ -13,6 +13,16 @@ router.post('/register',async function(req, res, next){
     }
 });
 
+router.post('/validateRegistration', async function(req, res, next) {
+    try{
+        userInfo = await AuthServices.validateRegistration(req.body)     
+        res.send(userInfo)
+    }catch(error){
+        console.log(error)
+        res.send(error.toString())
+    }
+});
+
 router.post('/updateProfile',async function(req, res, next){
     try{
         userInfo = await AuthServices.updateProfile(req.body)        
@@ -35,8 +45,6 @@ router.post('/signIn',async function(req, res, next){
 
 router.post('/forgotPassword', async function(req, res, next) {
     try{
-        console.log('req.body')
-        console.log(req.body)
         userInfo = await AuthServices.forgotPassword(req.body)     
         res.send(userInfo)
     }catch(error){
@@ -46,21 +54,8 @@ router.post('/forgotPassword', async function(req, res, next) {
 });
     
 router.post('/resetPassword', async function(req, res, next) {
-
     try{
         userInfo = await AuthServices.resetPassword(req.body)        
-        res.send(userInfo)
-    }catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }
-});
-
-router.post('/sendVerificationCode', async function(req, res, next) {
-    try{
-        console.log('req.body')
-        console.log(req.body)
-        userInfo = await AuthServices.sendVerificationCode(req.body)     
         res.send(userInfo)
     }catch(error){
         console.log(error)

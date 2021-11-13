@@ -21,7 +21,7 @@ class AuthServices{
                 let userAlreadyRegistered = await User.exists(filter)
                 let continueRegistration = true
 
-                if(userAlreadyRegistered){
+                /*if(userAlreadyRegistered){
                     let user = await User.findOne(filter)
                     if (user.verified) {
                         continueRegistration = false
@@ -38,16 +38,62 @@ class AuthServices{
                         continueRegistration = false
                         resolve({alreadyRegistered: true, verified: false})
                     }
+                }*/
+
+                if(userAlreadyRegistered){
+                    let user = await User.findOne(filter)
+                    if (user.verified) {
+                        continueRegistration = false
+                        resolve({alreadyRegistered: true, verified: true})
+                    }
                 }
                 
                 if (continueRegistration) {
-                    data.verified = true
-                    data.authCode = ""
+                    data.verified = false
+                    var authCode = generator.generate( {
+                        length: 10,
+                        numbers: true,
+                        uppercase: false
+                    });
+                    data['authCode'] = authCode
                     let newUser = new User(data)
                     let res = await newUser.save()
                     delete res.password
-                    resolve({registrationDone: true})
-                    //resolve(newUser)
+                    
+                    // TODO CMZ : change mail
+                    var smtpTransport = mailer.createTransport({
+                        service: "gmail",
+                        auth: {
+                          user: "youkilehusky@gmail.com",
+                          pass: "Chest7-Frigidity-Cold",
+                        },
+                      });
+                      
+                    var mail = {
+                        from: 'youkilehusky@gmail.com',
+                        to: data.email,
+                        subject: 'Crop2ML : Validate your account',
+                        // HTML body
+                        html: `<p> Hi, </p>
+                        <p> If you asked to create an account to Crop2ML platform, please follow this link <a target='_blank' href='http://localhost:8080/#/ValidateRegistration?authCode=${authCode}&email=${data.email}'> validate account </a> </p>
+                        <p> If you do not ask to create an account ignore this message.</p>
+                        <p> This message has been automatically generated, please do not answer.</p>
+                        <p> Best regards, </p>
+                        <p> Crop2ML Team</p>`,
+                    }
+                
+                    smtpTransport.sendMail(mail, function(error, response){
+                        if(error){
+                            console.log(error);
+                            smtpTransport.close();
+                            reject(error);
+                        }else{
+                            console.log("Mail sent succesfully!")
+                            smtpTransport.close();
+                            resolve({registrationInProgress: true})
+                            //resolve("Validate account message has been sent")
+                        }
+                    });
                 }
             } catch(error){
                 console.log(error)
@@ -134,7 +180,7 @@ class AuthServices{
                     subject: 'Crop2ML : Reset password',
                     // HTML body
                     html: `<p> Hi, </p>
-                    <p> If you asked to reset your password from Crop2ML platform, please follow this link <a target='_blank' href='http://localhost:8080/#/ResetPassword?authCode=${authCode}'> reset password </a> </p>
+                    <p> If you asked to reset your password from Crop2ML platform, please follow this link <a target='_blank' href='http://localhost:8080/#/ResetPassword?authCode=${authCode}&email=${data.email}'> reset password </a> </p>
                     <p> If you do not ask to reset your password ignore this message.</p>
                     <p> This message has been automatically generated, please do not answer.</p>
                     <p> Best regards, </p>
@@ -160,27 +206,27 @@ class AuthServices{
     }
 
     //OK
-    static async resetPassword(resetPasswordDetails){
+    static async resetPassword(data){
         return new Promise(async (resolve, reject) => {
             try{
 
-                const hash =bcrypt.hashSync(resetPasswordDetails.password,saltRounds)
-                resetPasswordDetails.password = hash
+                const hash =bcrypt.hashSync(data.password,saltRounds)
+                data.password = hash
 
-                const authCode = resetPasswordDetails.authCode;
-                delete resetPasswordDetails.authCode 
+                const authCode = data.authCode;
+                delete data.authCode 
 
                 const filter = {authCode: authCode};
-                const update = {$set: resetPasswordDetails, $unset: {authCode:""}};
+                const update = {$set: data, $unset: {authCode:""}};
                 const options = {upsert:false, returnOriginal:false}
 
-                await User.updateOne(filter,update,options)
+                const user = await User.updateOne(filter,update,options)
 
-                if(typeof storedUserInfo.value !== null){
-                    delete storedUserInfo.value.password;
-                    delete storedUserInfo.value._id;
-                    delete storedUserInfo.value.authCode;
-                    resolve(storedUserInfo.value)
+                if(typeof user.value !== null){
+                    delete user.value.password;
+                    delete user.value._id;
+                    delete user.value.authCode;
+                    resolve(user.value)
                 }else{
                     resolve({errorMsg:"Error: Reset Password failed"})
                 }
@@ -193,7 +239,30 @@ class AuthServices{
     }
 
     // TODO CMZ : changer mail
-    static async sendVerificationCode(data){
+    static async validateRegistration(data){
+        return new Promise(async (resolve, reject) => {
+            try{
+                const authCode = data.authCode;
+                const email = data.email;
+                const filter = {email: email, authCode: authCode};
+                const update = {$set: {verified: true}, $unset: {authCode:""}};
+                const options = {upsert:false, returnOriginal:false}
+                const res = await User.updateOne(filter,update,options)
+
+                if (res.ok == 1 && res.nModified == 1){
+                    resolve({registrationDone: true})
+                }else{
+                    resolve({errorMsg:"Error: User unknown"})
+                }
+            } catch(error){
+                console.log(error)
+                reject(error);
+            }
+        }) 
+    }
+
+    // TODO CMZ : changer mail
+    /*static async sendVerificationMail(data){
         return new Promise(async (resolve, reject) => {
             try{
                 // Generate a code
@@ -247,7 +316,7 @@ class AuthServices{
                 reject(error);
             }
         }) 
-    }
+    }*/
 }
 
 module.exports = AuthServices

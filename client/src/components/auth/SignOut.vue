@@ -13,7 +13,10 @@
       </b-card-img>
 
       <div v-if="$store.getters.getLoggedUserInfo == null">
-        <h2> You are signed out</h2>
+        <h3> You are signed out</h3> <br>
+        <b-button variant="secondary" @click="$router.push('/signIn')" style="margin-top:1em">
+          Sign in
+        </b-button>
       </div>
 
     </b-card>
