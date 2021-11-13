@@ -21,25 +21,6 @@ class AuthServices{
                 let userAlreadyRegistered = await User.exists(filter)
                 let continueRegistration = true
 
-                /*if(userAlreadyRegistered){
-                    let user = await User.findOne(filter)
-                    if (user.verified) {
-                        continueRegistration = false
-                        resolve({alreadyRegistered: true, verified: true})
-                    } else if (data.authCode != "") {
-                        if (data.authCode == user.authCode) {
-                            continueRegistration = true
-                        }
-                        else {
-                            continueRegistration = false
-                            resolve({alreadyRegistered: true, verified: false, verifError: true})
-                        }
-                    } else {
-                        continueRegistration = false
-                        resolve({alreadyRegistered: true, verified: false})
-                    }
-                }*/
-
                 if(userAlreadyRegistered){
                     let user = await User.findOne(filter)
                     if (user.verified) {
@@ -103,15 +84,15 @@ class AuthServices{
     }
 
     //OK
-    static async updateProfile(profileDetails){
+    static async updateProfile(data){
         return new Promise(async (resolve, reject) => {
             try {
-                if (typeof profileDetails.password !== 'undefined') {
-                    const hash =bcrypt.hashSync(profileDetails.password,saltRounds)
-                    profileDetails.password = hash
+                if (typeof data.password !== 'undefined') {
+                    const hash =bcrypt.hashSync(data.password,saltRounds)
+                    data.password = hash
                 }
-                const filter = {email: profileDetails.email};
-                const update = {$set: profileDetails};
+                const filter = {email: data.email};
+                const update = {$set: data};
                 const options = {upsert:true}
                 await User.updateOne(filter,update,options)
                 resolve()
@@ -123,14 +104,14 @@ class AuthServices{
     }
 
     //OK
-    static async signIn(userSignInDetails){
+    static async signIn(data){
         return new Promise(async (resolve, reject) => {
             try{
-                const filter = {email: userSignInDetails.email}
+                const filter = {email: data.email}
                 let storedUserInfo = await User.findOne(filter)
                 if(storedUserInfo !== null){
-                    // const signInPasswordHash = bcrypt.hashSync(userSignInDetails.password,saltRounds)
-                    if(bcrypt.compareSync(userSignInDetails.password, storedUserInfo.password)){
+                    // const signInPasswordHash = bcrypt.hashSync(data.password,saltRounds)
+                    if(bcrypt.compareSync(data.password, storedUserInfo.password)){
                         delete storedUserInfo.password;
                         delete storedUserInfo._id;
                         resolve(storedUserInfo)
@@ -162,42 +143,46 @@ class AuthServices{
                 const filter = {email: data.email};
                 const update = {$set: data};
                 const options = {upsert:false}
-                await User.updateOne(filter,update,options)
+                const res = await User.updateOne(filter,update,options)
 
-                // var smtpTransport = mailer.createTransport("smtps://devinfo.digitag%40gmail.com:"+encodeURIComponent('#01INRAE10#')+"@smtp.gmail.com:465"); 
-                //var smtpTransport = mailer.createTransport("smtps://noreply.crop2ml%40gmail.com:"+encodeURIComponent('#01NOREPLY10#')+"@smtp.gmail.com:465");
-                var smtpTransport = mailer.createTransport({
-                    service: "gmail",
-                    auth: {
-                      user: "youkilehusky@gmail.com",
-                      pass: "Chest7-Frigidity-Cold",
-                    },
-                  });
-                  
-                var mail = {
-                    from: 'youkilehusky@gmail.com',
-                    to: data.email,
-                    subject: 'Crop2ML : Reset password',
-                    // HTML body
-                    html: `<p> Hi, </p>
-                    <p> If you asked to reset your password from Crop2ML platform, please follow this link <a target='_blank' href='http://localhost:8080/#/ResetPassword?authCode=${authCode}&email=${data.email}'> reset password </a> </p>
-                    <p> If you do not ask to reset your password ignore this message.</p>
-                    <p> This message has been automatically generated, please do not answer.</p>
-                    <p> Best regards, </p>
-                    <p> Crop2ML Team</p>`,
-                }
-            
-                smtpTransport.sendMail(mail, function(error, response){
-                    if(error){
-                        console.log(error);
-                        smtpTransport.close();
-                        reject(error);
-                    }else{
-                        console.log("Mail sent succesfully!")
-                        smtpTransport.close();
-                        resolve("Reset password message has been sent")
+                if (res.ok == 1 && res.nModified == 1){
+                    // var smtpTransport = mailer.createTransport("smtps://devinfo.digitag%40gmail.com:"+encodeURIComponent('#01INRAE10#')+"@smtp.gmail.com:465"); 
+                    //var smtpTransport = mailer.createTransport("smtps://noreply.crop2ml%40gmail.com:"+encodeURIComponent('#01NOREPLY10#')+"@smtp.gmail.com:465");
+                    var smtpTransport = mailer.createTransport({
+                        service: "gmail",
+                        auth: {
+                        user: "youkilehusky@gmail.com",
+                        pass: "Chest7-Frigidity-Cold",
+                        },
+                    });
+                    
+                    var mail = {
+                        from: 'youkilehusky@gmail.com',
+                        to: data.email,
+                        subject: 'Crop2ML : Reset password',
+                        // HTML body
+                        html: `<p> Hi, </p>
+                        <p> If you asked to reset your password from Crop2ML platform, please follow this link <a target='_blank' href='http://localhost:8080/#/ResetPassword?authCode=${authCode}&email=${data.email}'> reset password </a> </p>
+                        <p> If you do not ask to reset your password ignore this message.</p>
+                        <p> This message has been automatically generated, please do not answer.</p>
+                        <p> Best regards, </p>
+                        <p> Crop2ML Team</p>`,
                     }
-                });
+                
+                    smtpTransport.sendMail(mail, function(error, response){
+                        if(error){
+                            console.log(error);
+                            smtpTransport.close();
+                            reject(error);
+                        }else{
+                            console.log("Mail sent succesfully!")
+                            smtpTransport.close();
+                            resolve("Reset password message has been sent")
+                        }
+                    });
+                } else {
+                    resolve("User unknown")
+                }
             } catch(error){
                 console.log(error)
                 reject(error);
@@ -220,13 +205,10 @@ class AuthServices{
                 const update = {$set: data, $unset: {authCode:""}};
                 const options = {upsert:false, returnOriginal:false}
 
-                const user = await User.updateOne(filter,update,options)
+                const res = await User.updateOne(filter,update,options)
 
-                if(typeof user.value !== null){
-                    delete user.value.password;
-                    delete user.value._id;
-                    delete user.value.authCode;
-                    resolve(user.value)
+                if(res.ok == 1 && res.nModified == 1){
+                    resolve({resetDone: true})
                 }else{
                     resolve({errorMsg:"Error: Reset Password failed"})
                 }
@@ -260,63 +242,6 @@ class AuthServices{
             }
         }) 
     }
-
-    // TODO CMZ : changer mail
-    /*static async sendVerificationMail(data){
-        return new Promise(async (resolve, reject) => {
-            try{
-                // Generate a code
-                var authCode = generator.generate( {
-                    length: 10,
-                    numbers: true,
-                    uppercase: false
-                });
-                data['authCode'] = authCode
-                const filter = {email: data.email};
-                const update = {$set: data};
-                const options = {upsert:false}
-                var user = await User.updateOne(filter,update,options)
-
-                // var smtpTransport = mailer.createTransport("smtps://devinfo.digitag%40gmail.com:"+encodeURIComponent('#01INRAE10#')+"@smtp.gmail.com:465"); 
-                //var smtpTransport = mailer.createTransport("smtps://noreply.crop2ml%40gmail.com:"+encodeURIComponent('#01NOREPLY10#')+"@smtp.gmail.com:465");
-                var smtpTransport = mailer.createTransport({
-                    service: "gmail",
-                    auth: {
-                      user: "youkilehusky@gmail.com",
-                      pass: "Chest7-Frigidity-Cold",
-                    },
-                  });
-                  
-                var mail = {
-                    from: 'youkilehusky@gmail.com',
-                    to: data.email,
-                    subject: 'Crop2ML : verification code',
-                    // HTML body
-                    html: `<p> Hi, </p>
-                    <p> If you asked to register into Crop2ML platform, please paste the code <b> ${authCode} </b> into the registration form. </p>
-                    <p> If you do not ask to register ignore this message.</p>
-                    <p> This message has been automatically generated, please do not answer.</p>
-                    <p> Best regards, </p>
-                    <p> Crop2ML Team</p>`,
-                }
-            
-                smtpTransport.sendMail(mail, function(error, response){
-                    if(error){
-                        console.log(error);
-                        smtpTransport.close();
-                        reject(error);
-                    }else{
-                        console.log("Mail sent succesfully!")
-                        smtpTransport.close();
-                        resolve("Verification code message has been sent")
-                    }
-                });
-            } catch(error){
-                console.log(error)
-                reject(error);
-            }
-        }) 
-    }*/
 }
 
 module.exports = AuthServices

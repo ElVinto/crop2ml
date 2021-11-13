@@ -35,11 +35,6 @@
           </p>
         </div>
 
-        
-
-        
-      
-
     </b-card>
   </center>
 </div>
@@ -52,42 +47,28 @@ export default {
   data() {
     return {
       email: "",
-      
       forgotPasswordMsg:"",
-
-
     };
   },
 
   mounted() {
-    // this.email = this.$store.getters.getLoggedUserEMail;
   },
 
   methods: {
-    
     async forgotPassword() {
-      console.log('START forgotPassword')
       try {
-        
         this.forgotPasswordMsg = await AuthServices.forgotPassword(this.email)
-        
       } catch (error) { 
         this.error = error.message;
-      }finally{
-        console.log('END forgotPassword')
       }
     },
-
   },
 
   watch:{
     email(){
       this.forgotPasswordMsg=""
     },
-    
-    
   }
-
 };
 </script>
 

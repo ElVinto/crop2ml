@@ -10,30 +10,30 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
 
 class AuthServices {
 
-    static register(data) {
+    static register(body) {
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "auth/register", data).then(res => {
+                axios.post(url + "auth/register", body).then(res => {
                     resolve(res.data);
                 })
             } catch (err) { reject(err); }
         })
     }
 
-    static validateRegistration(data) {
+    static validateRegistration(body) {
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "auth/validateRegistration", data).then(res => {
+                axios.post(url + "auth/validateRegistration", body).then(res => {
                     resolve(res.data);
                 })
             } catch (err) { reject(err); }
         })
     }
 
-    static updateProfile(data) {
+    static updateProfile(body) {
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "auth/updateProfile", data).then(res => {
+                axios.post(url + "auth/updateProfile", body).then(res => {
                     resolve(res.data);
                 })
             } catch (err) { reject(err); }
@@ -64,10 +64,10 @@ class AuthServices {
         })
     }
 
-    static resetPassword(resetPasswordDetails) {
+    static resetPassword(body) {
         return new Promise((resolve, reject) => {
             try {
-                axios.post(url + "auth/resetPassword", resetPasswordDetails).then(res => {
+                axios.post(url + "auth/resetPassword", body).then(res => {
                     resolve(res.data);
                 })
 

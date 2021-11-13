@@ -38,14 +38,16 @@
         </p>
       </div>
 
-      <b-button variant="secondary" @click="resetPassword()" style="margin-top:1em">
-        Submit
-      </b-button>
-  
       <div v-if="resetPasswordMsg">
           {{resetPasswordMsg}}
       </div>
 
+      <b-button v-if="!resetDone" variant="secondary" @click="resetPassword()" style="margin-top:1em">
+        Submit
+      </b-button>
+      <b-button v-else variant="secondary" @click="$router.push('/SignIn')" style="margin-top:1em">
+        Sign in
+      </b-button>
 
     </b-card>
   </center>
@@ -60,16 +62,18 @@ export default {
   data() {
     return {
       authCode : null,
+      email: "",
       password1: "",
       password2: "",
       passwordErrorMsg:"",
       resetPasswordMsg:"",
+      resetDone: false
     };
   },
 
   mounted() {
     this.authCode = this.$route.query.authCode
-    // TODO CMZ : manque l'email du user dans la requete pour le récupérer ici non ?
+    this.email = this.$route.query.email
   },
 
   methods: {
@@ -81,21 +85,19 @@ export default {
           return
         }
         
-        let resetPasswordDetails = {
+        let data = {
           authCode: this.authCode,
+          email: this.email,
           password: this.password2,
         }
 
-        const userInfo =await AuthServices.resetPassword(resetPasswordDetails)
-        console.log(userInfo)
+        const res = await AuthServices.resetPassword(data)
 
-        if(typeof userInfo.errorMsg !== 'undefined' ){
-          this.$store.commit('setLoggedUserInfo', userInfo)
+        if(res.resetDone){
           this.resetPasswordMsg= "Reset Password successful"
-          console.log('this.$store.state.loggedUserInfo')
-          console.log(this.$store.state.loggedUserInfo)
+          this.resetDone = true
         }else{
-          this.resetPasswordMsg = userInfo.errorMsg;
+          this.resetPasswordMsg = res.errorMsg;
         }
       } catch (error) {
         console.log(error)
