@@ -2,14 +2,9 @@ const FormData = require('form-data');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+import config from '../config'
 
-require('dotenv').config()
-// prod
-var url = '/';
-if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
-    // dev 
-    url = 'http://localhost:5000/';
-}
+var url = `http://${config.server.host}:${config.server.port}/`;
 
 
 class FileServices {

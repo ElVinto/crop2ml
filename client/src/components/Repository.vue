@@ -447,6 +447,7 @@ import { bTreeView } from 'bootstrap-vue-treeview'
 import ModelServices from "../services/ModelServices"
 
 import ModelPreview from './ModelPreview'
+import config from '../config'
 
 
 export default {
@@ -548,7 +549,7 @@ export default {
     },
 
     getPicturePath(picture){
-      return 'http://localhost:5000/packages/' + this.selectedModel.metaData.packageName + '/doc/images/' + picture
+      return `http://${config.server.host}:${config.server.port}/packages/` + this.selectedModel.metaData.packageName + '/doc/images/' + picture
     },
 
     hasAlgorithm(){

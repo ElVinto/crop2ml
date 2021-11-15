@@ -3,10 +3,10 @@ let mongoose = require ('mongoose')
 let bodyParser = require('body-parser')
 let cors = require('cors')
 let path = require('path')
-let dbConfig = require('./config/dbConfig');
+let config = require('./config');
 
 // Connecting mongoDB
-mongoose.connect(dbConfig.db, {
+mongoose.connect(`${config.db.protocol}://${config.db.user}:${config.db.password}@${config.db.host}:${config.db.port}/${config.db.name}?authSource=admin`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -42,14 +42,9 @@ app.use('/auth', auth);
 const user = require('./api/routes/userRoutes');
 app.use('/user', user);
 
-
-// Create port
-const port = process.env.PORT || 5000;
-
-
 // Connecting port
-const server = app.listen(port, () => {
-    console.log('Server started on port ' + port)
+const server = app.listen(config.server.port, () => {
+    console.log('Server started on port ' + config.server.port)
 })
 
 // Handle production in Heroku

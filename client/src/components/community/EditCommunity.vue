@@ -113,6 +113,7 @@
 import CommunityServices from "../../services/CommunityServices"
 import UserServices from "../../services/UserServices"
 import ModelServices from "../../services/ModelServices"
+import config from "../../config"
 const path = require('path');
 
 export default {
@@ -187,7 +188,7 @@ export default {
     },
 
     getPicturePath(picture){
-      return 'http://localhost:5000/community_images/' + picture
+      return `http://${config.server.host}:${config.server.port}/community_images/` + picture
     },
   },
 

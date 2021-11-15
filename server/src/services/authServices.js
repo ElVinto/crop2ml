@@ -2,7 +2,7 @@ var mailer = require("nodemailer");
 var generator = require('generate-password');
 const bcrypt = require('bcryptjs');
 const saltRounds =10;
-
+let config = require('../config');
 let User = require('../models/UserSchema')
 
 class AuthServices{
@@ -45,18 +45,18 @@ class AuthServices{
                     var smtpTransport = mailer.createTransport({
                         service: "gmail",
                         auth: {
-                          user: "youkilehusky@gmail.com",
-                          pass: "Chest7-Frigidity-Cold",
+                          user: `${config.email.sender}`,
+                          pass: `${config.email.password}`,
                         },
                       });
                       
                     var mail = {
-                        from: 'youkilehusky@gmail.com',
+                        from: `${config.email.sender}`,
                         to: data.email,
                         subject: 'Crop2ML : Validate your account',
                         // HTML body
                         html: `<p> Hi, </p>
-                        <p> If you asked to create an account to Crop2ML platform, please follow this link <a target='_blank' href='http://localhost:8080/#/ValidateRegistration?authCode=${authCode}&email=${data.email}'> validate account </a> </p>
+                        <p> If you asked to create an account to Crop2ML platform, please follow this link <a target='_blank' href='http://${config.client.host}:${config.client.port}/#/ValidateRegistration?authCode=${authCode}&email=${data.email}'> validate account </a> </p>
                         <p> If you do not ask to create an account ignore this message.</p>
                         <p> This message has been automatically generated, please do not answer.</p>
                         <p> Best regards, </p>
@@ -88,7 +88,7 @@ class AuthServices{
         return new Promise(async (resolve, reject) => {
             try {
                 if (typeof data.password !== 'undefined') {
-                    const hash =bcrypt.hashSync(data.password,saltRounds)
+                    const hash = bcrypt.hashSync(data.password,saltRounds)
                     data.password = hash
                 }
                 const filter = {email: data.email};
@@ -151,18 +151,18 @@ class AuthServices{
                     var smtpTransport = mailer.createTransport({
                         service: "gmail",
                         auth: {
-                        user: "youkilehusky@gmail.com",
-                        pass: "Chest7-Frigidity-Cold",
+                            user: `${config.email.sender}`,
+                            pass: `${config.email.password}`,
                         },
                     });
                     
                     var mail = {
-                        from: 'youkilehusky@gmail.com',
+                        from: `${config.email.sender}`,
                         to: data.email,
                         subject: 'Crop2ML : Reset password',
                         // HTML body
                         html: `<p> Hi, </p>
-                        <p> If you asked to reset your password from Crop2ML platform, please follow this link <a target='_blank' href='http://localhost:8080/#/ResetPassword?authCode=${authCode}&email=${data.email}'> reset password </a> </p>
+                        <p> If you asked to reset your password from Crop2ML platform, please follow this link <a target='_blank' href='http://${config.client.host}:${config.client.port}/#/ResetPassword?authCode=${authCode}&email=${data.email}'> reset password </a> </p>
                         <p> If you do not ask to reset your password ignore this message.</p>
                         <p> This message has been automatically generated, please do not answer.</p>
                         <p> Best regards, </p>

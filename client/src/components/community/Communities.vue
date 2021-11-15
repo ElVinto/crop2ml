@@ -79,7 +79,7 @@
 
 
 import CommunityServices from "../../services/CommunityServices"
-
+import config from '../../config'
 
 export default {
   name: 'Communities',
@@ -133,7 +133,7 @@ export default {
   methods: {
 
     getPicturePath(picture){
-      return 'http://localhost:5000/community_images/' + picture
+      return `http://${config.server.host}:${config.server.port}/community_images/` + picture
     },
 
     userCanEdit(c){
