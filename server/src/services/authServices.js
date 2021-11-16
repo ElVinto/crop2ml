@@ -41,7 +41,6 @@ class AuthServices{
                     let res = await newUser.save()
                     delete res.password
                     
-                    // TODO CMZ : change mail
                     var smtpTransport = mailer.createTransport({
                         service: "gmail",
                         auth: {
@@ -128,7 +127,7 @@ class AuthServices{
         }) 
     }
 
-    // TODO CMZ : changer mail
+    //OK
     static async forgotPassword(data){
         return new Promise(async (resolve, reject) => {
             try{
@@ -220,7 +219,7 @@ class AuthServices{
         }) 
     }
 
-    // TODO CMZ : changer mail
+    //OK
     static async validateRegistration(data){
         return new Promise(async (resolve, reject) => {
             try{

@@ -5,8 +5,8 @@ var archiver = require('archiver');
 var fs = require('fs');
 var xml2js = require('xml2js');
 const directoryTree = require("directory-tree");
-
-ModelServices = require('./ModelServices.js');
+const UserServices = require('./UserServices.js');
+const ModelServices = require('./ModelServices.js');
 
 class FileServices {
 
@@ -58,9 +58,13 @@ class FileServices {
                 let picturesFolder = dirPath + '/doc/images'
                 let savedJsonModels =[]
                 let extractedKeywords =[]
-
                 let pictures = fs.readdirSync(picturesFolder)
                 let xmlFNames =fs.readdirSync(crop2mlFolder).filter(fName => fName.includes('.xml'))
+                let metaData = JSON.parse(fields.metaData)
+                let administrators = metaData.administratorsMails
+                let editors = metaData.editorsMails
+
+                // Compute each model
                 for(let xmlFName of xmlFNames ){
                     let jsonModel = await this.xmlFile2jsonModel(crop2mlFolder+'/'+xmlFName)
     
@@ -72,21 +76,35 @@ class FileServices {
                     keywords = keywords.concat(jsonModel.Description.Institution.split(' ').filter(s => s.length && !keywords.includes(s) ))
                     keywords = keywords.concat(idValue.split('.').filter(s => s.length>0  && !keywords.includes(s)))
     
-                    jsonModel["metaData"]=JSON.parse(fields.metaData)
-                    jsonModel["metaData"]={...jsonModel["metaData"], dirPath, xmlFName, idProperty, idValue, keywords, pictures}
-                    console.log(jsonModel)
+                    jsonModel["metaData"]={...metaData, dirPath, xmlFName, idProperty, idValue, keywords, pictures}
+                    
+                    //save model
                     let savedJsonModel = await ModelServices.saveModel(jsonModel)
                     savedJsonModels.push(savedJsonModel)
-    
-                    await ModelServices.saveKeywords(jsonModel.metaData)
                     
+                    //save keywords
+                    await ModelServices.saveKeywords(jsonModel.metaData)
                     jsonModel.metaData.keywords.forEach (k => {
                         if(extractedKeywords.indexOf(k)===-1){
                             extractedKeywords.push(k)
                         }
                     })
+
+                    for (let i in editors) {
+                        await UserServices.addRole(editors[i], idValue, "editor")
+                    }
+                    for (let i in administrators) {
+                        await UserServices.addRole(administrators[i], idValue, "administrator")
+                    }
                 }
 
+                // Notif users by mail
+                let contributors = administrators.concat(editors)
+                contributors=[...new Set(contributors)] //to remove duplicates
+                contributors.forEach (async(contrib) => {
+                    await UserServices.notifyContributor(contrib, metaData.packageName)
+                })
+                
                 resolve([savedJsonModels,extractedKeywords])
                 
             } catch (error) {
