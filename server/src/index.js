@@ -6,10 +6,17 @@ let path = require('path')
 let config = require('./config');
 
 // Connecting mongoDB
-mongoose.connect(`${config.db.protocol}://${config.db.user}:${config.db.password}@${config.db.host}:${config.db.port}/${config.db.name}?authSource=admin`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+if (config.db.protocol === "mongodb+srv") {
+    mongoose.connect(`${config.db.protocol}://${config.db.user}:${config.db.password}@${config.db.host}/${config.db.name}?authSource=admin`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+} else {
+    mongoose.connect(`${config.db.protocol}://${config.db.user}:${config.db.password}@${config.db.host}:${config.db.port}/${config.db.name}?authSource=admin`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+}
 
 let db = mongoose.connection;
 db.once('open', function() {
@@ -47,17 +54,14 @@ const server = app.listen(config.server.port, () => {
     console.log('Server started on port ' + config.server.port)
 })
 
-// Handle production in Heroku
-// CMZ comment
-//if(process.env.NODE_ENV === 'production'){
-    // Static folder 
-    app.use('/static', express.static(__dirname+'/../public'));// __dirname means . (i.e., current directory)
-    app.use('/community_images', express.static(__dirname+'/../data/community_images'));
-    app.use('/packages', express.static(__dirname+'/../data/packages'));
-    // Handle Single Page application
-    // for any other routes redirect it to index.html
-    app.get(/.*/,(req,res)=> res.sendFile(__dirname+'/../public/index.html'));
-//}
+// Static folder 
+app.use('/static', express.static(__dirname+'/../public'));// __dirname means . (i.e., current directory)
+//app.use(express.static(path.join(__dirname, 'dist')));
+app.use('/community_images', express.static(__dirname+'/../data/community_images'));
+app.use('/packages', express.static(__dirname+'/../data/packages'));
+// Handle Single Page application
+// for any other routes redirect it to index.html
+app.get(/.*/,(req,res)=> res.sendFile(__dirname+'/../public/index.html'));
 
 /* CMZ : get from boilerplate
 // Find 404 and hand over to error handler
@@ -77,10 +81,6 @@ app.use(function (err, req, res, next) {
     console.error(err.message);
     if (!err.statusCode) err.statusCode = 500;
     res.status(err.statusCode).send(err.message);
-});
-
-// Static build location
-app.use(express.static(path.join(__dirname, 'dist')));
-*/
+});*/
 
 //module.exports =app;
