@@ -27,10 +27,6 @@ class FileServices {
                     }
                 }).then( res =>{
                     console.log(' sendZip SUCCESS!!');
-
-                    console.log(' receive ');
-                    console.log(res.data);
-
                     resolve(res.data)
                 })
 

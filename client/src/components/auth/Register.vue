@@ -201,7 +201,6 @@ export default {
           institution: this.institution,
           email: this.email,
           password: this.password2,
-          category: "user",
         }
 
         const res = await AuthServices.register(data)

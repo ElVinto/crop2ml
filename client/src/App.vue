@@ -49,13 +49,12 @@ export default {
  #app { 
   font-family: Avenir, Helvetica, Arial, sans-serif;
   text-align: center;
+  overflow-x: clip;
  }
 
  #main{
    width: 100%;
    /* position: fixed; */
-   padding-bottom:  4.1em;
-   
  }
  
 

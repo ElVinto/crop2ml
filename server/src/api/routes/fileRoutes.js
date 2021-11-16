@@ -18,8 +18,6 @@ router.get('/data',async function(req,res,next){
 //OK
 router.post('/uploadZip', async function(req, res, next) {
 
-    console.log('START post /uploadZip')
-
     const form = new formidable.IncomingForm();
     // Parse `req` and upload all associated files
     form.parse(req, async function(err, fields, files) {

@@ -236,9 +236,8 @@ const ModelSchema = new Schema(
             largerModelPackageNames: {type: [String], required: false},
             linkedCommunity: {type: String, required: false},
             uploaderMail: {type: String, required: false},
-            administratorMails: {type: [String], required: false},
+            administratorsMails: {type: [String], required: false},
             editorsMails: {type: [String], required: false},
-            maintainerMails: {type: [String], required: false},
             tags: {type: [String], required: false},
             pictures: {type: [String], required: false},
         }

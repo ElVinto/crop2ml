@@ -98,28 +98,24 @@
 
                 </b-col>
               </b-row>
-
-              
             </div>
 
             
 
             <!-- Linked Community -->
-              
-            <b-input-group id="LinkedCommunity" prepend="Link to an existing community" style="margin-top:1em; width:100%; text-align:left; overflow:scroll">
-            <b-form-input  placeholder="Select in the list" list="communityNameList" v-model="linkedCommunity"></b-form-input>
+            <b-input-group id="LinkedCommunity" prepend="Link to an existing community" style="padding-top: 1em; ">
+              <b-form-input  placeholder="Select in the list" list="communityNameList" v-model="linkedCommunity"></b-form-input>
+              <datalist id="communityNameList">
+                <option  
+                  v-for="communityNameOption in communityNames"
+                  v-bind:key="communityNameOption"
+                  >
+                  {{communityNameOption}}
+                </option>
+              </datalist> 
+            </b-input-group>
             
-            <datalist id="communityNameList">
-              <option  
-                v-for="communityNameOption in communityNames"
-                v-bind:key="communityNameOption"
-                >
-                {{communityNameOption}}
-              </option>
-            </datalist> 
-
-          </b-input-group>
-            
+            <!-- Tags -->
             <b-input-group style="padding-top: 1em; " prepend="Tags">
               <b-form-tags class="text-capitalize"
                 v-model="tags"
@@ -135,123 +131,33 @@
 
             <h3 style="padding-top: 1em; text-align:left; ">  Contributors : </h3>
 
-            
-            <b-input-group style="padding-top: 1em; text-align:left;" prepend="Uploader">
-                <!-- <b-form-input
-                  v-model="$store.getters.getLoggedUserInfo.email"
-                  disabled
-                >
-                </b-form-input> -->
-              <span class="form-control">
-                {{$store.getters.getLoggedUserInfo.email}}
-              </span>
+            <!-- Model Package Administrators-->
+            <p>Administrators can edit informations, update the model, delete the model.<br>
+            Editors can only edit informations</p>
+            <b-input-group prepend="Administrators" style="padding-top: 1em; text-align:left;">
+              <b-form-tags class="form-control"  style="background: white;"
+                  v-model="administrators"
+                  separator=","
+                  placeholder= "Enter e-mail separated by comma"
+                  invalid-tag-text="Please enter a valid email address"
+                  :tag-validator="emailValidator"
+                  duplicate-tag-text="duplicated e-mail"
+                  no-add-on-enter
+                ></b-form-tags>
             </b-input-group>
 
-            <!-- Model Package Administrators-->
-            <b-row no-gutters style="margin-top:1em;">
-              <b-col lg="9" >
-            
-                <b-input-group prepend="Administrators" style="width:100%; text-align:left; overflow:scroll">
-                <b-form-tags class="form-control"  style="background: white;"
-                    v-model="administrators"
-                    separator=","
-                    placeholder= "Enter e-mail separated by comma"
-                    invalid-tag-text="not registered e-mail"
-                    duplicate-tag-text="duplicated e-mail"
-                    :tag-validator="emailValidator"
-                    no-add-on-enter
-                  ></b-form-tags>
-                </b-input-group>
-              </b-col>
-
-              <b-col lg="3" >
-                <b-input-group id="AddAdministrator" style="width:100%; text-align:left; overflow:scroll">
-                  <b-form-input placeholder=" email list" list="registeredEmailList" v-model="selectedAdministrator"></b-form-input>
-                  
-                    <datalist id="registeredEmailList">
-                      <option  
-                        v-for="emailOption in registeredEmails"
-                        v-bind:key="emailOption"
-                        >
-                        {{emailOption}}
-                      </option>
-                    </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="addAdministrator()" type="submit">Add</b-button>
-                </b-input-group>
-              </b-col>
-            </b-row>
-
             <!-- Model Package Editors -->
-            <b-row no-gutters style="margin-top:1em;">
-              <b-col lg="9" >
-            
-                <b-input-group prepend="Editors" style="width:100%; text-align:left; overflow:scroll">
-                <b-form-tags class="form-control"  style="background: white;"
-                    v-model="editors"
-                    separator=","
-                    placeholder= "Enter e-mail separated by comma"
-                    invalid-tag-text="not registered e-mail"
-                    duplicate-tag-text="duplicated e-mail"
-                    :tag-validator="emailValidator"
-                    no-add-on-enter
-                  ></b-form-tags>
-                </b-input-group>
-              </b-col>
-
-              <b-col lg="3" >
-                <b-input-group id="AddEditor" style="width:100%; text-align:left; overflow:scroll">
-                  <b-form-input placeholder=" email list" list="registeredEmailList" v-model="selectedEditor"></b-form-input>
-                  
-                    <datalist id="registeredEmailList">
-                      <option  
-                        v-for="emailOption in registeredEmails"
-                        v-bind:key="emailOption"
-                        >
-                        {{emailOption}}
-                      </option>
-                    </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="addEditor()" type="submit">Add</b-button>
-                </b-input-group>
-              </b-col>
-            </b-row>
-
-            <!-- Model Package Maintainers -->
-            <b-row no-gutters style="margin-top:1em;">
-              <b-col lg="9" >
-            
-                <b-input-group prepend="Maintainers" style="width:100%; text-align:left; overflow:scroll">
-                <b-form-tags class="form-control"  style="background: white;"
-                    v-model="editors"
-                    separator=","
-                    placeholder= "Enter e-mail separated by comma"
-                    invalid-tag-text="not registered e-mail"
-                    duplicate-tag-text="duplicated e-mail"
-                    :tag-validator="emailValidator"
-                    no-add-on-enter
-                  ></b-form-tags>
-                </b-input-group>
-              </b-col>
-
-              <b-col lg="3" >
-                <b-input-group id="AddMaintainer" style="width:100%; text-align:left; overflow:scroll">
-                  <b-form-input placeholder=" email list" list="registeredEmailList" v-model="selectedMaintainer"></b-form-input>
-                  
-                    <datalist id="registeredEmailList">
-                      <option  
-                        v-for="emailOption in registeredEmails"
-                        v-bind:key="emailOption"
-                        >
-                        {{emailOption}}
-                      </option>
-                    </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="addMaintainer()" type="submit">Add</b-button>
-                </b-input-group>
-              </b-col>
-            </b-row>
-
+            <b-input-group prepend="Editors" style="padding-top: 1em; text-align:left;">
+            <b-form-tags class="form-control"  style="background: white;"
+                v-model="editors"
+                separator=","
+                placeholder= "Enter e-mail separated by comma"
+                invalid-tag-text="Please enter a valid email address"
+                :tag-validator="emailValidator"
+                duplicate-tag-text="duplicated e-mail"
+                no-add-on-enter
+              ></b-form-tags>
+            </b-input-group>
 
           </div>
 
@@ -300,20 +206,13 @@
             <b-tree-view v-on:nodeSelect="treeNodeSelect" :data="treeDataReceived"  :renameNodeOnDblClick=false :contextMenu=false :contextMenuItems=[] ></b-tree-view>
           </p>
           
-          
-        
+
         </div>
-        
-        
+
       </div>
       <div class="col-sm-2"/>
       
     </div>
-  
-
-
-
-
   </div>
 
 </template>
@@ -321,59 +220,41 @@
 
 import ModelServices from "../services/ModelServices"
 import FileServices from "../services/FileServices"
-import UserServices from "../services/UserServices"
+//import UserServices from "../services/UserServices"
 import CommunityServices from "../services/CommunityServices"
-
 import { bTreeView } from 'bootstrap-vue-treeview'
-
 
 export default {
   name: 'Catalog',
 
    data() {
       return {
-
+        reg: /^(([^<>()\\[\]\\.,;:\s@"]+(\.[^<>()\\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
         packageZip: null,
         packageZipSent : false,
-        
         packageName:'',
         PackageNameIsValid:false,
         PackageNameMsg:'',
-
         tags:[],
-
         keywords:[],
-
         submitted: false,
-
         treeDataReceived :null,
         modelTypeSelected : 'Main',
         modelTypeOptions: [
             {value: 'Main', text: 'Main'},
             {value: 'Component', text: 'Component'},
         ],
-
         isPartOfLargerModel: false,
-        
         registeredPackageNames : [],
         largerModelPackageNames:[],
         selectedLargerPackage : null,
-        
-        
-
         linkedCommunity: null,
         communityNames:[],
-
-        registeredEmails : [],
-        
+        //registeredEmails : [],
         administrators:[],
-        selectedAdministrator: null,
-
+        //selectedAdministrator: null,
         editors:[],
-        selectedEditor: null,
-
-        maintainers:[],
-        selectedMaintainer: null,
+        //selectedEditor: null,
       }
     },
 
@@ -387,12 +268,10 @@ export default {
       if(!this.packageZip && this.packageZipSent){
         msg= 'Model package sent successfully'
       }
-
       if(this.packageZip){
         // return 'Selected package: '+this.packageZip.name
       }
       return msg;
-
     }
   },
 
@@ -420,7 +299,7 @@ export default {
       await this.$store.dispatch('initModels');
     }
 
-    this.registeredEmails = await UserServices.getRegisteredEmails();
+    //this.registeredEmails = await UserServices.getRegisteredEmails();
 
     this.registeredPackageNames = await ModelServices.getAllModelsPackageNames();
 
@@ -431,103 +310,43 @@ export default {
     console.log("END mounted Catalog")
   },
 
-  
-
   methods: {
-
     treeNodeSelect(event){
-      console.log("event.data.name")
-      
-      console.log("selected "+event.selected)
-
       if(event.selected){
         console.log(event.data.name)
-
       }
-
-    },
-
-    // TODO remove not used
-    handleZipUpload(){
-      console.log("START handleZipUpload")
-
-      this.packageZip = this.$refs.zip.files[0];
-      
-
-      console.log(" zip file")
-      console.log(this.packageZip)
-
-
-      console.log("END handleZipUpload")
     },
 
     async submitZip(){
-      console.log("START submitZip")
 
       // let formData = new FormData();
       // formData.append('file', this.file);
 
-      
-      console.log("this.tags")
-      console.log(this.tags)
-
       this.packageZip.packageName = this.packageName
-      
-      console.log("this.packageZip to send: ")
-      console.log(this.packageZip)
 
       const modelMetaDataPart ={
-        
         zipFileName: this.packageZip.name,
         packageName: this.packageName,
         modelType : this.modelTypeSelected,
-        
         largerModelPackageNames: this.largerModelPackageNames,
-        
         linkedCommunity: this.linkedCommunity,
-
         uploaderMail: this.$store.getters.getLoggedUserInfo.email,
-        administratorMails: this.administrators,
+        administratorsMails: this.administrators,
         editorsMails: this.editors,
-        maintainerMails: this.maintainers,
-
         tags: this.tags,
       }
-
 
       this.submitted =true;
       const res =  await FileServices.sendZip(this.packageZip,modelMetaDataPart)
       this.treeDataReceived = [res.tree]
       this.keywords = res.extractedKeywords
 
-      console.log("received treeData from server: ")
-      console.log(this.treeDataReceived[0])
-      
-
       this.packageZip = null
-
       this.packageZipSent=true;
-
-      console.log("END submitZip")
     },
 
     addLargerPackage(){
       this.largerModelPackageNames.push(this.selectedLargerPackage)
-    },
-
-    addAdministrator(){
-      if(this.selectedAdministrator !==null && !this.administrators.includes(this.selectedAdministrator))
-        this.administrators.push(this.selectedAdministrator)
-    },
-
-    addEditor(){
-      if(this.selectedEditor !== null && !this.editors.includes(this.selectedEditor))
-        this.editors.push(this.selectedEditor)
-    },
-
-    addMaintainer(){
-      if(this.selectedMaintainer !== null && !this.maintainers.includes(this.selectedMaintainer))
-        this.maintainer.push(this.selectedMaintainer)
     },
 
     packageValidator(tag){
@@ -535,7 +354,7 @@ export default {
     },
 
     emailValidator(tag){
-      return this.registeredEmails.includes(tag)
+      return (tag == "")? "" : (this.reg.test(tag)) ? true : false;
     },
     
   },

@@ -12,8 +12,10 @@ const UserSchema = new Schema(
         institution: {type: String, required: false},
         verified: {type: Boolean, required: true},
         authCode: {type: String, required: false},
-        category: {type: String, required: false, enum:['user'],
-        }, 
+        associatedModels: {
+            modelId: {type: String},
+            role: {type: String, required: false, enum:['editor', 'administrator']},
+        }
     },
     {timestamps: true}
 );

@@ -217,48 +217,7 @@
               </b-col>
             </b-row>
 
-            <!-- Model Package Maintainers -->
-            <b-row no-gutters style="margin-top:1em;">
-              <b-col lg="9" >
-            
-                <b-input-group prepend="Maintainers" style="width:100%; text-align:left; overflow:scroll">
-                <b-form-tags class="form-control"  style="background: white;"
-                    v-model="editors"
-                    separator=","
-                    placeholder= "Enter e-mail separated by comma"
-                    invalid-tag-text="not registered e-mail"
-                    duplicate-tag-text="duplicated e-mail"
-                    :tag-validator="emailValidator"
-                    no-add-on-enter
-                  ></b-form-tags>
-                </b-input-group>
-              </b-col>
-
-              <b-col lg="3" >
-                <b-input-group id="AddMaintainer" style="width:100%; text-align:left; overflow:scroll">
-                  <b-form-input placeholder=" email list" list="registeredEmailList" v-model="selectedMaintainer"></b-form-input>
-                  
-                    <datalist id="registeredEmailList">
-                      <option  
-                        v-for="emailOption in registeredEmails"
-                        v-bind:key="emailOption"
-                        >
-                        {{emailOption}}
-                      </option>
-                    </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="addMaintainer()" type="submit">Add</b-button>
-                </b-input-group>
-              </b-col>
-            </b-row>
-
-
           </div>
-
-          
-            
-          
-
 
           <div style="padding-top: 1em;" v-if="packageNameIsValid">
             <b-button variant="secondary"  v-on:click="submitZip()">Submit model</b-button>
@@ -379,9 +338,6 @@ export default {
         editors:[],
         selectedEditor: null,
 
-        maintainers:[],
-        selectedMaintainer: null,
-
       }
     },
 
@@ -495,9 +451,8 @@ export default {
         linkedCommunity: this.linkedCommunity,
 
         uploaderMail: this.$store.getters.getLoggedUserInfo.email,
-        administratorMails: this.administrators,
+        administratorsMails: this.administrators,
         editorsMails: this.editors,
-        maintainerMails: this.maintainers,
 
         tags: this.tags,
       }
@@ -531,11 +486,6 @@ export default {
     addEditor(){
       if(this.selectedEditor !== null && !this.editors.includes(this.selectedEditor))
         this.editors.push(this.selectedEditor)
-    },
-
-    addMaintainer(){
-      if(this.selectedMaintainer !== null && !this.maintainers.includes(this.selectedMaintainer))
-        this.maintainer.push(this.selectedMaintainer)
     },
 
     packageValidator(tag){

@@ -215,7 +215,6 @@ export default {
           country: this.country,
           institution: this.institution,
           email: this.email,
-          category: "user"
         }
 
         if(this.password2){
