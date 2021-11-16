@@ -62,6 +62,7 @@ class FileServices {
                 let xmlFNames =fs.readdirSync(crop2mlFolder).filter(fName => fName.includes('.xml'))
                 let metaData = JSON.parse(fields.metaData)
                 let administrators = metaData.administratorsMails
+                administrators.push(metaData.uploaderMail)
                 let editors = metaData.editorsMails
 
                 // Compute each model
@@ -89,7 +90,8 @@ class FileServices {
                             extractedKeywords.push(k)
                         }
                     })
-
+                    
+                    //manage contributors
                     for (let i in editors) {
                         await UserServices.addRole(editors[i], idValue, "editor")
                     }
@@ -102,7 +104,8 @@ class FileServices {
                 let contributors = administrators.concat(editors)
                 contributors=[...new Set(contributors)] //to remove duplicates
                 contributors.forEach (async(contrib) => {
-                    await UserServices.notifyContributor(contrib, metaData.packageName)
+                    if (contrib != metaData.uploaderMail)
+                        await UserServices.notifyContributor(contrib, metaData.packageName)
                 })
                 
                 resolve([savedJsonModels,extractedKeywords])

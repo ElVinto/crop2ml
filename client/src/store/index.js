@@ -82,7 +82,21 @@ export default new Vuex.Store({
          }
          
          return modelIds.sort()
-      }
+      },
+
+      getListOfPersonalModels:(state)=>{
+         let models = []
+         if (typeof state.loggedUserInfo.associatedModels === "undefined")
+            return models
+            
+         for(let m of state.models.keys()){
+            let index = state.loggedUserInfo.associatedModels.findIndex(mod => mod.modelId == m)
+            if (index != -1)
+               models.push(state.loggedUserInfo.associatedModels[index])
+         }
+         
+         return models.sort((a,b) => (a.modelId > b.modelId) ? 1 : ((b.modelId > a.modelId) ? -1 : 0))
+      },
    },
 
    mutations: { // synchronous  commit of changes of state

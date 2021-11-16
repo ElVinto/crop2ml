@@ -13,6 +13,7 @@
               <b-nav-item @click="activateSearchMode()"  >Search</b-nav-item>
               <b-nav-item @click="activateHierarchyMode()" >Hierarchy</b-nav-item>
               <b-nav-item @click="activateListMode()" >List</b-nav-item>
+              <b-nav-item @click="activatePersoMode()" >Mine</b-nav-item>
 
               <!-- <b-button variant="outline-secondary" @click="activateSearchMode()"  >Search</b-button>
               <b-button variant="outline-secondary" @click="activateHierarchyMode()"  >Hierarchy</b-button>
@@ -128,6 +129,25 @@
                     style="font-size:0.75em" 
                   >
                     {{ modelid}}
+                  </b-list-group-item>
+                </b-list-group>
+              </div>
+            </div>
+
+            <div v-if="persoMode" id="modelPerso"  class="row" >
+              <div  class="col-sm-12">
+                <p>
+                  Select a model in the list: 
+                </p>
+                <b-list-group class="scrollable-menu" role="menu" style="width:100%">
+                  <b-list-group-item 
+                    v-for="model in $store.getters.getListOfPersonalModels"
+                    v-bind:key="model"
+                    v-on:click="selectModelById(model.modelId)"
+                    style="font-size:0.75em" 
+                  >
+                    {{ model.modelId}}<br>
+                    <!--b-badge color="primary">{{ model.role}}</b-badge-->
                   </b-list-group-item>
                 </b-list-group>
               </div>
@@ -489,6 +509,7 @@ export default {
       searchMode:true,
       hierarchyMode:false,
       listMode:false,
+      persoMode:false,
     }
   },
 
@@ -531,6 +552,13 @@ export default {
       this.searchMode =false;
       this.hierarchyMode =false;
       this.listMode=true;
+    },
+
+    activatePersoMode(){
+      this.searchMode =false;
+      this.hierarchyMode =false;
+      this.listMode=false;
+      this.persoMode=true;
     },
 
     treeNodeSelect(event){
