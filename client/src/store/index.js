@@ -14,16 +14,10 @@ export default new Vuex.Store({
     * catalog.get(modelId) = model 
     */
      models : new Map(),
-
      dataAreloaded:false,
      currentNavPath: null,
-
      loggedUserInfo: null,
-
      keywordsObj: {},
-     tagsObj: {},
-
-
    },
 
 
@@ -36,7 +30,6 @@ export default new Vuex.Store({
       getModelIds: (state) => {
          return state.models.keys();
       },
-
 
       getDataAreLoaded:(state) =>{
          return state.dataAreloaded
@@ -54,24 +47,9 @@ export default new Vuex.Store({
          return Object.keys(state.keywordsObj)
       },
 
-      getTags:(state) =>{
-         return Object.keys(state.tagsObj)
-      },
-
       getWordOptions:(state) =>{
-
-
          let allWords = Array.prototype.concat([],Object.keys(state.keywordsObj))
-         
-
-         for(let t in state.tagsObj){
-            if(!(allWords.includes(t))){
-               allWords.push(t)
-            }
-         }
-
          allWords.sort()
-
          return allWords;
       },
 
@@ -115,24 +93,12 @@ export default new Vuex.Store({
             }
             state.keywordsObj[k].push(idValue)
          }
-
-
-         for(let t of model.metaData.tags){
-            
-            if(!(Object.prototype.hasOwnProperty.call(state.tagsObj,t))){
-               state.tagsObj[t]=[]
-            }
-            state.tagsObj[t].push(idValue)
-         }
-         
-         
       },
 
       deleteModel: (state, model) => {
          const modelid = model.metaData.idValue
          state.models.delete(modelid)
       },
-
 
       setDataAreLoaded: (state, bool) =>{
          state.dataAreloaded =bool
@@ -145,35 +111,20 @@ export default new Vuex.Store({
       setLoggedUserInfo:(state,val) =>{
          state.loggedUserInfo =val
       }
-
-
    },
 
    actions: { // assynchronous commit of changes
 
       async initModels({ state, commit }) {
-
          return new Promise((resolve, reject) => {
-            
             try { 
-               console.log('START initModels')
-
-                 
                ModelServices.getAllModels().then(models =>{ 
-
                   for(const model of models){
                      commit('addModel', model)
                   }
                   commit('setDataAreLoaded',true)
-
-                  console.log('state.models')
-                  console.log(state.models)
-
-                  console.log('END initModels')
                   resolve(state.models)
-                  
                })
-
             } catch (err) { 
                console.error(err);
                reject(err);
@@ -184,20 +135,12 @@ export default new Vuex.Store({
       async reInitModel({commit},modelid){
          return new Promise((resolve, reject) => {
             try { 
-               console.log("START reInitmodel "+modelid)
-
                ModelServices.getModelById(modelid).then(savedmodel =>{ 
-                  
                   if(savedmodel.model !== undefined){
-                     console.log('savedmodel')
-                     console.log(savedmodel)
                      commit('addmodel',savedmodel)
                   }
-
-                  console.log("END reInitmodel "+modelid)
                   resolve(savedmodel)
                })
-
             } catch (err) { 
                console.error(err);
                reject(err);
@@ -205,77 +148,21 @@ export default new Vuex.Store({
          })
       },
 
-
       async saveModel({commit},model){
-
-         console.log("START savemodel")
-         console.log(model)
-
          const savedmodel = await ModelServices.savemodel(model)
-
          if(savedmodel.model !== undefined){
             commit('addmodel',savedmodel)
          }
-         
-
-         console.log(savedmodel)
-         console.log("END savemodel")
-
          return savedmodel;
       },
 
       async deleteModel({commit},model){
-
-         console.log("START STORE deletemodel")
-         
-
          const deletedmodel = await ModelServices.deleteModelById(model.model.Attributs.modelid)
-
-         console.log("deletedmodel")
-         console.log(deletedmodel)
-
          if(deletedmodel.model !== undefined){
             commit('deletemodel',deletedmodel)
          }
-         
-         console.log(deletedmodel)
-
-         console.log("END STORE deletemodel")
-
          return deletedmodel;
       },
-
-
-      /*initKeywords({ state, commit }){
-
-         return new Promise((resolve, reject) => {
-            
-            try { 
-               console.log('START initKeywords')
-
-               ModelServices.getAllModels().then(models =>{ 
-
-                  for(const model of models){
-                     commit('addModel', model)
-                  }
-                  commit('setDataAreLoaded',true)
-
-                  console.log('state.models')
-                  console.log(state.models)
-
-                  console.log('END initKeywords')
-                  resolve(state.models)
-                  
-               })
-
-            } catch (err) { 
-               console.error(err);
-               reject(err);
-            }
-         })
-
-      },*/
-   
    }
 });
 

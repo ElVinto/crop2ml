@@ -27,7 +27,6 @@ router.post('/uploadZip', async function(req, res, next) {
 
         // TODO parse fields
         /*{
-            tags: 'tag_cmz',
             fileName: 'zip_test.zip',
             packageName: 'zip_test',
             uploaderMail: 'charles.moszkowicz@gmail.com'

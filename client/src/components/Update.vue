@@ -120,17 +120,14 @@
 
           </b-input-group>
             
-            <b-input-group style="padding-top: 1em; " prepend="Tags">
+            <!--b-input-group style="padding-top: 1em; " prepend="Keywords">
               <b-form-tags class="text-capitalize"
-                v-model="tags"
+                v-model="keywords"
                 separator=","
-                placeholder="Enter new tags separated by comma"
+                placeholder="Enter new keywords separated by comma"
                 no-add-on-enter
               ></b-form-tags>
-            </b-input-group>
-            <!-- <p>
-              {{tags}}
-            </p> -->
+            </b-input-group-->
 
 
             <h3 style="padding-top: 1em; text-align:left; ">  Contributors : </h3>
@@ -238,18 +235,7 @@
         </div>
 
         <div v-if="treeDataReceived">
-
-          <b-input-group style="padding-top: 1em; " prepend="Added Tags">
-              <b-form-tags
-                v-model="tags"
-                separator=" "
-                placeholder=" "
-                disabled
-              ></b-form-tags>
-          </b-input-group>
           
-          
-
           <b-input-group style="padding-top: 1em; " prepend="Extracted keywords">
               <b-form-tags
                 v-model="keywords"
@@ -297,47 +283,30 @@ export default {
 
    data() {
       return {
-
         packageZip: null,
         packageZipSent : false,
-        
         packageName:'',
         PackageNameIsValid:false,
         PackageNameMsg:'',
-
-        tags:[],
-
         keywords:[],
-
         submitted: false,
-
         treeDataReceived :null,
-
         modelTypeSelected : 'Main',
         modelTypeOptions: [
             {value: 'Main', text: 'Main'},
             {value: 'Component', text: 'Component'},
         ],
-
         isPartOfLargerModel: false,
-        
         registeredPackageNames : [],
         largerModelPackageNames:[],
         selectedLargerPackage : null,
-        
-        
-
         linkedCommunity: null,
         communityNames:[],
-
         registeredEmails : [],
-        
         administrators:[],
         selectedAdministrator: null,
-
         editors:[],
         selectedEditor: null,
-
       }
     },
 
@@ -431,10 +400,6 @@ export default {
       // let formData = new FormData();
       // formData.append('file', this.file);
 
-      
-      console.log("this.tags")
-      console.log(this.tags)
-
       this.packageZip.packageName = this.packageName
       
       console.log("this.packageZip to send: ")
@@ -453,8 +418,6 @@ export default {
         uploaderMail: this.$store.getters.getLoggedUserInfo.email,
         administratorsMails: this.administrators,
         editorsMails: this.editors,
-
-        tags: this.tags,
       }
 
 
@@ -488,12 +451,12 @@ export default {
         this.editors.push(this.selectedEditor)
     },
 
-    packageValidator(tag){
-      return this.registeredPackageNames.includes(tag)
+    packageValidator(name){
+      return this.registeredPackageNames.includes(name)
     },
 
-    emailValidator(tag){
-      return this.registeredEmails.includes(tag)
+    emailValidator(email){
+      return this.registeredEmails.includes(email)
     },
     
   },

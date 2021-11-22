@@ -238,7 +238,6 @@ const ModelSchema = new Schema(
             uploaderMail: {type: String, required: false},
             administratorsMails: {type: [String], required: false},
             editorsMails: {type: [String], required: false},
-            tags: {type: [String], required: false},
             pictures: {type: [String], required: false},
         }
   },

@@ -115,18 +115,15 @@
               </datalist> 
             </b-input-group>
             
-            <!-- Tags -->
-            <b-input-group style="padding-top: 1em; " prepend="Tags">
+            <!-- Keywords -->
+            <!--b-input-group style="padding-top: 1em; " prepend="Keywords">
               <b-form-tags class="text-capitalize"
-                v-model="tags"
+                v-model="keywords"
                 separator=","
-                placeholder="Enter new tags separated by comma"
+                placeholder="Enter new keywords separated by comma"
                 no-add-on-enter
               ></b-form-tags>
-            </b-input-group>
-            <!-- <p>
-              {{tags}}
-            </p> -->
+            </b-input-group-->
 
 
             <h3 style="padding-top: 1em; text-align:left; ">  Contributors : </h3>
@@ -181,17 +178,6 @@
 
         <div v-if="treeDataReceived">
 
-          <b-input-group style="padding-top: 1em; " prepend="Added Tags">
-              <b-form-tags
-                v-model="tags"
-                separator=" "
-                placeholder=" "
-                disabled
-              ></b-form-tags>
-          </b-input-group>
-          
-          
-
           <b-input-group style="padding-top: 1em; " prepend="Extracted keywords">
               <b-form-tags
                 v-model="keywords"
@@ -235,7 +221,6 @@ export default {
         packageName:'',
         PackageNameIsValid:false,
         PackageNameMsg:'',
-        tags:[],
         keywords:[],
         submitted: false,
         treeDataReceived :null,
@@ -333,7 +318,6 @@ export default {
         uploaderMail: this.$store.getters.getLoggedUserInfo.email,
         administratorsMails: this.administrators,
         editorsMails: this.editors,
-        tags: this.tags,
       }
 
       this.submitted =true;
@@ -349,12 +333,12 @@ export default {
       this.largerModelPackageNames.push(this.selectedLargerPackage)
     },
 
-    packageValidator(tag){
-      return this.registeredPackageNames.includes(tag)
+    packageValidator(name){
+      return this.registeredPackageNames.includes(name)
     },
 
-    emailValidator(tag){
-      return (tag == "")? "" : (this.reg.test(tag)) ? true : false;
+    emailValidator(email){
+      return (email == "")? "" : (this.reg.test(email)) ? true : false;
     },
     
   },

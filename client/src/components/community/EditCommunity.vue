@@ -179,12 +179,12 @@ export default {
       this.$router.push("/Communities")
     },
 
-    emailValidator(tag){
-      return this.registeredEmails.includes(tag)
+    emailValidator(email){
+      return this.registeredEmails.includes(email)
     },
 
-    packageValidator(tag){
-      return this.packageNames.includes(tag)
+    packageValidator(name){
+      return this.packageNames.includes(name)
     },
 
     getPicturePath(picture){

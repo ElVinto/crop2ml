@@ -27,11 +27,11 @@
             <div v-if="searchMode" id="modelSearch" class="row">
               <div  class="col-sm-12">
                 <p>
-                    Find a model by tags or keywords
+                    Find a model by keywords
                 </p>
 
                 <b-input-group id="Search"  >
-                  <b-form-input placeholder="tag, keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
+                  <b-form-input placeholder="keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
                   
                   <datalist id="wordOptionDataList">
                     <option  
@@ -45,14 +45,14 @@
                   <b-button size="sm" class="my-2 my-sm-0" v-on:click="submitSearch()" type="submit">Search</b-button>
                 </b-input-group>
 
-                <div v-if="selectedWord.length>0 && searchResults.fromTags !== null && searchResults.fromTags.length>0">
+                <div v-if="selectedWord.length>0 && searchResults.fromKeywords !== null && searchResults.fromKeywords.length>0">
                   <hr>
                   <p style="text-align:left; ">
-                    {{`Tag "${selectedWord}": models founds`}}
+                    {{`Keyword "${selectedWord}": models founds`}}
                   </p>
                   <b-list-group class="scrollable-submenu" role="menu" style="width:100%">
                     <b-list-group-item 
-                      v-for="modelid in searchResults.fromTags"
+                      v-for="modelid in searchResults.fromKeywords"
                       v-bind:key="modelid"
                       v-on:click="selectModelById(modelid)"
                       style="font-size:0.7em" 
@@ -62,24 +62,7 @@
                   </b-list-group>
                 </div>
 
-                <div v-if="selectedWord.length>0 && searchResults.fromKeywords !== null && searchResults.fromKeywords.length>0">
-                  <hr>
-                  <p style="text-align:left; font-size:0.9em">
-                    {{`Keyword "${selectedWord}": models found `}}
-                  </p>
-                  <b-list-group class="scrollable-submenu" role="menu" style="width:100%">
-                    <b-list-group-item 
-                      v-for="modelid in searchResults.fromKeywords"
-                      v-bind:key="modelid"
-                      v-on:click="selectModelById(modelid)"
-                      style="font-size:0.7em; " 
-                    >
-                      {{ modelid}}
-                    </b-list-group-item>
-                  </b-list-group>
-                </div>
-
-                <div v-if="submittedSearch && searchResults.fromTags.length ===0 && searchResults.fromKeywords.length ===0">
+                <div v-if="submittedSearch && searchResults.fromKeywords.length ===0 && searchResults.fromKeywords.length ===0">
                   <hr>
                   <p style="font-size:0.9em">
                     {{`No model has been found `}}
@@ -137,6 +120,7 @@
             <div v-if="persoMode" id="modelPerso"  class="row" >
               <div  class="col-sm-12">
                 <p>
+                  You are editor or administrator of those models.
                   Select a model in the list: 
                 </p>
                 <b-list-group class="scrollable-menu" role="menu" style="width:100%">
@@ -420,7 +404,7 @@
         </div>
 
         <div>
-          <b-card sub-title="Tags" >
+          <b-card sub-title="Keywords" >
           <b-card-img 
                 src="images/tag2_inconfinder_128px.png" 
                 style="max-width: 50px" 
@@ -430,7 +414,7 @@
             
             <div  v-if="selectedModelId">
               <b-form-tags  class="modelInfoCardText text-capitalize" input-id="tags-basic" 
-                v-model="selectedModel.metaData.tags"
+                v-model="selectedModel.metaData.keywords"
                 disabled placeholder="">
               </b-form-tags>
             </div>
@@ -503,7 +487,6 @@ export default {
       selectedWord: "",
       submittedSearch:false,
       searchResults:{
-        fromTags: [],
         fromKeywords:[]
       },
       searchMode:true,
@@ -517,17 +500,10 @@ export default {
   },
 
   async mounted() {
-    
-    console.log("START mounted Catalog")
-
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
     this.modelTree = [await ModelServices.getModelsTree()]
-
-    console.log('this.modelTree: ')
-    console.log(this.modelTree)
-    console.log("END mounted Catalog")
   },
 
   computed:{
@@ -540,18 +516,21 @@ export default {
       this.searchMode =true;
       this.hierarchyMode =false;
       this.listMode=false;
+      this.persoMode=false;
     },
 
     activateHierarchyMode(){
       this.searchMode =false;
       this.hierarchyMode =true;
       this.listMode=false;
+      this.persoMode=false;
     },
 
     activateListMode(){
       this.searchMode =false;
       this.hierarchyMode =false;
       this.listMode=true;
+      this.persoMode=false;
     },
 
     activatePersoMode(){
@@ -615,9 +594,6 @@ export default {
         this.searchResults.fromKeywords=this.$store.state.keywordsObj[this.selectedWord];
       }
       
-      if(typeof this.$store.state.tagsObj[this.selectedWord]!=='undefined'){
-          this.searchResults.fromTags=this.$store.state.tagsObj[this.selectedWord]
-      }
       console.log("END submitSearch")
     },
 
@@ -674,7 +650,6 @@ export default {
   watch:{
     selectedWord(){
       this.submittedSearch=false ;
-      this.searchResults.fromTags =[]
       this.searchResults.fromKeywords =[]
 
     }

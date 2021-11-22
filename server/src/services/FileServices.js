@@ -84,7 +84,6 @@ class FileServices {
                     savedJsonModels.push(savedJsonModel)
                     
                     //save keywords
-                    await ModelServices.saveKeywords(jsonModel.metaData)
                     jsonModel.metaData.keywords.forEach (k => {
                         if(extractedKeywords.indexOf(k)===-1){
                             extractedKeywords.push(k)
