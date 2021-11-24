@@ -25,12 +25,6 @@ router.post('/uploadZip', async function(req, res, next) {
         return res.status(400).json({ error: err.message });
         }
 
-        // TODO parse fields
-        /*{
-            fileName: 'zip_test.zip',
-            packageName: 'zip_test',
-            uploaderMail: 'charles.moszkowicz@gmail.com'
-        }*/
         console.log(fields)
         console.log('files received')
         console.log(files)
@@ -49,20 +43,13 @@ router.post('/uploadZip', async function(req, res, next) {
                 const packagesPath = 'data/packages/'
                 const extractionMsg = await FileServices.extractZip(zippath,packagesPath)
                 console.log(extractionMsg)
-                //const newPackageNames =fs.readdirSync(packagesPath)
-                //console.log('newPackageNames')
-                //console.log(newPackageNames)
-
-                const [savedJsonModels,extractedKeywords] = await FileServices.computeExtractedData('data/packages/'+packageName,fields)
-
+                const extractedKeywords = await FileServices.computeExtractedData('data/packages/'+packageName,fields)
                 let tree = FileServices.getDirTree('data/packages/'+packageName)
                 tree.name = fields.packageName
-
                 const result = {
                     tree,
                     extractedKeywords
                 }
-                console.log('END post /upload');
                 res.send(result);
             } catch (error) {
                 console.log(error)

@@ -9,6 +9,7 @@
             "type": "node",
             "request": "launch",
             "args": ["${workspaceFolder}/src/index.js"],
+            "envFile": "${workspaceFolder}/../.env",
             "runtimeArgs": ["--nolazy", "-r"],
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",

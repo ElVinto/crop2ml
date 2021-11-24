@@ -44,7 +44,7 @@ services:
   #       ipv4_address: 172.28.4.2
 
   # server:
-  #   image: node:lts-alpine
+  #   image: node:14-alpine
   #   volumes:
   #     - ./server:/var/app
   #   ports:
@@ -60,7 +60,7 @@ services:
   #       ipv4_address: 172.27.4.2
 
   # client:
-  #   image: node:lts-alpine
+  #   image: node:14-alpine
   #   volumes:
   #     - ./client:/var/app
   #   ports:

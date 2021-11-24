@@ -54,12 +54,21 @@ class FileServices {
     static async computeExtractedData(dirPath, fields){
         return new Promise(async (resolve,reject)=>{
             try {
+                let currPath = dirPath
+                dirPath = dirPath + Date.now()
+                await fs.promises.rename(currPath, dirPath);
+                /*await fs.rename(currPath, dirPath, function(err) {
+                    if (err) {
+                      console.log(err)
+                    } else {
+                      console.log("Successfully renamed the directory.")
+                    }
+                  })*/
                 let crop2mlFolder = dirPath + '/crop2ml'
                 let picturesFolder = dirPath + '/doc/images'
-                let savedJsonModels =[]
                 let extractedKeywords =[]
                 let pictures = fs.readdirSync(picturesFolder)
-                let xmlFNames =fs.readdirSync(crop2mlFolder).filter(fName => fName.includes('.xml'))
+                let xmlFNames = fs.readdirSync(crop2mlFolder).filter(fName => fName.includes('.xml'))
                 let metaData = JSON.parse(fields.metaData)
                 let administrators = metaData.administratorsMails
                 administrators.push(metaData.uploaderMail)
@@ -80,8 +89,7 @@ class FileServices {
                     jsonModel["metaData"]={...metaData, dirPath, xmlFName, idProperty, idValue, keywords, pictures}
                     
                     //save model
-                    let savedJsonModel = await ModelServices.saveModel(jsonModel)
-                    savedJsonModels.push(savedJsonModel)
+                    await ModelServices.saveModel(jsonModel)
                     
                     //save keywords
                     jsonModel.metaData.keywords.forEach (k => {
@@ -107,7 +115,7 @@ class FileServices {
                         await UserServices.notifyContributor(contrib, metaData.packageName)
                 })
                 
-                resolve([savedJsonModels,extractedKeywords])
+                resolve(extractedKeywords)
                 
             } catch (error) {
                 reject(error)

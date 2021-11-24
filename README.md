@@ -7,29 +7,25 @@ docker
 docker-compose
 node 16
 docker-desktop if possible
-pgadmin if possible
 vscode if possible
 vscode firefox debugger and chrome debugger extensions
 
 ### Installation
-# Build and run db container
+# Init DB
+Build and run db container
 `docker-compose -f docker-compose.dev.yml up`
-# Create Mongo DB
 In new terminal
 `docker exec -it crop2ml_db_1 /bin/sh`
 `mongo -u "root" -p "password"`
 ##`CREATE DATABASE dbtest;`
 ##`\q`
 Ctrl+D to exit the bash
-# Init backend, create migration file and init DB
+# Init server
 In "server" folder
 Delete package-lock, node_modules if exist then
 `npm install`
-##`npm run typeorm:migration:generate -n init`
-##`npm run schema:sync`
-##`npm run seed:run`
-# Init frontend
-In "frontend" folder
+# Init client
+In "client" folder
 delete package-lock and node_modules if exist then
 `npm install`
 
@@ -52,6 +48,15 @@ Place breakpoint wherever you want in the code directly in vscode and see the br
 # Access app
 __backend__ : http://localhost:5000
 __frontend__ : http://localhost:8080
+
+
+##### PROD #####
+docker
+docker-compose
+
+
+
+
 
 
 collections :
