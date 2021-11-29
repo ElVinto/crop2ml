@@ -27,6 +27,24 @@ export default new Vuex.Store({
          return state.models;
       },
 
+      getModelByIdAndVersion: (state) => (treeNodeData, version) => {
+         let isUnitModel = false
+         let mainModel = null
+         let compoModel = null
+         let unitModel = null
+         if(treeNodeData.parent == null){
+            mainModel = state.models.get(treeNodeData.id)
+            compoModel = mainModel.versions.find(m => m.Attributs.version == version) //TODO : change
+         } else {
+            isUnitModel = true
+            mainModel = state.models.get(treeNodeData.parent)
+            compoModel = mainModel.versions.find(m => m.Attributs.version == version) //TODO : change
+            unitModel = compoModel.Composition.Model.find(m => m.Attributs.id == treeNodeData.id).ModelContent
+         }
+
+         return [isUnitModel, mainModel, compoModel, unitModel]
+      },
+
       getModelIds: (state) => {
          return state.models.keys();
       },
@@ -84,20 +102,18 @@ export default new Vuex.Store({
       },
 
       addModel: (state, model) => {
-         const idValue = model.metaData.idValue
-         state.models.set(idValue,model)
+         state.models.set(model.id,model)
 
-         for(let k of model.metaData.keywords){
+         for(let k of model.versions[0].metaData.keywords){
             if(!(Object.prototype.hasOwnProperty.call(state.keywordsObj,k))){
                state.keywordsObj[k]=[]
             }
-            state.keywordsObj[k].push(idValue)
+            state.keywordsObj[k].push(model.id)
          }
       },
 
       deleteModel: (state, model) => {
-         const modelid = model.metaData.idValue
-         state.models.delete(modelid)
+         state.models.delete(model.id)
       },
 
       setDataAreLoaded: (state, bool) =>{

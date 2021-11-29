@@ -54,9 +54,9 @@ class FileServices {
     static async computeExtractedData(dirPath, fields){
         return new Promise(async (resolve,reject)=>{
             try {
-                let currPath = dirPath
+                /*let currPath = dirPath
                 dirPath = dirPath + Date.now()
-                await fs.promises.rename(currPath, dirPath);
+                await fs.promises.rename(currPath, dirPath);*/
                 /*await fs.rename(currPath, dirPath, function(err) {
                     if (err) {
                       console.log(err)
@@ -66,57 +66,77 @@ class FileServices {
                   })*/
                 let crop2mlFolder = dirPath + '/crop2ml'
                 let picturesFolder = dirPath + '/doc/images'
-                let extractedKeywords =[]
                 let pictures = fs.readdirSync(picturesFolder)
-                let xmlFNames = fs.readdirSync(crop2mlFolder).filter(fName => fName.includes('.xml'))
+                let xmlFiles = fs.readdirSync(crop2mlFolder).filter(name => name.includes('.xml'))
+                let xmlComposition = xmlFiles.filter(name => name.startsWith("composition."))
+                let xmlUnits = xmlFiles.filter(name => name.startsWith("unit."))
                 let metaData = JSON.parse(fields.metaData)
-                let administrators = metaData.administratorsMails
-                administrators.push(metaData.uploaderMail)
-                let editors = metaData.editorsMails
-
-                // Compute each model
-                for(let xmlFName of xmlFNames ){
-                    let jsonModel = await this.xmlFile2jsonModel(crop2mlFolder+'/'+xmlFName)
-    
-                    let idProperty = typeof jsonModel.Attributs.modelid === 'undefined'? "id" : "modelid"
-                    let idValue =  typeof jsonModel.Attributs.modelid === 'undefined'? jsonModel.Attributs.id : jsonModel.Attributs.modelid
-    
-                    let keywords = []
-                    keywords = keywords.concat(jsonModel.Description.Authors.split(' ').filter(s => s.length))
-                    keywords = keywords.concat(jsonModel.Description.Institution.split(' ').filter(s => s.length && !keywords.includes(s) ))
-                    keywords = keywords.concat(idValue.split('.').filter(s => s.length>0  && !keywords.includes(s)))
-    
-                    jsonModel["metaData"]={...metaData, dirPath, xmlFName, idProperty, idValue, keywords, pictures}
+                let administratorsMails = metaData.administratorsMails
+                administratorsMails.push(metaData.uploaderMail)
+                let editorsMails = metaData.editorsMails
+                
+                // Compute composition model
+                if (xmlComposition.length == 0){
+                    resolve()
+                }
+                else {
+                    let modelCompo = await this.xmlFile2jsonModel(crop2mlFolder +'/'+ xmlComposition[0])
                     
-                    //save model
-                    await ModelServices.saveModel(jsonModel)
-                    
-                    //save keywords
-                    jsonModel.metaData.keywords.forEach (k => {
-                        if(extractedKeywords.indexOf(k)===-1){
-                            extractedKeywords.push(k)
+                    let model  = await ModelServices.getModelById(modelCompo.Attributs.id)
+                    if (model != null){
+                        let versionExists = model.versionsList.contains(modelCompo.Attributs.version)
+                        if (versionExists){
+                            resolve({modelAlreadyExists:true})
                         }
+                    } else {
+                        model = {
+                            id: modelCompo.Attributs.id,
+                            versionsList: [],
+                            versions: []
+                        }
+                    }
+
+                    // Compute and add unit models into modelCompo
+                    for(let xmlFile of xmlUnits ){
+                        let unitModel = await this.xmlFile2jsonModel(crop2mlFolder +'/'+ xmlFile)
+                        let index = modelCompo.Composition.Model.findIndex(m => m.Attributs.id == unitModel.Attributs.id)
+                        modelCompo.Composition.Model[index].ModelContent = unitModel
+                    }
+                    
+                    // Add keywords and others metaData to modelCompo
+                    let keywords = []
+                    keywords = keywords.concat(modelCompo.Description.Authors.split(' ').filter(s => s.length))
+                    keywords = keywords.concat(modelCompo.Description.Institution.split(' ').filter(s => s.length && !keywords.includes(s) ))
+                    keywords = keywords.concat(modelCompo.Attributs.id.split('.').filter(s => s.length>0  && !keywords.includes(s)))
+                    modelCompo["metaData"]={...metaData, dirPath, keywords, pictures} //TODO CMZ : check metaData
+
+                    // Add metaData and model compo to model
+                    model.versionsList.push(modelCompo.Attributs.version)
+                    model.versions.push(modelCompo)
+                    model={...model, administratorsMails, editorsMails, ...metaData.linkedCommunity, ...metaData.modelType, ...metaData.largerModelPackageNames}
+
+                    //save model
+                    //await ModelServices.saveModelCompo(modelCompo)
+                    await ModelServices.saveModel(model)
+
+                    //manage contributors
+                    for (let i in editorsMails) {
+                        await UserServices.addRole(editorsMails[i], model.id, "editor")
+                    }
+                    for (let i in administratorsMails) {
+                        await UserServices.addRole(administratorsMails[i], model.id, "administrator")
+                    }
+                    // Notif users by mail
+                    let contributors = administratorsMails.concat(editorsMails)
+                    contributors=[...new Set(contributors)] //to remove duplicates
+                    contributors.forEach (async(contrib) => {
+                        if (contrib != metaData.uploaderMail)
+                            await UserServices.notifyContributor(contrib, metaData.packageName)
                     })
                     
-                    //manage contributors
-                    for (let i in editors) {
-                        await UserServices.addRole(editors[i], idValue, "editor")
-                    }
-                    for (let i in administrators) {
-                        await UserServices.addRole(administrators[i], idValue, "administrator")
-                    }
+                    resolve(keywords) //TODO also resolve admin and editors to update after save (instead of before)
+                    
                 }
-
-                // Notif users by mail
-                let contributors = administrators.concat(editors)
-                contributors=[...new Set(contributors)] //to remove duplicates
-                contributors.forEach (async(contrib) => {
-                    if (contrib != metaData.uploaderMail)
-                        await UserServices.notifyContributor(contrib, metaData.packageName)
-                })
-                
-                resolve(extractedKeywords)
-                
             } catch (error) {
                 reject(error)
             }
@@ -128,17 +148,22 @@ class FileServices {
         
         return new Promise((resolve,reject)=>{
             try {
+
+                function setIdAttribute(name){
+                    if (name == "modelid")
+                        return "id"
+                    else
+                        return name
+                }
                 let fileData = fs.readFileSync(path.resolve(xmlFPath))
                 let parser = new xml2js.Parser({
                     attrkey: "Attributs",
                     explicitRoot: false,
-                    //rootName: 'Model',
                     explicitArray: false,
-                    //cdata: true,
+                    attrNameProcessors: [setIdAttribute]
                 });
                 parser.parseStringPromise(fileData).then(
                     result => {
-                        // console.log(xmlFPath)
                         resolve( result)
                     }
                 )

@@ -12,7 +12,6 @@
             <b-nav tabs fill>
               <b-nav-item @click="activateSearchMode()"  >Search</b-nav-item>
               <b-nav-item @click="activateHierarchyMode()" >Hierarchy</b-nav-item>
-              <b-nav-item @click="activateListMode()" >List</b-nav-item>
               <b-nav-item @click="activatePersoMode()" >Mine</b-nav-item>
 
               <!-- <b-button variant="outline-secondary" @click="activateSearchMode()"  >Search</b-button>
@@ -86,6 +85,7 @@
                     :data="modelTree"  
 
                     nodeKeyProp="id"
+                    nodeLabelProp="name"
                     nodeChildrenProp="children"
 
                     :renameNodeOnDblClick=false 
@@ -96,24 +96,6 @@
                   </div>
                 </div>
 
-              </div>
-            </div>
-
-            <div v-if="listMode" id="modelList"  class="row" >
-              <div  class="col-sm-12">
-                <p>
-                  Select a model in the list: 
-                </p>
-                <b-list-group class="scrollable-menu" role="menu" style="width:100%">
-                  <b-list-group-item 
-                    v-for="modelid in $store.getters.getAlphabeticListOfModels"
-                    v-bind:key="modelid"
-                    v-on:click="selectModelById(modelid)"
-                    style="font-size:0.75em" 
-                  >
-                    {{ modelid}}
-                  </b-list-group-item>
-                </b-list-group>
               </div>
             </div>
 
@@ -197,7 +179,9 @@
           <br>
 
           <model-preview :selectedModel="selectedModel"></model-preview>
+
           <br>
+
           <div id="ModelDetails">
             <b-tabs content-class="mt-3">
               
@@ -223,8 +207,8 @@
                 </b-table-simple>
               </b-tab>
 
-              <b-tab title="Algorithm">
-                <b-table-simple v-if="hasAlgorithm()" class="text-left" :responsive="true" :striped="true" :hover="true">
+              <b-tab title="Algorithm" v-if="exists(selectedModel.Algorithm)">
+                <b-table-simple class="text-left" :responsive="true" :striped="true" :hover="true">
                   <b-tbody>
                       <b-tr v-for="(v,k) in selectedModel.Algorithm.Attributs" v-bind:key="k">
                           <b-td style='font-weight:bold;'>{{ k }}</b-td>
@@ -234,19 +218,19 @@
                 </b-table-simple>
               </b-tab>
 
-              <b-tab title="Inputs">
+              <b-tab title="Inputs" v-if="exists(selectedModel.Inputs)">
                 <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
                   <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Inputs.Input)"></b-table>
                 </div>
               </b-tab>
 
-              <b-tab title="Outputs">
+              <b-tab title="Outputs" v-if="exists(selectedModel.Outputs)">
                 <div v-if="toArrayIfNeeded(selectedModel.Outputs.Output)">
                   <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Outputs.Output)"></b-table>
                 </div>
               </b-tab>
 
-              <b-tab title="Parameters">
+              <b-tab title="Parameters" v-if="exists(selectedModel.Parameters)">
                 <div v-if="toArrayIfNeeded(selectedModel.Parametersets.Parameterset)">
 
                   <b-card
@@ -275,7 +259,7 @@
                 </div>
               </b-tab>
 
-              <b-tab title="Tests">
+              <b-tab title="Tests" v-if="exists(selectedModel.Tests)">
                 <div v-if="toArrayIfNeeded(selectedModel.Testsets.Testset)">
 
                   <b-card
@@ -337,7 +321,7 @@
                 </div>
               </b-tab>
 
-              <b-tab title="Pictures">
+              <b-tab title="Pictures" v-if="exists(selectedModel.metaData) && exists(selectedModel.metaData.pictures)">
                 <b-card v-for="picture in selectedModel.metaData.pictures" :key="picture">
                   <b-card-img :src="getPicturePath(picture)"/>
                 </b-card>
@@ -365,7 +349,7 @@
                 top>
             </b-card-img>
             
-            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+            <b-card-text v-if="selectedModelId && !isUnitModel" class="modelInfoCardText">
                 {{selectedModel.metaData.uploaderMail}}
             </b-card-text>
             
@@ -382,7 +366,7 @@
                 top>
             </b-card-img>
 
-            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+            <b-card-text v-if="selectedModelId && !isUnitModel" class="modelInfoCardText">
                 {{selectedModel.Attributs.version}}
             </b-card-text>
 
@@ -412,7 +396,7 @@
                 top>
             </b-card-img>
             
-            <div  v-if="selectedModelId">
+            <div  v-if="selectedModelId && !isUnitModel">
               <b-form-tags  class="modelInfoCardText text-capitalize" input-id="tags-basic" 
                 v-model="selectedModel.metaData.keywords"
                 disabled placeholder="">
@@ -491,8 +475,12 @@ export default {
       },
       searchMode:true,
       hierarchyMode:false,
-      listMode:false,
       persoMode:false,
+
+      isUnitModel:false,
+      model:{},
+      compoModel:{},
+      unitModel:{}
     }
   },
 
@@ -503,7 +491,32 @@ export default {
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-    this.modelTree = [await ModelServices.getModelsTree()]
+    //this.modelTree = [await ModelServices.getModelsTree()]
+    let models = await ModelServices.getAllModels()
+
+    let mainChildrens = []
+
+    for(let m of models){
+      let modelCompo = m.versions[0] //TODO : be sure it's the latest version
+      let modelTree = {
+        id: modelCompo.Attributs.id,
+        name: modelCompo.Attributs.id,
+        parent: null,
+        children: []
+      }
+      let modelUnits = modelCompo.Composition.Model 
+      for (let mu of modelUnits){
+        modelTree.children.push({
+            id : mu.Attributs.id,
+            name : mu.Attributs.id.split('.').at(-1),
+            parent : modelCompo.Attributs.id
+          }
+        )
+      }
+      mainChildrens.push(modelTree)
+    }
+
+    this.modelTree = mainChildrens
   },
 
   computed:{
@@ -515,43 +528,34 @@ export default {
     activateSearchMode(){
       this.searchMode =true;
       this.hierarchyMode =false;
-      this.listMode=false;
       this.persoMode=false;
     },
 
     activateHierarchyMode(){
       this.searchMode =false;
       this.hierarchyMode =true;
-      this.listMode=false;
-      this.persoMode=false;
-    },
-
-    activateListMode(){
-      this.searchMode =false;
-      this.hierarchyMode =false;
-      this.listMode=true;
       this.persoMode=false;
     },
 
     activatePersoMode(){
       this.searchMode =false;
       this.hierarchyMode =false;
-      this.listMode=false;
       this.persoMode=true;
     },
 
     treeNodeSelect(event){
       if(event.selected){
-        if(event.data.name.indexOf('.xml')>0){
+        if(typeof event.data.id != 'undefined'){
           console.log(`event.data.name : ${event.data.name}`)
           console.log(`event.data.id : ${event.data.id}`)
+          console.log(`event.data.parent : ${event.data.parent}`)
+          /*if (event.data.parent == null){
+            this.isUnitModel = false
+          } else {
+            this.isUnitModel = true
+          }*/
+          this.selectModelById(event.data, "001")
         }
-        if(typeof event.data.idValue != 'undefined'){
-          console.log(`event.data.name : ${event.data.name}`)
-          console.log(`event.data.idValue : ${event.data.idValue}`)
-          this.selectModelById(event.data.idValue)
-        }
-        
       }
     },
 
@@ -559,8 +563,8 @@ export default {
       return `http://${config.server.host}:${config.server.port}/packages/` + this.selectedModel.metaData.packageName + '/doc/images/' + picture
     },
 
-    hasAlgorithm(){
-      return !(typeof this.selectedModel.Algorithm === "undefined")
+    exists(field){
+      return !(typeof field === 'undefined')
     },
 
     toArrayIfNeeded(obj){
@@ -632,9 +636,10 @@ export default {
       console.log("END deleteModel")
     },
 
-    selectModelById: function (modelid){
-      this.selectedModelId = modelid;
-      this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
+    selectModelById: function (treeNodeData, version){
+      this.selectedModelId = treeNodeData.id;
+      [this.isUnitModel, this.model, this.compoModel, this.unitModel] = this.$store.getters.getModelByIdAndVersion(treeNodeData, version)
+      this.selectedModel = this.isUnitModel ? this.unitModel : this.compoModel
     },
 
     showCurrentRating: function(rating) {

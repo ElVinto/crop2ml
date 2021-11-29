@@ -1,7 +1,7 @@
 <template>
   <div id ="modelPreview" v-if="$store.getters.getDataAreLoaded"  >
     <b-card 
-        :header="selectedModel.metaData.idValue"
+        :header="selectedModel.Attributs.id"
         header-bg-variant="secondary"
         header-text-variant="white"
         class="text-left"
