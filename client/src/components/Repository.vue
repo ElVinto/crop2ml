@@ -25,7 +25,7 @@
             <br>
 
             <b-form-checkbox v-model="showOnlyPersoModels" @change="submitSearch()" class="mr-n2">
-              Show only models I am editor or administrator.
+              Show only models which I am editor or administrator.
             </b-form-checkbox>
 
           </b-card-header>
@@ -113,7 +113,34 @@
 
           <br>
 
-          <model-preview :selectedModel="selectedModel"></model-preview>
+          <div>
+            <b-card 
+                :header="selectedModel.Attributs.id"
+                header-bg-variant="secondary"
+                header-text-variant="white"
+                class="text-left"
+            > 
+                <b-row no-gutters>
+                    <b-col lg="3" >
+                        <b-card-img src="images/modeling_iconfinder_128px.png" style="max-width:100px"   alt="Model Preview" ></b-card-img>
+                    </b-col>
+                    <b-col lg="9" class="text-left">
+                        <h4>  {{ selectedModel.Description.Title}}</h4>
+                        <p>
+                            {{ ` ${selectedModel.Description.Abstract}`}} <br>
+                            {{ `Institution: ${selectedModel.Description.Institution}`}}   <br>     
+                            {{ `Authors: ${selectedModel.Description.Authors}`}}
+                        </p>
+                    </b-col>
+                </b-row>
+                <b-row no-gutters v-if="isAdmin()">
+                  <div class="col-md-4">
+                      <b-button variant="danger" v-on:click="deleteModel()">Delete model</b-button>
+                  </div >
+                  
+                </b-row>
+            </b-card>
+          </div>
 
           <br>
 
@@ -280,13 +307,13 @@
         <div>
           <b-card sub-title="Uploader" >
             <b-card-img 
-                src="images/user_icon.png" 
-                style="max-width:50px" 
-                alt="User"
-                top>
+              src="images/user_icon.png" 
+              style="max-width:50px" 
+              alt="User"
+              top>
             </b-card-img>
             <b-card-text v-if="selectedModelId" class="modelInfoCardText">
-                {{compoModel.metaData.uploaderMail}}
+              {{compoModel.metaData.uploaderMail}}
             </b-card-text>
           </b-card>
         </div>
@@ -300,7 +327,8 @@
                 top>
             </b-card-img>
             <b-card-text v-if="selectedModelId" class="modelInfoCardText">
-                {{compoModel.Attributs.version}}
+              <b-form-select v-model="selectedVersion" :options="this.model.versionsList">
+              </b-form-select>
             </b-card-text>
           </b-card>
         </div>
@@ -359,8 +387,6 @@ import { bTreeView } from 'bootstrap-vue-treeview'
 // import StarRating from 'vue-star-rating'
 
 import ModelServices from "../services/ModelServices"
-
-import ModelPreview from './ModelPreview'
 import config from '../config'
 
 
@@ -369,8 +395,7 @@ export default {
 
   components: {
     // StarRating,
-    bTreeView,
-    ModelPreview,
+    bTreeView
   },
 
   data() {
@@ -388,7 +413,9 @@ export default {
       model:{},
       compoModel:{},
       unitModel:{},
-      showOnlyPersoModels: false
+      showOnlyPersoModels: false,
+      selectedVersion: null,
+      selectedTreeNode: null
     }
   },
 
@@ -399,8 +426,6 @@ export default {
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-
-    
     await this.updateModelTree()
   },
 
@@ -408,6 +433,12 @@ export default {
   },
 
   methods: {
+
+    isAdmin(){
+      return (!this.isUnitModel &&
+      this.$store.getters.getLoggedUserEMail != null &&
+      this.model.administratorsMails.includes(this.$store.getters.getLoggedUserEMail))
+    },
 
     async updateModelTree(searchKeywords = []){
       let models = await ModelServices.getAllModels()
@@ -453,7 +484,9 @@ export default {
     treeNodeSelect(event){
       if(event.selected){
         if(typeof event.data.id != 'undefined'){
-          this.selectModelById(event.data, "001") // TODO : pass version
+          this.selectedVersion = null
+          this.selectedTreeNode = event.data
+          this.selectModelById()
         }
       }
     },
@@ -523,23 +556,26 @@ export default {
       console.log("END deleteModel")
     },
 
-    selectModelById: function (treeNodeData, version){
-      this.selectedModelId = treeNodeData.id;
-      [this.isUnitModel, this.model, this.compoModel, this.unitModel] = this.$store.getters.getModelByIdAndVersion(treeNodeData, version)
+    selectModelById(){
+      this.selectedModelId = this.selectedTreeNode.id;
+      [this.isUnitModel, this.model, this.compoModel, this.unitModel, this.selectedVersion] = this.$store.getters.getModelByIdAndVersion(this.selectedTreeNode, this.selectedVersion)
       this.selectedModel = this.isUnitModel ? this.unitModel : this.compoModel
     },
 
-    showCurrentRating: function(rating) {
+    showCurrentRating(rating) {
       this.currentRating = (rating === 0) ? this.currentSelectedRating : "Click to select " + rating + " stars"
     },
     
-    setCurrentSelectedRating: function(rating) {
+    setCurrentSelectedRating(rating) {
       this.currentSelectedRating = "You have Selected: " + rating + " stars";
     }
     
   },
 
   watch:{
+    selectedVersion: function(){
+      this.selectModelById()
+    }
   },
 
 }

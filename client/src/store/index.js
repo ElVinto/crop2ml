@@ -34,15 +34,21 @@ export default new Vuex.Store({
          let unitModel = null
          if(treeNodeData.parent == null){
             mainModel = state.models.get(treeNodeData.id)
-            compoModel = mainModel.versions.find(m => m.Attributs.version == version) //TODO : change
+            if (version == null) {
+               version = mainModel.versionsList.sort()[mainModel.versionsList.length -1]
+            }
+            compoModel = mainModel.versions.find(m => m.Attributs.version == version)
          } else {
             isUnitModel = true
             mainModel = state.models.get(treeNodeData.parent)
-            compoModel = mainModel.versions.find(m => m.Attributs.version == version) //TODO : change
+            if (version == null) {
+               version = mainModel.versionsList.sort()[mainModel.versionsList.length -1]
+            }
+            compoModel = mainModel.versions.find(m => m.Attributs.version == version)
             unitModel = compoModel.Composition.Model.find(m => m.Attributs.id == treeNodeData.id).ModelContent
          }
 
-         return [isUnitModel, mainModel, compoModel, unitModel]
+         return [isUnitModel, mainModel, compoModel, unitModel, version]
       },
 
       getModelIds: (state) => {
