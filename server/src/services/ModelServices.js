@@ -116,7 +116,7 @@ class ModelServices{
     static async getModelById (modelid){
         return new Promise(async (resolve, reject) => {
             try{
-                var result = await Model.findOne({'Attributs.id': modelid },{'_id':0, '__v':0})
+                var result = await Model.findOne({'id': modelid },{'_id':0, '__v':0})
                 resolve(result)
             }catch (err) { 
                 reject(err); 

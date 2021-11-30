@@ -8,7 +8,7 @@
 
         <b-card id ="modelsCard">
 
-          <b-card-header header-tag="nav">
+          <b-card-header>
             <b-input-group id="Search"  >
               <b-form-input placeholder="keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
               <datalist id="wordOptionDataList">
@@ -336,7 +336,7 @@
           </b-card>
         </div>
 
-        <div>
+        <!--div>
           <b-card sub-title="Favourite by" >
           <b-card-img 
                 src="images/favourite_iconfinder_128px.png" 
@@ -345,7 +345,7 @@
                 top>
             </b-card-img>
           </b-card>          
-        </div>
+        </div-->
         
       </div>
 
@@ -375,34 +375,15 @@ export default {
 
   data() {
     return {
-      file:'',
-      fileName:'',
-      packageZip:{},
-      packageName: '',
       errorMsg : "",
       selectedModelId: null,
       selectedModel:{},
-      modelUnitSchema :{},
-      expandedModelDetails: false,
-      expandedModelAttributs :false,
-      expandedDescription :false,
-      expandedAlgorithm :false,
-      expandedModelInputs :false,
-      expandedModelOutputs :false,
-      expandedModelParametersets: false,
-      expandedModelTestsets :false,
+
       currentRating: "No Rating",
       currentSelectedRating: "No Current Rating",
+      
       modelTree: null,
       selectedWord: "",
-      submittedSearch:false,
-      searchResults:{
-        fromKeywords:[]
-      },
-      searchMode:true,
-      hierarchyMode:false,
-      persoMode:false,
-
       isUnitModel:false,
       model:{},
       compoModel:{},
@@ -559,20 +540,15 @@ export default {
   },
 
   watch:{
-    selectedWord(){
-      this.submittedSearch=false ;
-      this.searchResults.fromKeywords =[]
-
-    }
   },
 
 }
 </script>
 
 <style>
-.tree-node-children .tree-node-label span:before {
+/*.tree-node-children .tree-node-label span:before {
   content: ".";
-}
+}*/
 .tree-node-children .tree-node-label span {
   font-size: small;
 }

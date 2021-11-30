@@ -29,26 +29,40 @@ router.post('/uploadZip', async function(req, res, next) {
         console.log('files received')
         console.log(files)
 
-        const [firstFileName] = Object.keys(files);
-        const firstFile = files[firstFileName]
-        const oldpath = path.resolve(firstFile.path);
-        const zippath = path.resolve('data/zip/' + firstFileName);
+        const [fileName] = Object.keys(files);
+        const file = files[fileName]
+        const oldpath = path.resolve(file.path);
+        const tempDir = 'data/temp/' + Date.now()
+        const tempZipDir = path.resolve(path.join(tempDir,'zip'));
+        const tempZipPath = path.resolve(path.join(tempZipDir, fileName));
+        const tempUnzippedDir = path.resolve(path.join(tempDir,'unzipped'));
+        if (!fs.existsSync(tempZipDir)){
+            fs.mkdirSync(tempZipDir, { recursive: true });
+        }
+        if (!fs.existsSync(tempUnzippedDir)){
+            fs.mkdirSync(tempUnzippedDir, { recursive: true });
+        }
 
-        await mv(oldpath, zippath, async function(err) {  
+        await mv(oldpath, tempZipPath, async function(err) {
             if (err)
                 throw err;
 
             try {
-                const packageName =  firstFileName.replace('.zip','')
+                let packageName =  fileName.replace('.zip','')
                 const packagesPath = 'data/packages/'
-                const extractionMsg = await FileServices.extractZip(zippath,packagesPath)
+                const extractionMsg = await FileServices.extractZip(tempZipPath, tempUnzippedDir)
                 console.log(extractionMsg)
-                const extractedKeywords = await FileServices.computeExtractedData('data/packages/'+packageName,fields)
-                let tree = FileServices.getDirTree('data/packages/'+packageName)
-                tree.name = fields.packageName
+                let extractedKeywords
+                [modelAlreadyExists, packageName, extractedKeywords] = await FileServices.computeExtractedData(tempDir, fileName, fields)
+                let tree = null
+                if (!modelAlreadyExists) {
+                    tree = FileServices.getDirTree(path.join(packagesPath, packageName))
+                    tree.name = packageName
+                }
                 const result = {
                     tree,
-                    extractedKeywords
+                    extractedKeywords,
+                    modelAlreadyExists
                 }
                 res.send(result);
             } catch (error) {

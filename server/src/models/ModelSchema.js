@@ -263,11 +263,9 @@ const CompositionModelSchema = new Schema(
         Composition: {type: CompositionSchema, required: false},
         Description: {type: DescriptionSchema, required:[true,'a model description is required ']},
         metaData : {
-            dirPath: {type: String, required: false},
             keywords: {type: [String], required: false},
-            zipFileName: {type: String, required: false},
-            //xmlFName: { type:String, required: false},
-            //packageName: {type: String, required: false},
+            packageName: {type: String, required: false},
+            zipName: {type: String, required: false},
             uploaderMail: {type: String, required: false},
             pictures: {type: [String], required: false},
         }

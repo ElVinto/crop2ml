@@ -6,7 +6,7 @@
         Please <a href="#/SignIn">sign-in</a>  or <a href="#/register"> register </a> before uploading a model
     </div>
 
-    <div v-else  id="packageZip" class="row" >
+    <div v-else class="row" >
       <div class="col-sm-2"></div>
       <div class="col-sm-8">
 
@@ -28,7 +28,6 @@
           -->
         </b-input-group>
 
-        
         <div class="mt-3">
           {{ uploadMsg  }}
         </div>
@@ -38,7 +37,7 @@
           <div >
 
             <!-- Choose Model Package Name-->
-            <b-input-group prepend="Model Package Name">
+            <!--b-input-group prepend="Model Package Name">
               <b-form-input
                 :placeholder="packageName"
                 v-model="packageName"
@@ -48,7 +47,7 @@
             
             <p style="color:red" v-if="!packageNameIsValid">
               {{ packageNameMsg }}
-            </p>
+            </p-->
 
             <!-- Add Model Type -->
             <b-input-group prepend="Type of model" style="padding-top: 1em; ">
@@ -158,7 +157,7 @@
 
           </div>
 
-          <div style="padding-top: 1em;" v-if="packageNameIsValid">
+          <div style="padding-top: 1em;" v-if="packageZip">
             <b-button variant="secondary"  v-on:click="submitZip()">Submit model</b-button>
           </div>
 
@@ -176,8 +175,7 @@
           </p>
         </div>
 
-        <div v-if="treeDataReceived">
-
+        <div v-if="!modelAlreadyExists && treeDataReceived">
           <b-input-group style="padding-top: 1em; " prepend="Extracted keywords">
               <b-form-tags
                 v-model="keywords"
@@ -191,8 +189,12 @@
             Extracted package structure:
             <b-tree-view v-on:nodeSelect="treeNodeSelect" :data="treeDataReceived"  :renameNodeOnDblClick=false :contextMenu=false :contextMenuItems=[] ></b-tree-view>
           </p>
-          
+        </div>
 
+        <div v-if="modelAlreadyExists">
+          <p style="padding-top:1em;">
+            <b>This version of this model already exists. Or you are not an administrator of this model and can not update it.</b>
+          </p>
         </div>
 
       </div>
@@ -218,9 +220,9 @@ export default {
         reg: /^(([^<>()\\[\]\\.,;:\s@"]+(\.[^<>()\\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
         packageZip: null,
         packageZipSent : false,
-        packageName:'',
-        PackageNameIsValid:false,
-        PackageNameMsg:'',
+        //packageName:'',
+        //PackageNameIsValid:false,
+        //PackageNameMsg:'',
         keywords:[],
         submitted: false,
         treeDataReceived :null,
@@ -240,6 +242,7 @@ export default {
         //selectedAdministrator: null,
         editors:[],
         //selectedEditor: null,
+        modelAlreadyExists: false
       }
     },
 
@@ -252,9 +255,6 @@ export default {
       }
       if(!this.packageZip && this.packageZipSent){
         msg= 'Model package sent successfully'
-      }
-      if(this.packageZip){
-        // return 'Selected package: '+this.packageZip.name
       }
       return msg;
     }
@@ -307,11 +307,11 @@ export default {
       // let formData = new FormData();
       // formData.append('file', this.file);
 
-      this.packageZip.packageName = this.packageName
+      //this.packageZip.packageName = this.packageName
 
       const modelMetaDataPart ={
-        zipFileName: this.packageZip.name,
-        packageName: this.packageName,
+        //zipFileName: this.packageZip.name,
+        //packageName: this.packageName,
         modelType : this.modelTypeSelected,
         largerModelPackageNames: this.largerModelPackageNames,
         linkedCommunity: this.linkedCommunity,
@@ -322,6 +322,7 @@ export default {
 
       this.submitted =true;
       const res =  await FileServices.sendZip(this.packageZip,modelMetaDataPart)
+      this.modelAlreadyExists = res.modelAlreadyExists
       this.treeDataReceived = [res.tree]
       this.keywords = res.extractedKeywords
 
@@ -347,13 +348,12 @@ export default {
 
     packageZip: function(){
       if(this.packageZip){
-        this.packageName = this.packageZip.name.replace('.zip','')
+        //this.packageName = this.packageZip.name.replace('.zip','')
         return this.packageZipSent=false;
-
       }
     },
 
-    packageName: function(){
+    /*packageName: function(){
       
         if(this.packageName.indexOf(' ')!==-1 || !this.packageName ){
           this.packageNameIsValid =false
@@ -363,7 +363,7 @@ export default {
           this.packageNameMsg =''
         }
       
-    }
+    }*/
 
   }
 
