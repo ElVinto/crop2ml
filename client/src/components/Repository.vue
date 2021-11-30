@@ -6,88 +6,43 @@
       
       <div id="models" class="col-lg-3" >
 
-        <b-card >
+        <b-card id ="modelsCard">
 
           <b-card-header header-tag="nav">
-            <b-nav tabs fill>
-              <b-nav-item @click="activateSearchMode()"  >Search</b-nav-item>
-              <b-nav-item @click="activateHierarchyMode()" >Hierarchy</b-nav-item>
-              <b-nav-item @click="activatePersoMode()" >Mine</b-nav-item>
+            <b-input-group id="Search"  >
+              <b-form-input placeholder="keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
+              <datalist id="wordOptionDataList">
+                <option  
+                  v-for="wordOption in $store.getters.getWordOptions"
+                  v-bind:key="wordOption"
+                  >
+                  {{wordOption}}
+                </option>
+              </datalist> 
+              <b-button size="sm" class="my-2 my-sm-0" v-on:click="submitSearch()" type="submit">Filter</b-button>
+            </b-input-group>
 
-              <!-- <b-button variant="outline-secondary" @click="activateSearchMode()"  >Search</b-button>
-              <b-button variant="outline-secondary" @click="activateHierarchyMode()"  >Hierarchy</b-button>
-              <b-button variant="outline-secondary" @click="activateListMode()"  >List</b-button> -->
-              
-            </b-nav>
+            <br>
+
+            <b-form-checkbox v-model="showOnlyPersoModels" @change="submitSearch()" class="mr-n2">
+              Show only models I am editor or administrator.
+            </b-form-checkbox>
+
           </b-card-header>
           
           <b-card-body >
 
-            <div v-if="searchMode" id="modelSearch" class="row">
+            <div id="modelTreeView"  class="row" >
               <div  class="col-sm-12">
-                <p>
-                    Find a model by keywords
-                </p>
-
-                <b-input-group id="Search"  >
-                  <b-form-input placeholder="keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
-                  
-                  <datalist id="wordOptionDataList">
-                    <option  
-                      v-for="wordOption in $store.getters.getWordOptions"
-                      v-bind:key="wordOption"
-                      >
-                      {{wordOption}}
-                    </option>
-                  </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="submitSearch()" type="submit">Search</b-button>
-                </b-input-group>
-
-                <div v-if="selectedWord.length>0 && searchResults.fromKeywords !== null && searchResults.fromKeywords.length>0">
-                  <hr>
-                  <p style="text-align:left; ">
-                    {{`Keyword "${selectedWord}": models founds`}}
-                  </p>
-                  <b-list-group class="scrollable-submenu" role="menu" style="width:100%">
-                    <b-list-group-item 
-                      v-for="modelid in searchResults.fromKeywords"
-                      v-bind:key="modelid"
-                      v-on:click="selectModelById(modelid)"
-                      style="font-size:0.7em" 
-                    >
-                      {{ modelid}}
-                    </b-list-group-item>
-                  </b-list-group>
-                </div>
-
-                <div v-if="submittedSearch && searchResults.fromKeywords.length ===0 && searchResults.fromKeywords.length ===0">
-                  <hr>
-                  <p style="font-size:0.9em">
-                    {{`No model has been found `}}
-                  </p>
-                </div>
-
-              </div>
-            </div>
-
-            <div v-if="hierarchyMode" id="modelTreeView"  class="row" >
-              <div  class="col-sm-12">
-                <p>
-                    Select a model in the hierarchy 
-                </p>
                 
                 <div v-if="modelTree">
-                  
                   <div id="packages">
                   <b-tree-view 
                     v-on:nodeSelect="treeNodeSelect" 
                     :data="modelTree"  
-
                     nodeKeyProp="id"
                     nodeLabelProp="name"
                     nodeChildrenProp="children"
-
                     :renameNodeOnDblClick=false 
                     :contextMenu=false 
                     :contextMenuItems=[] 
@@ -96,26 +51,6 @@
                   </div>
                 </div>
 
-              </div>
-            </div>
-
-            <div v-if="persoMode" id="modelPerso"  class="row" >
-              <div  class="col-sm-12">
-                <p>
-                  You are editor or administrator of those models.
-                  Select a model in the list: 
-                </p>
-                <b-list-group class="scrollable-menu" role="menu" style="width:100%">
-                  <b-list-group-item 
-                    v-for="model in $store.getters.getListOfPersonalModels"
-                    v-bind:key="model"
-                    v-on:click="selectModelById(model.modelId)"
-                    style="font-size:0.75em" 
-                  >
-                    {{ model.modelId}}<br>
-                    <!--b-badge color="primary">{{ model.role}}</b-badge-->
-                  </b-list-group-item>
-                </b-list-group>
               </div>
             </div>
           
@@ -207,7 +142,7 @@
                 </b-table-simple>
               </b-tab>
 
-              <b-tab title="Algorithm" v-if="exists(selectedModel.Algorithm)">
+              <!--b-tab title="Algorithm" v-if="exists(selectedModel.Algorithm)">
                 <b-table-simple class="text-left" :responsive="true" :striped="true" :hover="true">
                   <b-tbody>
                       <b-tr v-for="(v,k) in selectedModel.Algorithm.Attributs" v-bind:key="k">
@@ -216,7 +151,7 @@
                       </b-tr>
                   </b-tbody>
                 </b-table-simple>
-              </b-tab>
+              </b-tab-->
 
               <b-tab title="Inputs" v-if="exists(selectedModel.Inputs)">
                 <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
@@ -332,32 +267,31 @@
         </div>
 
         <div v-else>
-            Select a model to view its description
+          <br>
+          <b>Select a model on the left to view its description</b>
         </div>
           
       </div>
+
+
 
       <div id="modelInfo" class="col-lg-2" >
         
         <div>
           <b-card sub-title="Uploader" >
-            
             <b-card-img 
                 src="images/user_icon.png" 
                 style="max-width:50px" 
                 alt="User"
                 top>
             </b-card-img>
-            
-            <b-card-text v-if="selectedModelId && !isUnitModel" class="modelInfoCardText">
-                {{selectedModel.metaData.uploaderMail}}
+            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+                {{compoModel.metaData.uploaderMail}}
             </b-card-text>
-            
           </b-card>
         </div>
 
         <div>
-          
           <b-card sub-title="Version" >
             <b-card-img 
                 src="images/version_iconfinder_128px.png" 
@@ -365,13 +299,10 @@
                 alt="Users"
                 top>
             </b-card-img>
-
-            <b-card-text v-if="selectedModelId && !isUnitModel" class="modelInfoCardText">
-                {{selectedModel.Attributs.version}}
+            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+                {{compoModel.Attributs.version}}
             </b-card-text>
-
           </b-card>
-
         </div>
 
         <div>
@@ -382,32 +313,30 @@
                 alt="Users"
                 top>
             </b-card-img>
-
+            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+                {{model.linkedCommunity}}
+            </b-card-text>
           </b-card>
-
         </div>
 
         <div>
           <b-card sub-title="Keywords" >
-          <b-card-img 
+            <b-card-img 
                 src="images/tag2_inconfinder_128px.png" 
                 style="max-width: 50px" 
                 alt="Users"
                 top>
             </b-card-img>
-            
-            <div  v-if="selectedModelId && !isUnitModel">
-              <b-form-tags  class="modelInfoCardText text-capitalize" input-id="tags-basic" 
-                v-model="selectedModel.metaData.keywords"
+            <div  v-if="selectedModelId">
+              <b-form-tags class="modelInfoCardText text-capitalize" input-id="tags-basic" 
+                v-model="compoModel.metaData.keywords"
                 disabled placeholder="">
               </b-form-tags>
             </div>
-            
-
           </b-card>
         </div>
 
-         <div>
+        <div>
           <b-card sub-title="Favourite by" >
           <b-card-img 
                 src="images/favourite_iconfinder_128px.png" 
@@ -418,12 +347,9 @@
           </b-card>          
         </div>
         
-
-      
-      
       </div>
 
-  </div>
+    </div>
   </div>
   
 </template>
@@ -480,7 +406,8 @@ export default {
       isUnitModel:false,
       model:{},
       compoModel:{},
-      unitModel:{}
+      unitModel:{},
+      showOnlyPersoModels: false
     }
   },
 
@@ -491,70 +418,61 @@ export default {
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-    //this.modelTree = [await ModelServices.getModelsTree()]
-    let models = await ModelServices.getAllModels()
 
-    let mainChildrens = []
-
-    for(let m of models){
-      let modelCompo = m.versions[0] //TODO : be sure it's the latest version
-      let modelTree = {
-        id: modelCompo.Attributs.id,
-        name: modelCompo.Attributs.id,
-        parent: null,
-        children: []
-      }
-      let modelUnits = modelCompo.Composition.Model 
-      for (let mu of modelUnits){
-        modelTree.children.push({
-            id : mu.Attributs.id,
-            name : mu.Attributs.id.split('.').at(-1),
-            parent : modelCompo.Attributs.id
-          }
-        )
-      }
-      mainChildrens.push(modelTree)
-    }
-
-    this.modelTree = mainChildrens
+    
+    await this.updateModelTree()
   },
 
   computed:{
   },
 
-
   methods: {
 
-    activateSearchMode(){
-      this.searchMode =true;
-      this.hierarchyMode =false;
-      this.persoMode=false;
-    },
-
-    activateHierarchyMode(){
-      this.searchMode =false;
-      this.hierarchyMode =true;
-      this.persoMode=false;
-    },
-
-    activatePersoMode(){
-      this.searchMode =false;
-      this.hierarchyMode =false;
-      this.persoMode=true;
+    async updateModelTree(searchKeywords = []){
+      let models = await ModelServices.getAllModels()
+      let mainChildrens = []
+      let email = this.$store.getters.getLoggedUserEMail
+      let checkEmail = false
+      if (this.showOnlyPersoModels && email != null){
+        checkEmail = true
+      }
+      
+      for(let m of models){
+        if (checkEmail && !m.administratorsMails.includes(email) && !m.editorsMails.includes(email)){
+          continue
+        } else {
+          let modelCompo = m.versions[0] //TODO : be sure it's the latest version
+          let addModel = true
+          if (searchKeywords.length > 0){
+            addModel = modelCompo.metaData.keywords.some(keyword => searchKeywords.includes(keyword))
+          }
+          if (addModel) {
+            let compoModelTree = {
+              id: modelCompo.Attributs.id,
+              name: modelCompo.Attributs.id,
+              parent: null,
+              children: []
+            }
+            let modelUnits = modelCompo.Composition.Model 
+            for (let mu of modelUnits){
+              compoModelTree.children.push({
+                  id : mu.Attributs.id,
+                  name : mu.Attributs.id.split('.').at(-1),
+                  parent : modelCompo.Attributs.id
+                }
+              )
+            }
+            mainChildrens.push(compoModelTree)
+          }
+        }
+      }
+      this.modelTree = mainChildrens
     },
 
     treeNodeSelect(event){
       if(event.selected){
         if(typeof event.data.id != 'undefined'){
-          console.log(`event.data.name : ${event.data.name}`)
-          console.log(`event.data.id : ${event.data.id}`)
-          console.log(`event.data.parent : ${event.data.parent}`)
-          /*if (event.data.parent == null){
-            this.isUnitModel = false
-          } else {
-            this.isUnitModel = true
-          }*/
-          this.selectModelById(event.data, "001")
+          this.selectModelById(event.data, "001") // TODO : pass version
         }
       }
     },
@@ -584,31 +502,19 @@ export default {
       return items;
     },
 
-    
     async submitSearch(){
-      console.log("START submitSearch")
-      console.log(this.selectedWord)
-
-      this.submittedSearch=true ;
-
-      // TODO reuse for more complex search with or condition
-      // const modelIdValues =  await ModelServices.findJsonModelsBySearchWords([this.selectedWord]);
-      
-      if(typeof this.$store.state.keywordsObj[this.selectedWord] !=='undefined'){
-        this.searchResults.fromKeywords=this.$store.state.keywordsObj[this.selectedWord];
-      }
-      
-      console.log("END submitSearch")
+      if (this.selectedWord != "")
+        await this.updateModelTree([this.selectedWord])
+      else
+        await this.updateModelTree()
     },
 
     async saveModel(){
-      console.log("START saveModel")
       this.errorMsg =""
       const res =  await this.$store.dispatch('saveModel',this.selectedModel);
       if(res.Model === undefined){
         this.errorMsg = res;
       }
-      console.log("END saveModel")
     },
 
     async reInitModel(){
@@ -663,6 +569,15 @@ export default {
 }
 </script>
 
+<style>
+.tree-node-children .tree-node-label span:before {
+  content: ".";
+}
+.tree-node-children .tree-node-label span {
+  font-size: small;
+}
+</style>
+
 <style scoped>
 
 #repository{
@@ -682,10 +597,6 @@ p{
   outline-color: black;
 }
 
-#modelSearch{
-
-}
-
 #myDisabledInput{
   width: 100%;
   background: seashell;
@@ -693,10 +604,9 @@ p{
   text-align: center;
 }
 
-#packages{
-  padding: 20px;
-  max-height: 50vh;
+#modelsCard{
   overflow:scroll;
+  height: 100%;
 }
 
 .dropdown-menu {

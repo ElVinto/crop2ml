@@ -54,7 +54,10 @@ export default new Vuex.Store({
       },
 
       getLoggedUserEMail:(state) =>{
-         return state.loggedUserInfo.email
+         if (state.loggedUserInfo == null)
+            return null
+         else
+            return state.loggedUserInfo.email
       },
       
       getLoggedUserInfo:(state) =>{

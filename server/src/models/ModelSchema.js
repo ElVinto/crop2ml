@@ -203,7 +203,7 @@ const UnitModelSchema = new Schema(
             name: {type: String, required:[true,'a model name is required']},
             id: { type:String, required:[false,'a modelid is required']},
             timestep: { type:String, required:[false,'a model timestep is required']},
-            version:{String, required:[false,'a model version is required']}
+            version:{ type:String, required:[false,'a model version is required']}
         },
         Description: {type: DescriptionSchema, required:[true,'a model description is required ']},
         Inputs: {
