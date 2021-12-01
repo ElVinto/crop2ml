@@ -188,17 +188,23 @@
 
               <b-tab title="Inputs" v-if="exists(selectedModel.Inputs)">
                 <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
-                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Inputs.Input)"></b-table>
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="setInputs(selectedModel.Inputs.Input)"></b-table>
                 </div>
               </b-tab>
 
               <b-tab title="Outputs" v-if="exists(selectedModel.Outputs)">
                 <div v-if="toArrayIfNeeded(selectedModel.Outputs.Output)">
-                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Outputs.Output)"></b-table>
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="setOutputs(selectedModel.Outputs.Output)"></b-table>
                 </div>
               </b-tab>
 
-              <b-tab title="Parameters" v-if="exists(selectedModel.Parameters)">
+              <b-tab title="Parameters" v-if="exists(selectedModel.Inputs)">
+                <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="setParameters(selectedModel.Inputs.Input)"></b-table>
+                </div>
+              </b-tab>
+
+              <!--b-tab title="Parametersets" v-if="exists(selectedModel.Parametersets)">
                 <div v-if="toArrayIfNeeded(selectedModel.Parametersets.Parameterset)">
 
                   <b-card
@@ -225,9 +231,9 @@
                   </b-card>
 
                 </div>
-              </b-tab>
+              </b-tab-->
 
-              <b-tab title="Tests" v-if="exists(selectedModel.Tests)">
+              <!--b-tab title="Testsets" v-if="exists(selectedModel.Testsets)">
                 <div v-if="toArrayIfNeeded(selectedModel.Testsets.Testset)">
 
                   <b-card
@@ -287,7 +293,7 @@
                   </b-card>
 
                 </div>
-              </b-tab>
+              </b-tab-->
 
               <b-tab title="Pictures" v-if="exists(selectedModel.metaData) && exists(selectedModel.metaData.pictures)">
                 <b-card v-for="picture in selectedModel.metaData.pictures" :key="picture">
@@ -513,7 +519,31 @@ export default {
       }
     },
 
-    toItems(input_or_output){
+    setInputs(input_or_output){
+      let array_of_obj = this.toArrayIfNeeded(input_or_output);
+      let items = [];
+      for(let obj of array_of_obj){
+        if(obj.Attributs.inputtype == "variable"){
+          delete obj.Attributs.inputtype
+          items.push(obj.Attributs)
+        }
+      }
+      return items;
+    },
+
+    setParameters(input_or_output){
+      let array_of_obj = this.toArrayIfNeeded(input_or_output);
+      let items = [];
+      for(let obj of array_of_obj){
+        if(obj.Attributs.inputtype == "parameter"){
+          delete obj.Attributs.inputtype
+          items.push(obj.Attributs)
+        }
+      }
+      return items;
+    },
+
+    setOutputs(input_or_output){
       let array_of_obj = this.toArrayIfNeeded(input_or_output);
       let items = [];
       for(let obj of array_of_obj){
