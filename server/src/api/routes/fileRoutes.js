@@ -8,12 +8,24 @@ var fs = require('fs');
 
 FileServices = require('../../services/FileServices.js');
 
-router.get('/data',async function(req,res,next){
+/*router.get('/data', async function(req,res,next){
     // const foldername = req.query.folder;
     var filePath = path.resolve(req.body.serverFilePath);
     res = await FileServices.zipDirectory('./server/data/xml','./server/data/zipped/xml.zip')
     console.log(res)
+})*/
+
+//OK
+router.get('/downloadZip', async function(req,res,next){
+    var filePath = path.resolve(path.join('data','zip',req.query.zipName))
+    res.download(filePath);
 })
+
+/*
+router.post('/downloadFile',async function(req,res,next){
+    var filePath = path.resolve(req.body.serverFilePath);
+    res.sendFile(filePath)
+})*/
 
 //OK
 router.post('/uploadZip', async function(req, res, next) {
@@ -92,7 +104,7 @@ router.post('/uploadZip', async function(req, res, next) {
 })*/
 
 
-router.get('/zipFolder',async function(req,res,next){
+/*router.get('/zipFolder',async function(req,res,next){
     // const foldername = req.query.folder;
      res = await FileServices.zipDirectory('./server/data/xml','./server/data/zipped/xml.zip')
      console.log(res)
@@ -102,12 +114,6 @@ router.post('/zipFolder',async function(req,res,next){
     const foldername = req.body.folder;
     res = await FileServices.zipDirectory('./server/data/xml','./server/data/zipped/xml.zip')
     console.log(res)
-})
-
-//OK
-router.post('/downloadFile',async function(req,res,next){
-    var filePath = path.resolve(req.body.serverFilePath);
-    res.sendFile(filePath)
-})
+})*/
 
 module.exports = router;

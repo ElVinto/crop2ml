@@ -133,8 +133,11 @@
                         </p>
                     </b-col>
                 </b-row>
-                <b-row no-gutters v-if="isAdmin()">
+                <b-row no-gutters >
                   <div class="col-md-4">
+                      <b-button variant="primary" @click="downloadModel">Download model</b-button>
+                  </div >
+                  <div class="col-md-4" v-if="isAdmin()">
                       <b-button variant="danger" v-b-modal.modal-1>Delete model</b-button>
                       <b-modal id="modal-1" title="Delete model ?" ok-title="Yes I'm sure" ok-variant="danger" @ok="deleteModel()">
                         <p class="my-4">{{ `Are you sure you want to delete the version ${this.selectedVersion} of the model ${this.compoModel.Attributs.name} ?`}}</p>
@@ -388,7 +391,7 @@
 
 import { bTreeView } from 'bootstrap-vue-treeview'
 // import StarRating from 'vue-star-rating'
-
+import FileServices from "../services/FileServices"
 import ModelServices from "../services/ModelServices"
 import config from '../config'
 
@@ -553,6 +556,11 @@ export default {
       await this.$store.dispatch('deleteModel', {modelid: this.model.id, version: this.selectedVersion, user: this.$store.state.loggedUserInfo.email});
       this.unselectModel()
       await this.submitSearch()
+    },
+
+    async downloadModel(){
+      const res =  await FileServices.downloadZip(this.compoModel.metaData.zipName)
+      console.log(res)
     },
 
     unselectModel(){

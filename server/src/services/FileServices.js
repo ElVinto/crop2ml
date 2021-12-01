@@ -15,7 +15,7 @@ class FileServices {
      * @param {String} out 
      * @returns {Promise}
      */
-    static async zipDirectory(source, out) {
+    /*static async zipDirectory(source, out) {
         const archive = archiver('zip', { zlib: { level: 9 }});
         const stream = fs.createWriteStream(out);
     
@@ -29,7 +29,7 @@ class FileServices {
         stream.on('close', () => resolve('zip successful '));
         archive.finalize();
         });
-    }
+    }*/
     
     /**
      * 
