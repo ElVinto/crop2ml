@@ -3,22 +3,6 @@ var router = express.Router();
 
 ModelServices = require('../../services/ModelServices.js');
 
-//TODO reuse for more complex search with or condition
-/*
-router.post('/findJsonModelsBySearchWords',async function(req, res, next){
-    try {
-        jsonModelIds = await ModelServices.findJsonModelsBySearchWords(req.body.searchWords)
-        if(jsonModelIds){
-            res.send(jsonModelIds)
-        }else{
-            res.send(`No model has been found`)
-        }
-    } catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }
-});*/
-
 //OK
 router.post('/getAllModels',async function(req, res, next){
     try {
@@ -66,7 +50,7 @@ router.get('/getAllModelsPackageNames',async function(req, res, next){
 });
 
 //OK
-router.post('/getModelsTree',  async function(req, res, next) {
+/*router.post('/getModelsTree',  async function(req, res, next) {
     const modelsMetaData = await ModelServices.getAllModelsMetaData();
     let tree = {
         name: 'models',
@@ -94,34 +78,20 @@ router.post('/getModelsTree',  async function(req, res, next) {
         }
     }
     res.send(tree);
-})
+})*/
 
+//OK
 router.post('/deleteModelById',async function(req, res, next){
     try{
         const modelid =  req.body.modelid;
-        result = await ModelServices.deleteModelById(modelid)
+        const version =  req.body.version;
+        const user = req.body.user;
+        result = await ModelServices.deleteModelById(modelid, version, user)
         res.send(result)
     }catch(error){
         console.log(error)
         res.send(error.toString())
     }
 });
-
-/*router.post('/findAllKeywords',async function(req, res, next){
-
-    try{
-        jsonModels = await ModelServices.getAllModels()
-        if(jsonModels){
-            res.send(jsonModels)
-        }else{
-            res.send(`No model has been found`)
-        }
-        
-    }catch(error){
-        console.log(error)
-        res.send(error.toString())
-    }
-
-});*/
 
 module.exports = router;

@@ -80,7 +80,7 @@ class ModelServices{
 
     }*/
 
-    //OK
+    /*
     static getModelsTree (){
         return new Promise((resolve,reject)=>{
             try{
@@ -93,7 +93,7 @@ class ModelServices{
                 reject(err);
             }
         })
-    }
+    }*/
 
     static async getModelById (modelid){
         return new Promise((resolve, reject) => {
@@ -131,12 +131,14 @@ class ModelServices{
         })
     }
 
-    static async deleteModelById (modelid){
+    static async deleteModelById (modelid, version, user){
         return new Promise((resolve, reject) => {
             
             try { 
                 let body ={
                     modelid: modelid,
+                    version: version,
+                    user: user
                 }
                 axios.post(url + "models/deleteModelById", body).then(res => {
                     resolve(res.data) ;

@@ -1,4 +1,6 @@
 let { Model } = require('../models/ModelSchema')
+FileServices = require('./FileServices')
+var path = require('path');
 
 class ModelServices{
 
@@ -124,11 +126,41 @@ class ModelServices{
         })
     }
 
-    static async deleteModelById (modelid){
+    static async deleteModelById (modelid, version, user){
         return new Promise(async (resolve, reject) => {
             try{
-                var result = await Model.findOneAndDelete({'Attributs.id': modelid}).exec()
-                resolve(result)
+                var model = await Model.findOne({'id': modelid})
+                if (!model.administratorsMails.includes(user)){
+                    resolve({success:false, model:model})
+                    return
+                }
+                var indexVersion = model.versionsList.indexOf(version)
+                if (indexVersion != -1){
+                    let indexCompo = model.versions.findIndex(compo => compo.Attributs.version == version)
+                    if (indexCompo != -1){
+                        let compoModel = model.versions[indexCompo]
+                        FileServices.deleteDir(path.join('data','packages',compoModel.metaData.packageName))
+                        FileServices.deleteFile(path.join('data','zip',compoModel.metaData.zipName))
+                        model.versions.splice(indexCompo,1)
+                        model.versionsList.splice(indexVersion,1)
+                    }
+                    if(model.versionsList.length == 0){
+                        await Model.deleteOne({'id': modelid}, function (err) {
+                            if(err) console.log(err);
+                            console.log("Successful deletion");
+                            resolve({success:true, model:""})
+                            return
+                        });
+                        
+                    } else {
+                        model.save()
+                        resolve({success:true, model:model})
+                        return
+                    }
+                } else {
+                    resolve({success:false, model:model})
+                    return
+                }
             }catch (err) {
                 console.log(err.message)
                 reject(err); 

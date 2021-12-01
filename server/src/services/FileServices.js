@@ -76,6 +76,7 @@ class FileServices {
                 // Compute composition model
                 if (xmlComposition.length == 0){
                     resolve()
+                    return
                 }
                 else {
                     let modelCompo = await this.xmlFile2jsonModel(crop2mlFolder +'/'+ xmlComposition[0])
@@ -86,13 +87,15 @@ class FileServices {
                         let versionExists = model.versionsList.includes(modelCompo.Attributs.version)
                         if (versionExists){
                             try {
-                                fs.rmdirSync(path.join(tempDir), { recursive: true });
+                                this.deleteDir(tempDir)
                             } catch (error) {
                                 console.log(error)
                             }
-                            resolve([versionExists, modelCompo.Attributs.id, keywords])
+                            resolve([false, modelCompo.Attributs.id, keywords, model])
+                            return
                         } else if(!model.administratorsMails.includes(metaData.uploaderMail)) {
-                            resolve([versionExists, modelCompo.Attributs.id, keywords])
+                            resolve([false, modelCompo.Attributs.id, keywords, model])
+                            return
                         }
                     } else {
                         model = {
@@ -120,11 +123,8 @@ class FileServices {
                     let zipPath = path.resolve(path.join(zipDir, zipName))
                     await mv(tempZipPath, zipPath, async function(err) {})
                     await mv(tempPackagePath, packagePath, async function(err) {})
-                    fs.rmdirSync(path.join(tempDir), { recursive: true });
+                    this.deleteDir(tempDir)
 
-                    //await fs.promises.rename(path.join(packagesPath, oldPackageName), path.join(packagesPath, packageName));
-                    //await fs.promises.rename(path.join(zipPath, oldZipName), path.join(zipPath, zipName));
-                    
                     // Add keywords and others metaData to modelCompo
                     keywords = keywords.concat(modelCompo.Description.Authors.split(' ').filter(s => s.length))
                     keywords = keywords.concat(modelCompo.Description.Institution.split(' ').filter(s => s.length && !keywords.includes(s) ))
@@ -136,8 +136,8 @@ class FileServices {
                     model.versions.push(modelCompo)
                     let addedFields={administratorsMails, editorsMails, linkedCommunity:metaData.linkedCommunity, modelType:metaData.modelType, largerModelPackageNames:metaData.largerModelPackageNames}
                     Object.assign(model, addedFields);
+
                     //save model
-                    //await ModelServices.saveModelCompo(modelCompo)
                     await ModelServices.saveModel(model)
 
                     //manage contributors
@@ -155,13 +155,31 @@ class FileServices {
                             await UserServices.notifyContributor(contrib, metaData.packageName)
                     })
                     
-                    resolve([false, packageName, keywords]) //TODO also resolve admin and editors to update after save (instead of before)
+                    resolve([true, packageName, keywords, model]) //TODO also resolve admin and editors to update after save (instead of before)
                     
                 }
             } catch (error) {
                 reject(error)
             }
         })
+    }
+
+    //OK
+    static deleteFile(filePath){
+        try{
+            fs.unlinkSync(path.resolve(filePath))
+        }catch(error) {
+            console.log(error);
+        }
+    }
+
+    //OK
+    static deleteDir(dir){
+        try{
+            fs.rmdirSync(path.resolve(dir), { recursive: true });
+        }catch(error) {
+            console.log(error);
+        }
     }
     
     //OK
@@ -192,7 +210,6 @@ class FileServices {
                 reject(error)
             }
         })
-    
     }
 
     /*
@@ -249,30 +266,8 @@ class FileServices {
                     children: nvDirTreeChildren
                 } 
             }
-            
         }
     }
-
-     /*static clean (argDirTree, nvDirTree){
-        nvDirTree['name']= argDirTree.name
-
-        if(argDirTree.children){
-            nvDirTree['children'] = []
-            for(let argDirTreeChild of argDirTree.children ){
-
-                // console.log(argDirTreeChild)
-                let nvTreeNode = {};
-                nvDirTree['children'].push(nvTreeNode)
-                this.clean(argDirTreeChild,nvTreeNode)
-
-                // nvDirTree['children'].push({})
-                // this.clean(argDirTreeChild,nvDirTree['children'][nvDirTree['children'].length-1])
-                
-            }
-            return 
-        }
-    }*/
-
 }
 
 module.exports = FileServices

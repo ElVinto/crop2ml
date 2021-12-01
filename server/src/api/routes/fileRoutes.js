@@ -53,16 +53,17 @@ router.post('/uploadZip', async function(req, res, next) {
                 const extractionMsg = await FileServices.extractZip(tempZipPath, tempUnzippedDir)
                 console.log(extractionMsg)
                 let extractedKeywords
-                [modelAlreadyExists, packageName, extractedKeywords] = await FileServices.computeExtractedData(tempDir, fileName, fields)
+                [success, packageName, extractedKeywords,model] = await FileServices.computeExtractedData(tempDir, fileName, fields)
                 let tree = null
-                if (!modelAlreadyExists) {
+                if (success) {
                     tree = FileServices.getDirTree(path.join(packagesPath, packageName))
                     tree.name = packageName
                 }
                 const result = {
                     tree,
                     extractedKeywords,
-                    modelAlreadyExists
+                    success,
+                    model,
                 }
                 res.send(result);
             } catch (error) {

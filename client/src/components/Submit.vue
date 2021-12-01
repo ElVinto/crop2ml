@@ -175,7 +175,7 @@
           </p>
         </div>
 
-        <div v-if="!modelAlreadyExists && treeDataReceived">
+        <div v-if="success && treeDataReceived">
           <b-input-group style="padding-top: 1em; " prepend="Extracted keywords">
               <b-form-tags
                 v-model="keywords"
@@ -191,7 +191,7 @@
           </p>
         </div>
 
-        <div v-if="modelAlreadyExists">
+        <div v-if="!success && treeDataReceived">
           <p style="padding-top:1em;">
             <b>This version of this model already exists. Or you are not an administrator of this model and can not update it.</b>
           </p>
@@ -242,7 +242,7 @@ export default {
         //selectedAdministrator: null,
         editors:[],
         //selectedEditor: null,
-        modelAlreadyExists: false
+        success: false
       }
     },
 
@@ -265,34 +265,17 @@ export default {
   },
 
   async created() {
-
-    // console.log("START created Catalog")
-
-    // this.modelUnitSchema = ModelServices.buildSchema();
-
-    // console.log("this.modelUnitSchema")
-    // console.log(this.modelUnitSchema)
-
-    // console.log("END created Catalog")
   },
 
   async mounted() {
-    
-    console.log("START mounted Catalog")
-
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
 
     //this.registeredEmails = await UserServices.getRegisteredEmails();
-
     this.registeredPackageNames = await ModelServices.getAllModelsPackageNames();
-
     let communityList = await CommunityServices.getAllCommunities()
-
     this.communityNames = communityList.map(c => c.name)
-
-    console.log("END mounted Catalog")
   },
 
   methods: {
@@ -304,14 +287,7 @@ export default {
 
     async submitZip(){
 
-      // let formData = new FormData();
-      // formData.append('file', this.file);
-
-      //this.packageZip.packageName = this.packageName
-
       const modelMetaDataPart ={
-        //zipFileName: this.packageZip.name,
-        //packageName: this.packageName,
         modelType : this.modelTypeSelected,
         largerModelPackageNames: this.largerModelPackageNames,
         linkedCommunity: this.linkedCommunity,
@@ -322,12 +298,16 @@ export default {
 
       this.submitted =true;
       const res =  await FileServices.sendZip(this.packageZip,modelMetaDataPart)
-      this.modelAlreadyExists = res.modelAlreadyExists
+      this.success = res.success
       this.treeDataReceived = [res.tree]
       this.keywords = res.extractedKeywords
+      let model = res.model
 
       this.packageZip = null
-      this.packageZipSent=true;
+      this.packageZipSent = true;
+      if (this.success){
+        this.$store.commit("setModel", model);
+      }
     },
 
     addLargerPackage(){
@@ -352,19 +332,6 @@ export default {
         return this.packageZipSent=false;
       }
     },
-
-    /*packageName: function(){
-      
-        if(this.packageName.indexOf(' ')!==-1 || !this.packageName ){
-          this.packageNameIsValid =false
-          this.packageNameMsg = 'model name cannot be empty or contain spaces'
-        }else{
-          this.packageNameIsValid = true
-          this.packageNameMsg =''
-        }
-      
-    }*/
-
   }
 
 }
@@ -375,8 +342,6 @@ export default {
 .packageZipInputGroup{
   width: 80%;
   text-align: center;
-  
-  
 }
 
 p{

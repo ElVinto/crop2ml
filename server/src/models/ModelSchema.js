@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 const OutputValueSchema = new Schema(
     {
         Attributs:{
-            name: {type: String, required: true}, 
+            name: {type: String, required: false}, 
             description: {type: String, required: false}, 
             precision: {type: String, required: false} 
         },
-        _: {type: String, required: true}
+        _: {type: String, required: false}
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true}
 )
@@ -16,9 +16,9 @@ const OutputValueSchema = new Schema(
 const InputValueSchema = new Schema(
     {
         Attributs:{
-            name: {type: String, required: true} 
+            name: {type: String, required: false} 
         },
-        _: {type: String, required: true} 
+        _: {type: String, required: false} 
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true}
 )
@@ -26,7 +26,7 @@ const InputValueSchema = new Schema(
 const TestSchema = new Schema(
     {
         Attributs:{
-            name: {type: String, required: true}, 
+            name: {type: String, required: false}, 
             description: {type: String, required: false},
             uri: {type: String, required: false} 
         },
@@ -39,9 +39,9 @@ const TestSchema = new Schema(
 const TestsetSchema = new Schema(
     {
         Attributs:{
-            name: {type: String, required: true}, 
-            description: {type: String, required: true},
-            parameterset: {type: String, required: true}, 
+            name: {type: String, required: false}, 
+            description: {type: String, required: false},
+            parameterset: {type: String, required: false}, 
             uri: {type: String, required: false}
         },
         Test :{type: [TestSchema], required: false }
@@ -52,9 +52,9 @@ const TestsetSchema = new Schema(
 const ParamSchema = new Schema(
     {
         Attributs:{
-            name: {type: String, required: true},
+            name: {type: String, required: false},
         },
-        _: {type: String, required: true}, 
+        _: {type: String, required: false}, 
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true}
 )
@@ -62,8 +62,8 @@ const ParamSchema = new Schema(
 const ParametersetSchema = new Schema(
     {
         Attributs:{
-            description: {type: String, required: true}, 
-            name: {type: String, required: true}, 
+            description: {type: String, required: false}, 
+            name: {type: String, required: false}, 
             uri: {type: String, required: false} 
         },
         Param :{type: [ParamSchema], required: false }
@@ -74,7 +74,7 @@ const ParametersetSchema = new Schema(
 const AlgorithmSchema = new Schema(
     {  
         Attributs:{
-            language: {type: String, required: true}, 
+            language: {type: String, required: false}, 
             platform: {type: String, required: false},
             filename: {type: String, required: false}, 
             function: {type: String, required: false} 
@@ -85,8 +85,8 @@ const AlgorithmSchema = new Schema(
 
 const FunctionSchema = new Schema(
     {
-        name: {type: String, required: true},
-        language: {type: String, required: true}, 
+        name: {type: String, required: false},
+        language: {type: String, required: false}, 
         filename: {type: String, required: false}, 
         type: {
             type: String,
@@ -102,7 +102,7 @@ const FunctionSchema = new Schema(
 const OutputSchema = new Schema(
     {
         Attributs:{
-            name: {type: String, required: true}, 
+            name: {type: String, required: false}, 
             datatype: {
                 type: String,
                 required: [true,`datatype  required for path Attributs.datatype `],
@@ -117,7 +117,7 @@ const OutputSchema = new Schema(
                 required: false,
                 enum: ['state', 'rate', 'auxiliary']
             }, 
-            unit: {type: String, required: true}, 
+            unit: {type: String, required: false}, 
             uri: {type: String, required: false},
         }
     },
@@ -130,14 +130,14 @@ const InputSchema = new Schema(
             name: {type: String, required:true},
             datatype: {
                 type: String,
-                required: true,
+                required: false,
                 enum: ['STRING','STRINGARRAY','STRINGLIST','DATE','DATEARRAY','DATELIST','DOUBLE','DOUBLEARRAY','DOUBLELIST','INT','INTARRAY','INTLIST','BOOLEAN']
             }, 
-            description: {type: String, required:true},
+            description: {type: String, required:false},
             default: {type: String, required: false},
             max: {type: String, required: false},
             min: {type: String, required: false},
-            inputtype: {type: String, required: true}, // (variable|parameter) #REQUIRED
+            inputtype: {type: String, required: false}, // (variable|parameter) #REQUIRED
             parametercategory : {
                 type: String,
                 required: false,
@@ -148,7 +148,7 @@ const InputSchema = new Schema(
                 required: false,
                 enum: ['state','rate','auxiliary']
             }, 
-            unit: {type: String, required: true},
+            unit: {type: String, required: false},
             uri : {type: String, required: false},
         }
     },
@@ -157,12 +157,12 @@ const InputSchema = new Schema(
 
 const DescriptionSchema = new Schema(
     {
-        Title: {type: String, required: true},
-        Authors:{type: String, required: true},
-        Institution: {type: String, required: true},
+        Title: {type: String, required: false},
+        Authors:{type: String, required: false},
+        Institution: {type: String, required: false},
         URI:{trype: String, required: false},
         Reference: {type: String, required: false},
-        Abstract: {type: String, required: true}
+        Abstract: {type: String, required: false}
     },
     {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true} 
 );
@@ -215,10 +215,10 @@ const UnitModelSchema = new Schema(
         Function:{type: FunctionSchema, required: false},
         Algorithm:{type: AlgorithmSchema, required: false},
         Parametersets:{
-            Parameterset: {type: [ParametersetSchema], required: true},
+            Parameterset: {type: [ParametersetSchema], required: false},
         },
         Testsets:{
-            Testset: {type: [TestsetSchema], required: true},
+            Testset: {type: [TestsetSchema], required: false},
         },
         /*metaData : {
             dirPath: {type: String, required: false},
@@ -242,7 +242,8 @@ const CompositionSchema = new Schema(
                 filename: {type: String, required:true},
             },
             ModelContent: {type: UnitModelSchema, require: false}
-        }],
+        },
+        {autoIndex:false, autoCreate:false, id:false, _id:false,excludeIndexes:true}],
         Links: {
             InputLink: {type: [InputLinkSchema], required: false},
             InternalLink: {type: [InternalLinkSchema], required: false},

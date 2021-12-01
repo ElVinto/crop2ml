@@ -121,8 +121,12 @@ export default new Vuex.Store({
          }
       },
 
-      deleteModel: (state, model) => {
-         state.models.delete(model.id)
+      deleteModel: (state, modelid) => {
+         state.models.delete(modelid)
+      },
+
+      setModel: (state, model) => {
+         state.models.set(model.id,model)
       },
 
       setDataAreLoaded: (state, bool) =>{
@@ -138,7 +142,7 @@ export default new Vuex.Store({
       }
    },
 
-   actions: { // assynchronous commit of changes
+   actions: {
 
       async initModels({ state, commit }) {
          return new Promise((resolve, reject) => {
@@ -157,7 +161,7 @@ export default new Vuex.Store({
          })
       },
 
-      async reInitModel({commit},modelid){
+      /*async reInitModel({commit},modelid){
          return new Promise((resolve, reject) => {
             try { 
                ModelServices.getModelById(modelid).then(savedmodel =>{ 
@@ -171,22 +175,28 @@ export default new Vuex.Store({
                reject(err);
             }
          })
-      },
+      },*/
 
       async saveModel({commit},model){
          const savedmodel = await ModelServices.savemodel(model)
          if(savedmodel.model !== undefined){
-            commit('addmodel',savedmodel)
+            commit('addmodel', savedmodel)
          }
          return savedmodel;
       },
 
-      async deleteModel({commit},model){
-         const deletedmodel = await ModelServices.deleteModelById(model.model.Attributs.modelid)
-         if(deletedmodel.model !== undefined){
-            commit('deletemodel',deletedmodel)
-         }
-         return deletedmodel;
+      async deleteModel({commit}, modelData){
+         const res = await ModelServices.deleteModelById(modelData.modelid, modelData.version, modelData.user)
+         let success = res.success
+         let updatedModel = res.model
+         if(success){
+            if (updatedModel == "" ){
+               commit('deleteModel',modelData.modelid)
+            } else {
+               commit('setModel',updatedModel)
+            }
+         } 
+         return success;
       },
    }
 });

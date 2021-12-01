@@ -135,7 +135,10 @@
                 </b-row>
                 <b-row no-gutters v-if="isAdmin()">
                   <div class="col-md-4">
-                      <b-button variant="danger" v-on:click="deleteModel()">Delete model</b-button>
+                      <b-button variant="danger" v-b-modal.modal-1>Delete model</b-button>
+                      <b-modal id="modal-1" title="Delete model ?" ok-title="Yes I'm sure" ok-variant="danger" @ok="deleteModel()">
+                        <p class="my-4">{{ `Are you sure you want to delete the version ${this.selectedVersion} of the model ${this.compoModel.Attributs.name} ?`}}</p>
+                      </b-modal>
                   </div >
                   
                 </b-row>
@@ -401,21 +404,21 @@ export default {
   data() {
     return {
       errorMsg : "",
-      selectedModelId: null,
-      selectedModel:{},
-
+      
       currentRating: "No Rating",
       currentSelectedRating: "No Current Rating",
       
       modelTree: null,
+      showOnlyPersoModels: false,
       selectedWord: "",
       isUnitModel:false,
       model:{},
       compoModel:{},
       unitModel:{},
-      showOnlyPersoModels: false,
       selectedVersion: null,
-      selectedTreeNode: null
+      selectedTreeNode: null,
+      selectedModelId: null,
+      selectedModel:{},
     }
   },
 
@@ -531,7 +534,7 @@ export default {
       }
     },
 
-    async reInitModel(){
+    /*async reInitModel(){
       console.log("START reInitModel")
       this.errorMsg = ""
       // TODO case of new empty model
@@ -543,23 +546,32 @@ export default {
         this.errorMsg = res;
       }
       console.log("END reInitModel")
-    },
+    },*/
 
     async deleteModel(){
-      console.log("START deleteModel")
       this.errorMsg =""
-      const deletedModel = await this.$store.dispatch('deleteModel',this.selectedModel);
-      console.log('deletedModel')
-      console.log(deletedModel)
+      await this.$store.dispatch('deleteModel', {modelid: this.model.id, version: this.selectedVersion, user: this.$store.state.loggedUserInfo.email});
+      this.unselectModel()
+      await this.submitSearch()
+    },
+
+    unselectModel(){
+      this.isUnitModel=false
+      this.model={}
+      this.compoModel={}
+      this.unitModel={}
+      this.selectedVersion= null
+      this.selectedTreeNode= null
       this.selectedModelId= null
       this.selectedModel={}
-      console.log("END deleteModel")
     },
 
     selectModelById(){
-      this.selectedModelId = this.selectedTreeNode.id;
-      [this.isUnitModel, this.model, this.compoModel, this.unitModel, this.selectedVersion] = this.$store.getters.getModelByIdAndVersion(this.selectedTreeNode, this.selectedVersion)
-      this.selectedModel = this.isUnitModel ? this.unitModel : this.compoModel
+      if(this.selectedTreeNode != null){
+        this.selectedModelId = this.selectedTreeNode.id;
+        [this.isUnitModel, this.model, this.compoModel, this.unitModel, this.selectedVersion] = this.$store.getters.getModelByIdAndVersion(this.selectedTreeNode, this.selectedVersion)
+        this.selectedModel = this.isUnitModel ? this.unitModel : this.compoModel
+      }
     },
 
     showCurrentRating(rating) {
