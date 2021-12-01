@@ -3,14 +3,14 @@
   <div v-if="$store.getters.getDataAreLoaded" style="display:block; overflow: scroll; height:80vh; width:100%; margin-top:20px;" >
 
     <div v-if="!$store.getters.getLoggedUserInfo">
-        Please <a href="#/SignIn">sign-in</a>  or <a href="#/register"> register </a> before uploading a model
+        Please <a href="#/SignIn">sign-in</a>  or <a href="#/register"> register </a> before uploading or editing a model.
     </div>
 
     <div v-else class="row" >
       <div class="col-sm-2"></div>
       <div class="col-sm-8">
-
-        <b> Submit or update a model repository </b>
+        
+        <b> Submit a new model or update the version of a model.</b>
 
         <!--  Choose Package.zip -->
         <b-input-group  class="mt-3" >
@@ -32,22 +32,54 @@
           {{ uploadMsg  }}
         </div>
 
-        <div class="mt-3" v-if="packageZip"> 
-          
-          <div >
+        <b-button :disabled="!packageZip" variant="primary" style="margin-top: 1em;" v-on:click="submitZip()">Submit zip</b-button>
 
-            <!-- Choose Model Package Name-->
-            <!--b-input-group prepend="Model Package Name">
-              <b-form-input
-                :placeholder="packageName"
-                v-model="packageName"
-              >
-              </b-form-input>
+        <div v-if="submitted && !treeDataReceived">
+          <p>
+            <b>Extracting archive...</b> 
+          </p>
+          <p>
+            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
+            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
+            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
+          </p>
+        </div>
+
+        <div v-if="modelExists">
+          <p style="padding-top:1em;">
+            <b>This version of this model already exists. Or you are not an administrator of this model and can not update it.</b>
+          </p>
+        </div>
+
+        <div v-if="success && treeDataReceived && !zipPackage">
+          
+          <p style="text-align:left; padding-top:1em;">
+            <b>Extracted package structure:</b>
+            <b-tree-view v-on:nodeSelect="treeNodeSelect" :data="treeDataReceived"  :renameNodeOnDblClick=false :contextMenu=false :contextMenuItems=[] ></b-tree-view>
+          </p>
+
+          <h3 style="padding-top: 1em; text-align:left; ">  Metadata : </h3>
+          <p style="margin-bottom: 0; text-align:left; font-weight: bold;">It is already prefilled with extracted data from the package or previous version of the model.</p>
+
+          <div>
+
+            <!--b-input-group style="padding-top: 1em; " prepend="Keywords">
+              <b-form-tags
+                v-model="keywords"
+                separator=" "
+                placeholder= " "
+                disabled
+              ></b-form-tags>
+            </b-input-group-->
+            <!-- Keywords -->
+            <b-input-group style="padding-top: 1em; " prepend="Keywords">
+              <b-form-tags class="text-capitalize"
+                v-model="keywords"
+                separator=","
+                placeholder="Enter new keywords separated by comma"
+                no-add-on-enter
+              ></b-form-tags>
             </b-input-group>
-            
-            <p style="color:red" v-if="!packageNameIsValid">
-              {{ packageNameMsg }}
-            </p-->
 
             <!-- Add Model Type -->
             <b-input-group prepend="Type of model" style="padding-top: 1em; ">
@@ -99,8 +131,6 @@
               </b-row>
             </div>
 
-            
-
             <!-- Linked Community -->
             <b-input-group id="LinkedCommunity" prepend="Link to an existing community" style="padding-top: 1em; ">
               <b-form-input  placeholder="Select in the list" list="communityNameList" v-model="linkedCommunity"></b-form-input>
@@ -114,22 +144,8 @@
               </datalist> 
             </b-input-group>
             
-            <!-- Keywords -->
-            <!--b-input-group style="padding-top: 1em; " prepend="Keywords">
-              <b-form-tags class="text-capitalize"
-                v-model="keywords"
-                separator=","
-                placeholder="Enter new keywords separated by comma"
-                no-add-on-enter
-              ></b-form-tags>
-            </b-input-group-->
-
-
-            <h3 style="padding-top: 1em; text-align:left; ">  Contributors : </h3>
-
             <!-- Model Package Administrators-->
-            <p>Administrators can edit informations, update the model, delete the model.<br>
-            Editors can only edit informations</p>
+            <p style="padding-top: 1em; text-align:left; margin-bottom:0">Contributors : Administrators can edit informations, update the model, delete the model. Editors can only edit informations. The uploader of the package is automatically set as an administrator.</p>
             <b-input-group prepend="Administrators" style="padding-top: 1em; text-align:left;">
               <b-form-tags class="form-control"  style="background: white;"
                   v-model="administrators"
@@ -157,44 +173,8 @@
 
           </div>
 
-          <div style="padding-top: 1em;" v-if="packageZip">
-            <b-button variant="secondary"  v-on:click="submitZip()">Submit model</b-button>
-          </div>
+          <b-button variant="primary" style="margin-top: 1em;" v-on:click="saveModel()">Save metadata</b-button>
 
-
-        </div>
-
-        <div v-if="submitted && !treeDataReceived">
-          <p> 
-            <b>Extracting archive, populating database, ...</b> 
-          </p>
-           <p>
-            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
-            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
-            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
-          </p>
-        </div>
-
-        <div v-if="success && treeDataReceived">
-          <b-input-group style="padding-top: 1em; " prepend="Extracted keywords">
-              <b-form-tags
-                v-model="keywords"
-                separator=" "
-                placeholder= " "
-                disabled
-              ></b-form-tags>
-          </b-input-group>
-            
-          <p style="text-align:left; padding-top:1em;">
-            Extracted package structure:
-            <b-tree-view v-on:nodeSelect="treeNodeSelect" :data="treeDataReceived"  :renameNodeOnDblClick=false :contextMenu=false :contextMenuItems=[] ></b-tree-view>
-          </p>
-        </div>
-
-        <div v-if="!success && treeDataReceived">
-          <p style="padding-top:1em;">
-            <b>This version of this model already exists. Or you are not an administrator of this model and can not update it.</b>
-          </p>
         </div>
 
       </div>
@@ -213,7 +193,7 @@ import CommunityServices from "../services/CommunityServices"
 import { bTreeView } from 'bootstrap-vue-treeview'
 
 export default {
-  name: 'Catalog',
+  name: 'Submit',
 
    data() {
       return {
@@ -242,7 +222,8 @@ export default {
         //selectedAdministrator: null,
         editors:[],
         //selectedEditor: null,
-        success: false
+        success: false,
+        modelExists: false
       }
     },
 
@@ -296,12 +277,23 @@ export default {
         editorsMails: this.editors,
       }
 
-      this.submitted =true;
+      this.submitted =true
+      this.modelExists = false
+      this.treeDataReceived = null
+      this.keywords = []
+
       const res =  await FileServices.sendZip(this.packageZip,modelMetaDataPart)
       this.success = res.success
       this.treeDataReceived = [res.tree]
       this.keywords = res.extractedKeywords
       let model = res.model
+
+      if (!this.success){
+        this.submitted = false
+        if (this.treeDataReceived)
+          this.modelExists = true
+      }
+        
 
       this.packageZip = null
       this.packageZipSent = true;
@@ -351,16 +343,10 @@ p{
   padding-right: 2px;
 }
 
-
-
 .scrollable-menu {
     height: auto;
     max-height: 60vh;
     overflow: scroll;
 }
-
-
-
-
 
 </style>

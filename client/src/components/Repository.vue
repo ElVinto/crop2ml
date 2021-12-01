@@ -5,9 +5,7 @@
     <div class ="row"  > 
       
       <div id="models" class="col-lg-3" >
-
         <b-card id ="modelsCard">
-
           <b-card-header>
             <b-input-group id="Search"  >
               <b-form-input placeholder="keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
@@ -56,54 +54,10 @@
           
           </b-card-body>
         </b-card>
-
       </div>
 
       <div id="modelContent"   class="col-lg-7"  >
         <div v-if="selectedModelId">
-
-          <!-- <div id="modelIdAndActions" class="row">
-            <div class="col-md-12">
-              <h2 style="text-align:center;">{{ `${selectedModelId}`}} </h2>
-            </div>
-          </div > -->
-
-          <!-- <div id="Actions" class="row">
-            <div class="col-md-4">
-                <div @mouseleave="showCurrentRating(0)" style="display:inline-block;">
-                    <star-rating :show-rating="false" @current-rating="showCurrentRating" @rating-selected="setCurrentSelectedRating" :increment="0.5"></star-rating>
-                </div>
-                <div style="margin-top:10px;font-weight:bold;">{{currentRating}}</div>
-            </div >
-
-            <div class="col-md-8">
-              <div class="row" style="margin-top:5px;">
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-success myButtonStyle" v-on:click="saveModel()"  > 
-                    Save 
-                  </button>
-                </div >
-
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-info myButtonStyle" v-on:click="reInitModel()"  > 
-                    Reinit 
-                  </button>
-                </div >
-
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-danger myButtonStyle" v-on:click="deleteModel()"  > 
-                    Delete 
-                  </button>
-              </div >
-
-            </div >
-
-              
-              
-
-            </div >
-
-          </div> -->
 
           <div id="modelId" v-if="errorMsg" class="row">
             <div class="col-md-12">
@@ -137,6 +91,12 @@
                   <div class="col-md-4">
                       <b-button variant="primary" @click="downloadModel">Download model</b-button>
                   </div >
+                  <!--div class="col-md-4">
+                      <div @mouseleave="showCurrentRating(0)" style="display:inline-block;">
+                          <star-rating :show-rating="false" @current-rating="showCurrentRating" @rating-selected="setCurrentSelectedRating" :increment="0.5"></star-rating>
+                      </div>
+                      <div style="margin-top:10px;font-weight:bold;">{{currentRating}}</div>
+                  </div -->
                   <div class="col-md-4" v-if="isAdmin()">
                       <b-button variant="danger" v-b-modal.modal-1>Delete model</b-button>
                       <b-modal id="modal-1" title="Delete model ?" ok-title="Yes I'm sure" ok-variant="danger" @ok="deleteModel()">
@@ -411,7 +371,7 @@ import config from '../config'
 
 
 export default {
-  name: 'Catalog',
+  name: 'Repository',
 
   components: {
     // StarRating,
