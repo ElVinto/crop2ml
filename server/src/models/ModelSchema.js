@@ -284,6 +284,8 @@ const ModelSchema = new Schema(
         modelType: {type: String, required: false},
         largerModelPackageNames: {type: [String], required: false},
         linkedCommunity: {type: String, required: false},
+        publications: {type: [String], required: false},
+        gitLink: {type: String, required: false},
     },
     {autoIndex:true, autoCreate:false, id:true, _id:true,excludeIndexes:false,timestamps: false} 
 )

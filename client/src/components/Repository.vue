@@ -171,6 +171,14 @@
                           <b-td style='font-weight:bold;'>{{ k }}</b-td>
                           <b-td>{{ v }}</b-td>
                       </b-tr>
+                      <b-tr v-if="exists(model.publications)">
+                          <b-td style='font-weight:bold;'>Publications</b-td>
+                          <b-td>{{ setPublications(this.model.publications) }}</b-td>
+                      </b-tr>
+                      <b-tr v-if="exists(model.gitLink)">
+                          <b-td style='font-weight:bold;'>Git link</b-td>
+                          <b-td>{{ this.model.gitLink }}</b-td>
+                      </b-tr>
                   </b-tbody>
                 </b-table-simple>
               </b-tab>
@@ -517,6 +525,14 @@ export default {
       }else{ 
         return [obj]
       }
+    },
+
+    setPublications(listOfPublis){
+      let text = ""
+      for (let p of listOfPublis){
+        text.concat(p + '<br>')
+      }
+      return text
     },
 
     setInputs(input_or_output){
