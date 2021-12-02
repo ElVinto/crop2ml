@@ -12,7 +12,7 @@
         >
           <b-card-img 
             id = "displayedImg"
-            src="images/community_iconfinder_128px.png" 
+            :src="getPicturePath(community.picture)" 
             style="max-width: 150px" 
             alt="Community"
             top>
@@ -110,9 +110,10 @@
 <script>
 
 
-import CommunityRequests from "../../services/CommunityRequests"
-import UserRequests from "../../services/UserRequests"
-import ClientServerJsonModel from "../../services/ClientServerJsonModel"
+import CommunityServices from "../../services/CommunityServices"
+import UserServices from "../../services/UserServices"
+import config from "../../config"
+const path = require('path');
 
 export default {
 
@@ -122,21 +123,13 @@ export default {
 
   data() {
     return {
-
       inputImgFile: null,
-
       registeredEmails : [],
       packageNames : []
-
     };
   },
 
   async mounted() {
-
-    console.log("START mount Edit Community")
-    console.log(this.community)
-
-
     this.inputImgFile = this.community.file
     delete this.community.file
     delete this.community._id
@@ -145,7 +138,6 @@ export default {
 
     this.inputImgFile['name'] = image_path_elmts[image_path_elmts.length -1] ;
 
-
     var reader  = new FileReader();
     reader.onload = function(e)  {
       var image = document.getElementById("displayedImg");
@@ -153,28 +145,14 @@ export default {
     }
     reader.readAsDataURL(this.inputImgFile);
 
-    
-
-    this.registeredEmails = await UserRequests.getRegisteredEmails();
-    console.log("registeredEmails")
-    console.log(this.registeredEmails)
-
-
-    this.packageNames = await ClientServerJsonModel.findAllModelPackageNames();
-    console.log("packageNames")
-    console.log(this.packageNames)
-
-    console.log("End mount Edit Community")
-
+    this.registeredEmails = await UserServices.getRegisteredEmails();
+    //this.packageNames = await ModelServices.getAllModelsPackageNames();
+    this.packageNames = this.$store.getters.getModelIds
   },
 
   methods: {
 
-
     previewInputImgFile() {
-
-      console.log("START previewInputImgFile")
-
       var file = document.getElementById('inputImgFileForm').files[0];
       var reader  = new FileReader();
       reader.onload = function(e)  {
@@ -182,47 +160,39 @@ export default {
           image.src = e.target.result;
         }
       reader.readAsDataURL(file);
-
-      console.log("END previewInputImgFile")
      },
     
     async submitCommunity(){
-      console.log("START submitCommunity")
-
-      console.log("this.inputImgFile")
-      console.log(this.inputImgFile)
-
-
-      
-
-      const communityCreated =  await CommunityRequests.createCommunity(this.inputImgFile,this.community)
-      
-      console.log("communityCreated")
+      let image = this.inputImgFile;
+      let imageName;
+      if (image != null){
+        var extension = "." + image.name.split('.').pop();
+        var name = path.basename(image.name, extension)
+        imageName = name + Date.now() + extension
+      } else {
+        imageName = "community_iconfinder_128px.png"
+      }
+      this.community.picture = imageName
+      const communityCreated =  await CommunityServices.createCommunity(this.inputImgFile,this.community)
       console.log(communityCreated)
-
-
-      this.$router.push("/Communities")
-
-      console.log("END submitCommunity")
-
       
-
+      this.$router.push("/Communities")
     },
 
-    emailValidator(tag){
-      return this.registeredEmails.includes(tag)
+    emailValidator(email){
+      return this.registeredEmails.includes(email)
     },
 
-    packageValidator(tag){
-      return this.packageNames.includes(tag)
-    }
+    packageValidator(name){
+      return this.packageNames.includes(name)
+    },
 
-
+    getPicturePath(picture){
+      return `http://${config.server.host}:${config.server.port}/community_images/` + picture
+    },
   },
 
   watch:{
-   
-    
   }
 
 };

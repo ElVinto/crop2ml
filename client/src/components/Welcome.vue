@@ -19,7 +19,7 @@
               <h2> Recent Models </h2>
 
               <ul class="myListStyle">
-                <a href="#/catalog">
+                <a href="#/Repository">
                   <li>APSIM Phenology model component </li>
                 </a>
               </ul>

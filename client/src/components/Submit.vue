@@ -1,76 +1,106 @@
 <template>
 
-  <div v-if="$store.getters.getDataAreLoaded" style="display:block; overflow: scroll; height:80vh; width:100%; margin-top:20px;" >
+  <div v-if="$store.getters.getDataAreLoaded" style="display:block; width:100%; margin-top:20px; margin-bottom:100px" >
 
     <div v-if="!$store.getters.getLoggedUserInfo">
-        Please <a href="#/SignIn">sign-in</a>  or <a href="#/register"> register </a> before uploading a model
+        Please <a href="#/SignIn">sign-in</a>  or <a href="#/register"> register </a> before uploading or editing a model.
     </div>
 
-    <div v-else  id="packageZip" class="row" >
+    <div v-else-if="!canEdit">
+        You are not allowed to edit this model.
+    </div>
+
+    <div v-else class="row" >
       <div class="col-sm-2"></div>
       <div class="col-sm-8">
 
-        <b> Submit or update a model repository </b>
-
-        <!--  Choose Package.zip -->
-        <b-input-group  class="mt-3" >
-          <b-form-file
-            v-model="packageZip"
-            :state="Boolean(packageZip)"
-            placeholder="Choose a file.zip or drop it here..."
-            drop-placeholder="Drop file.zip here..."
-            accept=".zip"
-          ></b-form-file>
-          <!--
-            <div class="input-group-append">
-              <b-button variant="secondary"  v-on:click="submitZip()">Send</b-button>
-            </div>
-          -->
-        </b-input-group>
-
+        <div v-if='submitMode'>
         
-        <div class="mt-3">
-          {{ uploadMsg  }}
+          <b> Submit a new model or update the version of a model.</b>
+
+          <!--  Choose Package.zip -->
+          <b-input-group  class="mt-3" >
+            <b-form-file
+              v-model="packageZip"
+              :state="Boolean(packageZip)"
+              placeholder="Choose a file.zip or drop it here..."
+              drop-placeholder="Drop file.zip here..."
+              accept=".zip"
+            ></b-form-file>
+            <!--
+              <div class="input-group-append">
+                <b-button variant="secondary"  v-on:click="submitZip()">Send</b-button>
+              </div>
+            -->
+          </b-input-group>
+
+          <div class="mt-3">
+            {{ uploadMsg  }}
+          </div>
+
+          <b-button :disabled="!packageZip" variant="primary" style="margin-top: 1em;" v-on:click="submitZip()">Submit zip</b-button>
+
+          <div v-if="submitted && !treeDataReceived">
+            <p>
+              <b>Extracting archive...</b> 
+            </p>
+            <p>
+              <b-spinner small label="Small Spinner" type="grow"></b-spinner>
+              <b-spinner small label="Small Spinner" type="grow"></b-spinner>
+              <b-spinner small label="Small Spinner" type="grow"></b-spinner>
+            </p>
+          </div>
+
+          <div v-if="modelExists">
+            <p style="padding-top:1em;">
+              <b>This version of this model already exists. Or you are not an administrator of this model and can not update it.</b>
+            </p>
+          </div>
         </div>
 
-        <div class="mt-3" v-if="packageZip"> 
+        <div v-if="(submitMode && success && treeDataReceived && !packageZip) || !submitMode">
           
-          <div >
+          <p v-if="submitMode" style="text-align:left; padding-top:1em;">
+            <b>Extracted package structure:</b>
+            <b-tree-view v-on:nodeSelect="treeNodeSelect" :data="treeDataReceived"  :renameNodeOnDblClick=false :contextMenu=false :contextMenuItems=[] ></b-tree-view>
+          </p>
 
-            <!-- Choose Model Package Name-->
-            <b-input-group prepend="Model Package Name">
-              <b-form-input
-                :placeholder="packageName"
-                v-model="packageName"
-              >
-              </b-form-input>
+          <h3 style="padding-top: 1em; text-align:left; "> {{ model.id }} metadata : </h3>
+          <p style="margin-bottom: 0; text-align:left; font-weight: bold;">It is already prefilled with extracted data from the package or previous version of the model.</p>
+
+          <div>
+
+            <!-- Keywords -->
+            <b-input-group style="padding-top: 1em; " prepend="Latest version keywords">
+              <b-form-tags class="text-capitalize"
+                v-model="keywords"
+                separator=","
+                placeholder="Enter new keywords separated by comma"
+                no-add-on-enter
+              ></b-form-tags>
             </b-input-group>
-            
-            <p style="color:red" v-if="!packageNameIsValid">
-              {{ packageNameMsg }}
-            </p>
 
             <!-- Add Model Type -->
             <b-input-group prepend="Type of model" style="padding-top: 1em; ">
-              <b-form-select v-model="modelTypeSelected" :options="modelTypeOptions"></b-form-select>
+              <b-form-select v-model="model.modelType" :options="modelTypeOptions"></b-form-select>
             </b-input-group>
 
-            <b-input-group style="padding-top: 1em; ">
+            <!--b-input-group style="padding-top: 1em; ">
               <b-input-group-prepend is-text>
                   <b-form-checkbox switch v-model="isPartOfLargerModel" class="mr-n2">
                     <span class="sr-only">Switch for following text input</span>
                   </b-form-checkbox>
               </b-input-group-prepend>
               <b-form-input disabled placeholder=" Is part of a larger model ?" style="background:white" ></b-form-input>
-            </b-input-group>
+            </b-input-group-->
 
-            <div v-if="isPartOfLargerModel">
-              <b-row no-gutters style="margin-top:1em;margin-left:1em;">
+            <!--div v-if="isPartOfLargerModel"-->
+              <b-row no-gutters style="margin-top:1em;">
                 <b-col lg="9" >
                     <!-- Larger model packages -->
-                    <b-input-group prepend="Larger model names" style="width:100%; text-align:left; overflow:scroll">
+                    <b-input-group prepend="Larger model names">
                       <b-form-tags class="form-control" style="background: white;"
-                        v-model="largerModelPackageNames"
+                        v-model="model.largerModelPackageNames"
                         separator=","
                         placeholder="Enter registered package names separated by comma or .. "
                         invalid-tag-text="unknown package name"
@@ -81,7 +111,7 @@
                     </b-input-group>
                 </b-col>
                 <b-col lg="3" >
-                  <b-input-group id="AddPackage" style="width:100%; text-align:left; overflow:scroll">
+                  <b-input-group id="AddPackage">
                   <b-form-input placeholder=" add from the list" list="packageNameList" v-model="selectedLargerPackage"></b-form-input>
                   
                   <datalist id="packageNameList">
@@ -98,290 +128,127 @@
 
                 </b-col>
               </b-row>
-
-              
-            </div>
-
-            
+            <!--/div-->
 
             <!-- Linked Community -->
-              
-            <b-input-group id="LinkedCommunity" prepend="Link to an existing community" style="margin-top:1em; width:100%; text-align:left; overflow:scroll">
-            <b-form-input  placeholder="Select in the list" list="communityNameList" v-model="linkedCommunity"></b-form-input>
-            
-            <datalist id="communityNameList">
-              <option  
-                v-for="communityNameOption in communityNames"
-                v-bind:key="communityNameOption"
-                >
-                {{communityNameOption}}
-              </option>
-            </datalist> 
+            <b-input-group id="LinkedCommunity" prepend="Link to an existing community" style="padding-top: 1em; ">
+              <b-form-input  placeholder="Select in the list" list="communityNameList" v-model="model.linkedCommunity"></b-form-input>
+              <datalist id="communityNameList">
+                <option  
+                  v-for="communityNameOption in communityNames"
+                  v-bind:key="communityNameOption"
+                  >
+                  {{communityNameOption}}
+                </option>
+              </datalist> 
+            </b-input-group>
 
-          </b-input-group>
-            
-            <b-input-group style="padding-top: 1em; " prepend="Tags">
-              <b-form-tags class="text-capitalize"
-                v-model="tags"
+            <!-- Publications -->
+            <b-input-group prepend="Publications" style="padding-top: 1em; text-align:left;">
+            <b-form-tags class="form-control"  style="background: white;"
+                v-model="model.publications"
                 separator=","
-                placeholder="Enter new tags separated by comma"
+                placeholder= "Enter links separated by comma"
+                invalid-tag-text="Please enter a valid link"
+                :tag-validator="linkValidator"
+                duplicate-tag-text="duplicated links"
                 no-add-on-enter
               ></b-form-tags>
             </b-input-group>
-            <!-- <p>
-              {{tags}}
-            </p> -->
 
-
-            <h3 style="padding-top: 1em; text-align:left; ">  Contributors : </h3>
-
+             <!-- Git link-->
+            <b-input-group prepend="Git link" style="padding-top: 1em; text-align:left;">
+              <b-form-input
+                placeholder="Enter git link"
+                v-model="model.gitLink"
+              >
+              </b-form-input>
+            </b-input-group>
             
-            <b-input-group style="padding-top: 1em; text-align:left;" prepend="Uploader">
-                <!-- <b-form-input
-                  v-model="$store.getters.getLoggedUserInfo.email"
-                  disabled
-                >
-                </b-form-input> -->
-              <span class="form-control">
-                {{$store.getters.getLoggedUserInfo.email}}
-              </span>
+            <!-- Model Package Administrators-->
+            <p style="padding-top: 1em; text-align:left; margin-bottom:0">Contributors : Administrators can edit informations, update the model, delete the model. Editors can only edit informations. The uploader of the package is automatically set as an administrator.</p>
+            <b-input-group prepend="Administrators" style="padding-top: 1em; text-align:left;">
+              <b-form-tags class="form-control"  style="background: white;"
+                  v-model="model.administratorsMails"
+                  separator=","
+                  placeholder= "Enter e-mail separated by comma"
+                  invalid-tag-text="Please enter a valid email address"
+                  :tag-validator="emailValidator"
+                  duplicate-tag-text="duplicated e-mail"
+                  no-add-on-enter
+                ></b-form-tags>
             </b-input-group>
 
-            <!-- Model Package Administrators-->
-            <b-row no-gutters style="margin-top:1em;">
-              <b-col lg="9" >
-            
-                <b-input-group prepend="Administrators" style="width:100%; text-align:left; overflow:scroll">
-                <b-form-tags class="form-control"  style="background: white;"
-                    v-model="administrators"
-                    separator=","
-                    placeholder= "Enter e-mail separated by comma"
-                    invalid-tag-text="not registered e-mail"
-                    duplicate-tag-text="duplicated e-mail"
-                    :tag-validator="emailValidator"
-                    no-add-on-enter
-                  ></b-form-tags>
-                </b-input-group>
-              </b-col>
-
-              <b-col lg="3" >
-                <b-input-group id="AddAdministrator" style="width:100%; text-align:left; overflow:scroll">
-                  <b-form-input placeholder=" email list" list="registeredEmailList" v-model="selectedAdministrator"></b-form-input>
-                  
-                    <datalist id="registeredEmailList">
-                      <option  
-                        v-for="emailOption in registeredEmails"
-                        v-bind:key="emailOption"
-                        >
-                        {{emailOption}}
-                      </option>
-                    </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="addAdministrator()" type="submit">Add</b-button>
-                </b-input-group>
-              </b-col>
-            </b-row>
-
             <!-- Model Package Editors -->
-            <b-row no-gutters style="margin-top:1em;">
-              <b-col lg="9" >
-            
-                <b-input-group prepend="Editors" style="width:100%; text-align:left; overflow:scroll">
-                <b-form-tags class="form-control"  style="background: white;"
-                    v-model="editors"
-                    separator=","
-                    placeholder= "Enter e-mail separated by comma"
-                    invalid-tag-text="not registered e-mail"
-                    duplicate-tag-text="duplicated e-mail"
-                    :tag-validator="emailValidator"
-                    no-add-on-enter
-                  ></b-form-tags>
-                </b-input-group>
-              </b-col>
-
-              <b-col lg="3" >
-                <b-input-group id="AddEditor" style="width:100%; text-align:left; overflow:scroll">
-                  <b-form-input placeholder=" email list" list="registeredEmailList" v-model="selectedEditor"></b-form-input>
-                  
-                    <datalist id="registeredEmailList">
-                      <option  
-                        v-for="emailOption in registeredEmails"
-                        v-bind:key="emailOption"
-                        >
-                        {{emailOption}}
-                      </option>
-                    </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="addEditor()" type="submit">Add</b-button>
-                </b-input-group>
-              </b-col>
-            </b-row>
-
-            <!-- Model Package Maintainers -->
-            <b-row no-gutters style="margin-top:1em;">
-              <b-col lg="9" >
-            
-                <b-input-group prepend="Maintainers" style="width:100%; text-align:left; overflow:scroll">
-                <b-form-tags class="form-control"  style="background: white;"
-                    v-model="editors"
-                    separator=","
-                    placeholder= "Enter e-mail separated by comma"
-                    invalid-tag-text="not registered e-mail"
-                    duplicate-tag-text="duplicated e-mail"
-                    :tag-validator="emailValidator"
-                    no-add-on-enter
-                  ></b-form-tags>
-                </b-input-group>
-              </b-col>
-
-              <b-col lg="3" >
-                <b-input-group id="AddMaintainer" style="width:100%; text-align:left; overflow:scroll">
-                  <b-form-input placeholder=" email list" list="registeredEmailList" v-model="selectedMaintainer"></b-form-input>
-                  
-                    <datalist id="registeredEmailList">
-                      <option  
-                        v-for="emailOption in registeredEmails"
-                        v-bind:key="emailOption"
-                        >
-                        {{emailOption}}
-                      </option>
-                    </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="addMaintainer()" type="submit">Add</b-button>
-                </b-input-group>
-              </b-col>
-            </b-row>
-
+            <b-input-group prepend="Editors" style="padding-top: 1em; text-align:left;">
+            <b-form-tags class="form-control"  style="background: white;"
+                v-model="model.editorsMails"
+                separator=","
+                placeholder= "Enter e-mail separated by comma"
+                invalid-tag-text="Please enter a valid email address"
+                :tag-validator="emailValidator"
+                duplicate-tag-text="duplicated e-mail"
+                no-add-on-enter
+              ></b-form-tags>
+            </b-input-group>
 
           </div>
 
-          
-            
-          
-
-
-          <div style="padding-top: 1em;" v-if="packageNameIsValid">
-            <b-button variant="secondary"  v-on:click="submitZip()">Submit model</b-button>
+          <b-button variant="primary" style="margin-top: 1em;" v-on:click="saveModel()">Save metadata</b-button>
+          <div class="mt-3">
+            {{ editMsg  }}
           </div>
-
-
         </div>
 
-        <div v-if="submitted && !treeDataReceived">
-          <p> 
-            <b>Extracting archive, populating database, ...</b> 
-          </p>
-           <p>
-            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
-            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
-            <b-spinner small label="Small Spinner" type="grow"></b-spinner>
-          </p>
-        </div>
-
-        <div v-if="treeDataReceived">
-
-          <b-input-group style="padding-top: 1em; " prepend="Added Tags">
-              <b-form-tags
-                v-model="tags"
-                separator=" "
-                placeholder=" "
-                disabled
-              ></b-form-tags>
-          </b-input-group>
-          
-          
-
-          <b-input-group style="padding-top: 1em; " prepend="Extracted keywords">
-              <b-form-tags
-                v-model="keywords"
-                separator=" "
-                placeholder= " "
-                disabled
-              ></b-form-tags>
-          </b-input-group>
-            
-          <p style="text-align:left; padding-top:1em;">
-            Extracted package structure:
-            <b-tree-view v-on:nodeSelect="treeNodeSelect" :data="treeDataReceived"  :renameNodeOnDblClick=false :contextMenu=false :contextMenuItems=[] ></b-tree-view>
-          </p>
-          
-          
-        
-        </div>
-        
-        
       </div>
       <div class="col-sm-2"/>
       
     </div>
-  
-
-
-
-
   </div>
 
 </template>
 <script>
 
-// import ModelUnitServices from "../services/ModelUnitServices"
-import ClientServerFileSystem from "../services/ClientServerFileSystem"
-import ClientServerJsonModel from "../services/ClientServerJsonModel"
-import UserRequests from "../services/UserRequests"
-import CommunityRequests from "../services/CommunityRequests"
-
+import FileServices from "../services/FileServices"
+import CommunityServices from "../services/CommunityServices"
 import { bTreeView } from 'bootstrap-vue-treeview'
 
-
 export default {
-  name: 'Catalog',
+  name: 'Submit',
 
    data() {
       return {
-
+        regEmail: /^(([^<>()\\[\]\\.,;:\s@"]+(\.[^<>()\\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
+        regLink: /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i,
         packageZip: null,
         packageZipSent : false,
-        
-        packageName:'',
-        PackageNameIsValid:false,
-        PackageNameMsg:'',
-
-        tags:[],
-
         keywords:[],
-
         submitted: false,
-
         treeDataReceived :null,
-
         modelTypeSelected : 'Main',
         modelTypeOptions: [
             {value: 'Main', text: 'Main'},
             {value: 'Component', text: 'Component'},
         ],
-
         isPartOfLargerModel: false,
-        
         registeredPackageNames : [],
         largerModelPackageNames:[],
         selectedLargerPackage : null,
-        
-        
-
         linkedCommunity: null,
+        publications: [],
+        gitLink: null,
         communityNames:[],
-
-        registeredEmails : [],
-        
+        //registeredEmails : [],
         administrators:[],
-        selectedAdministrator: null,
-
+        //selectedAdministrator: null,
         editors:[],
-        selectedEditor: null,
-
-        maintainers:[],
-        selectedMaintainer: null,
-
+        //selectedEditor: null,
+        success: false,
+        model: null,
+        modelExists: false,
+        submitMode: true,
+        editMsg: "",
+        canEdit: true
       }
     },
 
@@ -390,17 +257,12 @@ export default {
     uploadMsg: function(){
       let msg = ""
       if(!this.packageZip && !this.packageZipSent){
-        msg= 'No selected file.zip '
+        msg= 'No selected file.zip'
       }
       if(!this.packageZip && this.packageZipSent){
         msg= 'Model package sent successfully'
       }
-
-      if(this.packageZip){
-        // return 'Selected package: '+this.packageZip.name
-      }
       return msg;
-
     }
   },
 
@@ -409,141 +271,117 @@ export default {
   },
 
   async created() {
-
-    // console.log("START created Catalog")
-
-    // this.modelUnitSchema = ModelUnitServices.buildSchema();
-
-    // console.log("this.modelUnitSchema")
-    // console.log(this.modelUnitSchema)
-
-    // console.log("END created Catalog")
   },
 
   async mounted() {
-    
-    console.log("START mounted Catalog")
-
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
 
-    this.registeredEmails = await UserRequests.getRegisteredEmails();
+    if (this.$route.name == "Edit" && this.$route.params.modelid != null){
+      this.submitMode = false
+      this.model = this.$store.getters.getModelById(this.$route.params.modelid)
+      this.setKeywords()
+      if (!this.isAdmin() && !this.isEditor()){
+        this.canEdit = false
+      }
+    }
 
-    this.registeredPackageNames = await ClientServerJsonModel.findAllModelPackageNames();
-
-    let communityList = await CommunityRequests.getAllCommunities()
-
+    //this.registeredEmails = await UserServices.getRegisteredEmails();
+    this.registeredPackageNames = this.$store.getters.getModelIds
+    let communityList = await CommunityServices.getAllCommunities()
     this.communityNames = communityList.map(c => c.name)
-
-    console.log("END mounted Catalog")
   },
-
-  
 
   methods: {
 
     treeNodeSelect(event){
-      console.log("event.data.name")
-      
-      console.log("selected "+event.selected)
-
       if(event.selected){
         console.log(event.data.name)
-
       }
-
     },
 
-    // TODO remove not used
-    handleZipUpload(){
-      console.log("START handleZipUpload")
+    isAdmin(){
+      return (this.$store.getters.getLoggedUserInfo != null &&
+      this.$store.getters.getLoggedUserInfo.associatedModels.findIndex(m => (m.modelId == this.model.id && m.role == "administrator")) != -1)
+    },
 
-      this.packageZip = this.$refs.zip.files[0];
-      
-
-      console.log(" zip file")
-      console.log(this.packageZip)
-
-
-      console.log("END handleZipUpload")
+    isEditor(){
+      return (this.$store.getters.getLoggedUserInfo != null &&
+      this.$store.getters.getLoggedUserInfo.associatedModels.findIndex(m => (m.modelId == this.model.id && m.role == "editor")) != -1)
     },
 
     async submitZip(){
-      console.log("START submitZip")
-
-      // let formData = new FormData();
-      // formData.append('file', this.file);
-
-      
-      console.log("this.tags")
-      console.log(this.tags)
-
-      this.packageZip.packageName = this.packageName
-      
-      console.log("this.packageZip to send: ")
-      console.log(this.packageZip)
 
       const modelMetaDataPart ={
-        
-        zipFileName: this.packageZip.name,
-        packageName: this.packageName,
-        modelType : this.modelTypeSelected,
-        
-        largerModelPackageNames: this.largerModelPackageNames,
-        
-        linkedCommunity: this.linkedCommunity,
-
         uploaderMail: this.$store.getters.getLoggedUserInfo.email,
-        administratorMails: this.administrators,
-        editorsMails: this.editors,
-        maintainerMails: this.maintainers,
-
-        tags: this.tags,
       }
 
+      this.submitted =true
+      this.modelExists = false
+      this.treeDataReceived = null
+      this.keywords = []
+      this.model = null
 
-      this.submitted =true;
-      const res =  await ClientServerFileSystem.sendZip(this.packageZip,modelMetaDataPart)
+      const res = await FileServices.sendZip(this.packageZip,modelMetaDataPart)
+      this.success = res.success
       this.treeDataReceived = [res.tree]
-      this.keywords = res.extractedKeywords
+      this.model = res.model
+      this.setKeywords()
 
-      console.log("received treeData from server: ")
-      console.log(this.treeDataReceived[0])
+      if (!this.success){
+        this.submitted = false
+        if (this.treeDataReceived)
+          this.modelExists = true
+      }
       
-
       this.packageZip = null
+      this.packageZipSent = true;
+      if (this.success){
+        this.$store.commit("setModel", this.model);
+      }
+    },
 
-      this.packageZipSent=true;
+    async saveModel(){
+      if (this.model.administratorsMails.length == 0){
+        this.editMsg = "At least one administrator is required."
+        return
+      }
+      this.editMsg = "" 
+      let indexLatestVersion = this.getModelLatestVersionIndex()
+      this.model.versions[indexLatestVersion].metaData.keywords = this.keywords
+      let editSuccess = await this.$store.dispatch('saveModel',this.model);
+      if (editSuccess)
+        this.editMsg = "Model saved"
+      else
+        this.editMsg = "Error while saving the model"
+    },
 
-      console.log("END submitZip")
+    getModelLatestVersionIndex(){
+      let latestVersionNum = this.model.versionsList.sort()[this.model.versionsList.length -1]
+      let indexLatestVersion = this.model.versions.findIndex(compo => compo.Attributs.version == latestVersionNum)
+      return indexLatestVersion
+    },
+
+    setKeywords(){
+      let indexLatestVersion = this.getModelLatestVersionIndex()
+      this.keywords = this.model.versions[indexLatestVersion].metaData.keywords
     },
 
     addLargerPackage(){
       this.largerModelPackageNames.push(this.selectedLargerPackage)
     },
 
-    addAdministrator(){
-      if(this.selectedAdministrator !==null && !this.administrators.includes(this.selectedAdministrator))
-        this.administrators.push(this.selectedAdministrator)
+    packageValidator(name){
+      return this.registeredPackageNames.includes(name)
     },
 
-    addEditor(){
-      if(this.selectedEditor !== null && !this.editors.includes(this.selectedEditor))
-        this.editors.push(this.selectedEditor)
+    emailValidator(email){
+      return (email == "")? "" : (this.regEmail.test(email)) ? true : false;
     },
 
-    addMaintainer(){
-      if(this.selectedMaintainer !== null && !this.maintainers.includes(this.selectedMaintainer))
-        this.maintainer.push(this.selectedMaintainer)
-    },
-
-    packageValidator(tag){
-      return this.registeredPackageNames.includes(tag)
-    },
-
-    emailValidator(tag){
-      return this.registeredEmails.includes(tag)
+    linkValidator(link){
+      return (link == "")? "" : (this.regLink.test(link)) ? true : false;
     },
     
   },
@@ -552,24 +390,10 @@ export default {
 
     packageZip: function(){
       if(this.packageZip){
-        this.packageName = this.packageZip.name.replace('.zip','')
+        //this.packageName = this.packageZip.name.replace('.zip','')
         return this.packageZipSent=false;
-
       }
     },
-
-    packageName: function(){
-      
-        if(this.packageName.indexOf(' ')!==-1 || !this.packageName ){
-          this.packageNameIsValid =false
-          this.packageNameMsg = 'model name cannot be empty or contain spaces'
-        }else{
-          this.packageNameIsValid = true
-          this.packageNameMsg =''
-        }
-      
-    }
-
   }
 
 }
@@ -580,8 +404,6 @@ export default {
 .packageZipInputGroup{
   width: 80%;
   text-align: center;
-  
-  
 }
 
 p{
@@ -591,16 +413,10 @@ p{
   padding-right: 2px;
 }
 
-
-
 .scrollable-menu {
     height: auto;
     max-height: 60vh;
     overflow: scroll;
 }
-
-
-
-
 
 </style>

@@ -28,7 +28,7 @@
           <hr>
           <b-row no-gutters>
               <b-col lg="3" >
-                  <b-card-img :id="'img-'+c._id" src="images/community_iconfinder_128px.png" style="max-heigth:100px; max-width:100px"   alt="Community Preview" ></b-card-img>
+                  <b-card-img :src="getPicturePath(c.picture)" style="max-heigth:100px; max-width:100px"   alt="Community Preview" ></b-card-img>
               </b-col>
               <b-col lg="9" class="text-left" style="font-size:0.75em;">
                   
@@ -78,16 +78,13 @@
 <script>
 
 
-
-import CommunityRequests from "../../services/CommunityRequests"
-import ClientServerFileSystem from "../../services/ClientServerFileSystem"
-
+import CommunityServices from "../../services/CommunityServices"
+import config from '../../config'
 
 export default {
   name: 'Communities',
 
   components: {
-
   },
 
   props:{
@@ -96,73 +93,48 @@ export default {
 
   data() {
     return {
-
-      
-
       communityList: [],
-      
       communityListLoaded: false,
-
-
-      
-      
     }
   },
 
   async created() {
-
   },
 
   async mounted() {
-    
-    console.log("START mounted Communities")
-
-    this.communityList = await CommunityRequests.getAllCommunities()
-
-    // for(c of this.communityList){
-    //   c['imageFile']= ClientServerFileSystem.downloadFile(c.image_path)
-    // }
-
-    console.log('communityList')
-    console.log(this.communityList) 
-
+    this.communityList = await CommunityServices.getAllCommunities()
     this.communityListLoaded =true;
 
-    try{
-
-      await Promise.all(this. communityList.map( async c =>{
+    /*try{
+      await Promise.all(this.communityList.map( async c =>{
         
         let serverFilePath = c.image_path
-        let file = await ClientServerFileSystem.downloadFile(serverFilePath)
+        let file = await FileServices.downloadFile(serverFilePath)
         c['file']=file
         let idxLastSep = serverFilePath.lastIndexOf('/')
         let fileName = serverFilePath.slice(idxLastSep+1)
 
         var reader = new FileReader();
         reader.onload = function(e)  {
-
           var image = document.querySelector(`#img-${c._id}`);
           image.src = e.target.result;
           image.title = fileName;
-
         }
         reader.readAsDataURL(file);      
-
       }))
-
-      console.log("END mounted Communities")
-    } catch (err) { 
+    } catch (err) {
       console.error(err);
-    }
-
+    }*/
   },
 
   computed:{
-
   },
 
-
   methods: {
+
+    getPicturePath(picture){
+      return `http://${config.server.host}:${config.server.port}/community_images/` + picture
+    },
 
     userCanEdit(c){
       if(this.$store.getters.getLoggedUserInfo){
@@ -170,7 +142,6 @@ export default {
       }
       return false
     },
-
 
   },
 

@@ -15,34 +15,7 @@
       <h3>User Profile</h3>
 
       <div v-if="$store.getters.getLoggedUserInfo !==null">
-
-      <b-input-group prepend="First name" style="margin-top:1em">
-        <b-form-input
-          placeholder="(optional)"
-          v-model="firstName"
-          type="text"
-        >
-        </b-form-input>
-      </b-input-group>
-
-      <b-input-group prepend="Last name" style="margin-top:1em">
-        <b-form-input
-          placeholder="(optional)"
-          v-model="lastName"
-          type="text"
-        >
-        </b-form-input>
-      </b-input-group>
-
-      <b-input-group prepend="Pseudo" style="margin-top:1em">
-        <b-form-input
-          placeholder="(optional)"
-          v-model="pseudo"
-          type="text"
-        >
-        </b-form-input>
-      </b-input-group>
-
+      
       <b-input-group prepend="Email" style="margin-top:1em">
         <b-form-input
           :placeholder="email"
@@ -51,11 +24,55 @@
         >
         </b-form-input>
       </b-input-group>
-      <div v-if="emailErrorMsg">
+
+      <b-input-group prepend="First name" style="margin-top:1em">
+        <b-form-input
+          v-model="firstName"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
+
+      <b-input-group prepend="Last name" style="margin-top:1em">
+        <b-form-input
+          v-model="lastName"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
+
+      <div v-if="requiredFieldsErrorMsg">
         <p style="color:red;">
-          {{emailErrorMsg}}
+          {{requiredFieldsErrorMsg}}
         </p>
       </div>
+
+      <b-input-group prepend="City" style="margin-top:1em">
+        <b-form-input
+          placeholder="(optional)"
+          v-model="city"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
+
+      <b-input-group prepend="Country" style="margin-top:1em">
+        <b-form-input
+          placeholder="(optional)"
+          v-model="country"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
+
+      <b-input-group prepend="Institution" style="margin-top:1em">
+        <b-form-input
+          placeholder="(optional)"
+          v-model="institution"
+          type="text"
+        >
+        </b-form-input>
+      </b-input-group>
 
       <b-button variant="secondary" @click="flipShowPassword()" style="margin-top:1em">
         {{`${showPassword?'-':'+'} Edit password`}}
@@ -72,8 +89,6 @@
           </b-form-input>
         </b-input-group>
 
-
-        
         <b-input-group prepend="Retype password" style="margin-top:1em">
           <b-form-input
             :placeholder="password2"
@@ -83,13 +98,11 @@
           </b-form-input>
         </b-input-group>
 
-      
-
-          <div v-if="passwordErrorMsg">
-            <p style="color:red;">
-              {{passwordErrorMsg}}
-            </p>
-          </div>
+        <div v-if="passwordErrorMsg">
+          <p style="color:red;">
+            {{passwordErrorMsg}}
+          </p>
+        </div>
 
       </div>
 
@@ -123,7 +136,7 @@
 
 <script>
 
-import Authentification from "../services/Authentification";
+import AuthServices from "../services/AuthServices";
 
 export default {
   name: "App",
@@ -137,22 +150,19 @@ export default {
 
   data() {
     return {
-
       firstName:"",
       lastName:"",
-      pseudo:"",
-
+      city:"",
+      country:"",
+      institution:"",
       email: "",
-      emailErrorMsg:"",
-      
+      requiredFieldsErrorMsg:"",
       showPassword:false,
       password1: "",
       password2: "",
       passwordErrorMsg:"",
-
       profileErrorMsg:"",
       profileSuccessMsg:"",
-
     };
   },
 
@@ -165,7 +175,9 @@ export default {
     }else{
       this.firstName = this.$store.getters.getLoggedUserInfo.firstName
       this.lastName = this.$store.getters.getLoggedUserInfo.lastName
-      this.pseudo = this.$store.getters.getLoggedUserInfo.pseudo
+      this.city = this.$store.getters.getLoggedUserInfo.city
+      this.country = this.$store.getters.getLoggedUserInfo.country
+      this.institution = this.$store.getters.getLoggedUserInfo.institution
       this.email = this.$store.getters.getLoggedUserInfo.email
     }
   },
@@ -177,93 +189,84 @@ export default {
     },
 
     async updateProfile() {
-
-      console.log('START updateProfile')
+      this.requiredFieldsErrorMsg = ""
+      this.passwordErrorMsg = ""
+      this.profileErrorMsg = ""
+      this.profileSuccessMsg = ""
+      let goOn = true
       try {
-        
-        console.log(`this.email ${this}`)
-
-        if(!this.validEmail()){
-          this.emailErrorMsg = "required email"
-          console.log('!this.validEmail()')
+        if(!this.validForm()){
+          this.requiredFieldsErrorMsg = "some required fields are empty"
+          goOn = false
         }
 
         if(!this.validPasswords()){
           this.passwordErrorMsg = "required passwords should be equal"
-          console.log('!this.validPasswords()')
+          goOn = false
         }
 
-        if(this.passwordErrorMsg || this.emailErrorMsg){
-          console.log('this.emailErrorMsg: '+this.emailErrorMsg)
-          console.log('this.passwordErrorMsg: '+this.passwordErrorMsg)
-
+        if (!goOn)
           return
-        }
-
 
         let userProfileDetails = {
           firstName: this.firstName,
           lastName: this.lastName,
-          pseudo: this.pseudo,
-
+          city: this.city,
+          country: this.country,
+          institution: this.institution,
           email: this.email,
-          category: "user"
         }
 
         if(this.password2){
           userProfileDetails['password']=this.password2
         }
 
+        const res = await AuthServices.updateProfile(userProfileDetails)
 
-
-        const registeredUserInfo =await Authentification.updateProfile(userProfileDetails)
-        console.log(registeredUserInfo)
-
-        if(registeredUserInfo.errorMsg === undefined ){
+        if(ResizeObserverEntry.errorMsg === undefined ){
           delete userProfileDetails.password
           this.$store.commit('setLoggedUserInfo', userProfileDetails)
           this.profileSuccessMsg= "Profile successful"
-          console.log('this.$store.state.loggedUserInfo')
-          console.log(this.$store.state.loggedUserInfo)
         }else{
-          this.profileErrorMsg = registeredUserInfo.errorMsg;
+          this.profileErrorMsg = res.errorMsg;
         }
-        
-        
       } catch (error) {
         console.log(error)
         this.profileErrorMsg = error.message;
         throw(error)
-      }finally{
-        console.log('END updateProfile')
       }
     },
 
     validPasswords(){
-      return this.password1 === this.password2;
+      return this.password1.length>0 && this.password1 === this.password2;
     },
 
-    validEmail(){
-      return this.email.length>0;
+    validForm(){
+      return this.email.length>0 && this.firstName.length>0 && this.lastName.length>0
     },
-
   },
 
   watch:{
 
     email(){
-      this.emailErrorMsg=""
-      this.profileErrorMsg=""
-      this.profileSuccessMsg=""
+      if (this.validForm())
+        this.requiredFieldsErrorMsg=""
     },
-
+    firstName(){
+      if (this.validForm())
+        this.requiredFieldsErrorMsg=""
+    },
+    lastName(){
+      if (this.validForm())
+        this.requiredFieldsErrorMsg=""
+    },
     password1(){
-      this.passwordErrorMsg=""
-      this.profileSuccessMsg=""
+      if (this.validPasswords())
+        this.passwordErrorMsg=""
     },
     password2(){
-      this.passwordErrorMsg=""
-      this.profileSuccessMsg=""
+      if (this.validPasswords())
+        this.passwordErrorMsg=""
     },
   },
 
