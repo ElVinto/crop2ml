@@ -5,6 +5,7 @@ Représentation sémantique et modulaire des modèles de culture à l'aide d'un 
 ### Prerequisites ###
 docker
 docker-compose
+git
 node 16
 docker-desktop if possible
 vscode if possible
@@ -17,8 +18,6 @@ Build and run db container
 In new terminal
 `docker exec -it crop2ml_db_1 /bin/sh`
 `mongo -u "root" -p "password"`
-##`CREATE DATABASE dbtest;`
-##`\q`
 Ctrl+D to exit the bash
 # Init server
 In "server" folder
@@ -51,8 +50,30 @@ __frontend__ : http://localhost:8080
 
 
 ##### PROD #####
+### Prerequisites ###
 docker
 docker-compose
+git
+
+### Installation
+# Get source code
+
+# Init DB
+Build and run db container
+`docker-compose -f docker-compose.yml up`
+In new terminal
+`docker exec -it crop2ml_db_1 /bin/sh`
+`mongo -u "root" -p "password"`
+Ctrl+D to exit the bash
+# Init server
+In "server" folder
+Delete package-lock, node_modules if exist then
+`npm install`
+# Init client
+In "client" folder
+delete package-lock and node_modules if exist then
+`npm install`
+
 
 
 
