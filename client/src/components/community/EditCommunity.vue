@@ -112,7 +112,6 @@
 
 import CommunityServices from "../../services/CommunityServices"
 import UserServices from "../../services/UserServices"
-import ModelServices from "../../services/ModelServices"
 import config from "../../config"
 const path = require('path');
 
@@ -147,7 +146,8 @@ export default {
     reader.readAsDataURL(this.inputImgFile);
 
     this.registeredEmails = await UserServices.getRegisteredEmails();
-    this.packageNames = await ModelServices.getAllModelsPackageNames();
+    //this.packageNames = await ModelServices.getAllModelsPackageNames();
+    this.packageNames = this.$store.getters.getModelIds
   },
 
   methods: {

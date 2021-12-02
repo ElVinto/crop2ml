@@ -59,6 +59,24 @@ class UserServices{
     }
 
     //OK
+    static async deleteRole(email, modelId){
+        try{
+            const filter = {email: email};
+            let user = await User.findOne(filter)
+            if (user != null){
+                let index = user.associatedModels.findIndex(m => m.modelId == modelId);
+                if (index != -1){
+                    user.associatedModels.splice(index,1);
+                    await user.save();
+                }
+            }
+        } catch(error){
+            console.log(error)
+            reject(error);
+        }
+    }
+
+    //OK
     static async notifyContributor(email, packageName){
         return new Promise(async (resolve, reject) => {
             try{

@@ -2,10 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Welcome from '../components/Welcome';
-import Catalog from '../components/Catalog';
 import Repository from '../components/Repository';
 import Submit from '../components/Submit';
-import Update from '../components/Update';
 import Profile from '../components/Profile';
 import LegalMentions from '../components/LegalMentions.vue';
 
@@ -33,12 +31,6 @@ export default new Router({
     },
 
     {
-      path: '/Catalog',
-      name: 'Catalog',
-      component: Catalog
-    },
-
-    {
       path: '/Repository',
       name: 'Repository',
       component: Repository
@@ -51,9 +43,10 @@ export default new Router({
     },
 
     {
-      path: '/Update',
-      name: 'Update',
-      component: Update
+      path: '/Edit/:modelid',
+      name: 'Edit',
+      component: Submit,
+      props: true
     },
 
     {

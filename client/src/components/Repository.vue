@@ -1,93 +1,46 @@
 <template>
 
-  <div id ="repository" v-if="$store.getters.getDataAreLoaded" style="display:block;  " >
+  <div id ="repository" v-if="$store.getters.getDataAreLoaded" style="display:block; margin-bottom:100px" >
 
     <div class ="row"  > 
       
       <div id="models" class="col-lg-3" >
+        <b-card id ="modelsCard">
+          <b-card-header>
+            <b-input-group id="Search"  >
+              <b-form-input placeholder="keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
+              <datalist id="wordOptionDataList">
+                <option  
+                  v-for="wordOption in $store.getters.getWordOptions"
+                  v-bind:key="wordOption"
+                  >
+                  {{wordOption}}
+                </option>
+              </datalist> 
+              <b-button size="sm" class="my-2 my-sm-0" v-on:click="submitSearch()" type="submit">Filter</b-button>
+            </b-input-group>
 
-        <b-card >
+            <br>
 
-          <b-card-header header-tag="nav">
-            <b-nav tabs fill>
-              <b-nav-item @click="activateSearchMode()"  >Search</b-nav-item>
-              <b-nav-item @click="activateHierarchyMode()" >Hierarchy</b-nav-item>
-              <b-nav-item @click="activateListMode()" >List</b-nav-item>
-              <b-nav-item @click="activatePersoMode()" >Mine</b-nav-item>
+            <b-form-checkbox v-model="showOnlyPersoModels" @change="submitSearch()" class="mr-n2">
+              Show only models which I am editor or administrator.
+            </b-form-checkbox>
 
-              <!-- <b-button variant="outline-secondary" @click="activateSearchMode()"  >Search</b-button>
-              <b-button variant="outline-secondary" @click="activateHierarchyMode()"  >Hierarchy</b-button>
-              <b-button variant="outline-secondary" @click="activateListMode()"  >List</b-button> -->
-              
-            </b-nav>
           </b-card-header>
           
           <b-card-body >
 
-            <div v-if="searchMode" id="modelSearch" class="row">
+            <div id="modelTreeView"  class="row" >
               <div  class="col-sm-12">
-                <p>
-                    Find a model by keywords
-                </p>
-
-                <b-input-group id="Search"  >
-                  <b-form-input placeholder="keyword" list="wordOptionDataList" v-model="selectedWord"></b-form-input>
-                  
-                  <datalist id="wordOptionDataList">
-                    <option  
-                      v-for="wordOption in $store.getters.getWordOptions"
-                      v-bind:key="wordOption"
-                      >
-                      {{wordOption}}
-                    </option>
-                  </datalist> 
-
-                  <b-button size="sm" class="my-2 my-sm-0" v-on:click="submitSearch()" type="submit">Search</b-button>
-                </b-input-group>
-
-                <div v-if="selectedWord.length>0 && searchResults.fromKeywords !== null && searchResults.fromKeywords.length>0">
-                  <hr>
-                  <p style="text-align:left; ">
-                    {{`Keyword "${selectedWord}": models founds`}}
-                  </p>
-                  <b-list-group class="scrollable-submenu" role="menu" style="width:100%">
-                    <b-list-group-item 
-                      v-for="modelid in searchResults.fromKeywords"
-                      v-bind:key="modelid"
-                      v-on:click="selectModelById(modelid)"
-                      style="font-size:0.7em" 
-                    >
-                      {{ modelid}}
-                    </b-list-group-item>
-                  </b-list-group>
-                </div>
-
-                <div v-if="submittedSearch && searchResults.fromKeywords.length ===0 && searchResults.fromKeywords.length ===0">
-                  <hr>
-                  <p style="font-size:0.9em">
-                    {{`No model has been found `}}
-                  </p>
-                </div>
-
-              </div>
-            </div>
-
-            <div v-if="hierarchyMode" id="modelTreeView"  class="row" >
-              <div  class="col-sm-12">
-                <p>
-                    Select a model in the hierarchy 
-                </p>
                 
                 <div v-if="modelTree">
-                  
                   <div id="packages">
                   <b-tree-view 
                     v-on:nodeSelect="treeNodeSelect" 
                     :data="modelTree"  
-
                     nodeKeyProp="id"
+                    nodeLabelProp="name"
                     nodeChildrenProp="children"
-
                     :renameNodeOnDblClick=false 
                     :contextMenu=false 
                     :contextMenuItems=[] 
@@ -98,95 +51,13 @@
 
               </div>
             </div>
-
-            <div v-if="listMode" id="modelList"  class="row" >
-              <div  class="col-sm-12">
-                <p>
-                  Select a model in the list: 
-                </p>
-                <b-list-group class="scrollable-menu" role="menu" style="width:100%">
-                  <b-list-group-item 
-                    v-for="modelid in $store.getters.getAlphabeticListOfModels"
-                    v-bind:key="modelid"
-                    v-on:click="selectModelById(modelid)"
-                    style="font-size:0.75em" 
-                  >
-                    {{ modelid}}
-                  </b-list-group-item>
-                </b-list-group>
-              </div>
-            </div>
-
-            <div v-if="persoMode" id="modelPerso"  class="row" >
-              <div  class="col-sm-12">
-                <p>
-                  You are editor or administrator of those models.
-                  Select a model in the list: 
-                </p>
-                <b-list-group class="scrollable-menu" role="menu" style="width:100%">
-                  <b-list-group-item 
-                    v-for="model in $store.getters.getListOfPersonalModels"
-                    v-bind:key="model"
-                    v-on:click="selectModelById(model.modelId)"
-                    style="font-size:0.75em" 
-                  >
-                    {{ model.modelId}}<br>
-                    <!--b-badge color="primary">{{ model.role}}</b-badge-->
-                  </b-list-group-item>
-                </b-list-group>
-              </div>
-            </div>
           
           </b-card-body>
         </b-card>
-
       </div>
 
       <div id="modelContent"   class="col-lg-7"  >
         <div v-if="selectedModelId">
-
-          <!-- <div id="modelIdAndActions" class="row">
-            <div class="col-md-12">
-              <h2 style="text-align:center;">{{ `${selectedModelId}`}} </h2>
-            </div>
-          </div > -->
-
-          <!-- <div id="Actions" class="row">
-            <div class="col-md-4">
-                <div @mouseleave="showCurrentRating(0)" style="display:inline-block;">
-                    <star-rating :show-rating="false" @current-rating="showCurrentRating" @rating-selected="setCurrentSelectedRating" :increment="0.5"></star-rating>
-                </div>
-                <div style="margin-top:10px;font-weight:bold;">{{currentRating}}</div>
-            </div >
-
-            <div class="col-md-8">
-              <div class="row" style="margin-top:5px;">
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-success myButtonStyle" v-on:click="saveModel()"  > 
-                    Save 
-                  </button>
-                </div >
-
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-info myButtonStyle" v-on:click="reInitModel()"  > 
-                    Reinit 
-                  </button>
-                </div >
-
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-danger myButtonStyle" v-on:click="deleteModel()"  > 
-                    Delete 
-                  </button>
-              </div >
-
-            </div >
-
-              
-              
-
-            </div >
-
-          </div> -->
 
           <div id="modelId" v-if="errorMsg" class="row">
             <div class="col-md-12">
@@ -196,8 +67,55 @@
 
           <br>
 
-          <model-preview :selectedModel="selectedModel"></model-preview>
+          <div>
+            <b-card 
+                :header="selectedModel.Attributs.id"
+                header-bg-variant="secondary"
+                header-text-variant="white"
+                class="text-left"
+            > 
+                <b-row no-gutters>
+                    <b-col lg="3" >
+                        <b-card-img src="images/modeling_iconfinder_128px.png" style="max-width:100px"   alt="Model Preview" ></b-card-img>
+                    </b-col>
+                    <b-col lg="9" class="text-left">
+                        <h4>  {{ selectedModel.Description.Title}}</h4>
+                        <p>
+                            {{ ` ${selectedModel.Description.Abstract}`}} <br>
+                            {{ `Institution: ${selectedModel.Description.Institution}`}}   <br>     
+                            {{ `Authors: ${selectedModel.Description.Authors}`}}
+                        </p>
+                    </b-col>
+                </b-row>
+                <b-row no-gutters >
+                  <div class="col-md-3 text-center">
+                      <b-button variant="primary" @click="downloadModel">Download model</b-button>
+                  </div >
+                  <!--div class="col-md-4">
+                      <div @mouseleave="showCurrentRating(0)" style="display:inline-block;">
+                          <star-rating :show-rating="false" @current-rating="showCurrentRating" @rating-selected="setCurrentSelectedRating" :increment="0.5"></star-rating>
+                      </div>
+                      <div style="margin-top:10px;font-weight:bold;">{{currentRating}}</div>
+                  </div -->
+                  <div class="col-md-3 text-center" v-if="isAdmin() || isEditor()">
+                      <b-button variant="primary" @click="$router.push({name: 'Edit', params: { modelid : selectedModelId }})">Edit model</b-button>
+                  </div >
+                  <div class="col-md-3 text-center" v-if="isAdmin()">
+                      <b-button variant="primary" @click="$router.push('/Submit')">Upload new version</b-button>
+                  </div >
+                  <div class="col-md-3 text-center" v-if="isAdmin()">
+                      <b-button variant="danger" v-b-modal.modal-1>Delete model</b-button>
+                      <b-modal id="modal-1" title="Delete model ?" ok-title="Yes I'm sure" ok-variant="danger" @ok="deleteModel()">
+                        <p class="my-4">{{ `Are you sure you want to delete the version ${this.selectedVersion} of the model ${this.compoModel.Attributs.name} ?`}}</p>
+                      </b-modal>
+                  </div >
+                  
+                </b-row>
+            </b-card>
+          </div>
+
           <br>
+
           <div id="ModelDetails">
             <b-tabs content-class="mt-3">
               
@@ -219,12 +137,22 @@
                           <b-td style='font-weight:bold;'>{{ k }}</b-td>
                           <b-td>{{ v }}</b-td>
                       </b-tr>
+                      <b-tr v-if="exists(model.publications)">
+                          <b-td style='font-weight:bold;'>Publications</b-td>
+                          <b-td>
+                            <div v-for="link in model.publications" :key="link"><a :href="link">{{ link }}</a></div>
+                          </b-td>
+                      </b-tr>
+                      <b-tr v-if="exists(model.gitLink)">
+                          <b-td style='font-weight:bold;'>Git link</b-td>
+                          <b-td><a :href="this.model.gitLink">{{ this.model.gitLink }}</a></b-td>
+                      </b-tr>
                   </b-tbody>
                 </b-table-simple>
               </b-tab>
 
-              <b-tab title="Algorithm">
-                <b-table-simple v-if="hasAlgorithm()" class="text-left" :responsive="true" :striped="true" :hover="true">
+              <!--b-tab title="Algorithm" v-if="exists(selectedModel.Algorithm)">
+                <b-table-simple class="text-left" :responsive="true" :striped="true" :hover="true">
                   <b-tbody>
                       <b-tr v-for="(v,k) in selectedModel.Algorithm.Attributs" v-bind:key="k">
                           <b-td style='font-weight:bold;'>{{ k }}</b-td>
@@ -232,21 +160,27 @@
                       </b-tr>
                   </b-tbody>
                 </b-table-simple>
-              </b-tab>
+              </b-tab-->
 
-              <b-tab title="Inputs">
+              <b-tab title="Inputs" v-if="exists(selectedModel.Inputs)">
                 <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
-                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Inputs.Input)"></b-table>
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="setInputs(selectedModel.Inputs.Input)"></b-table>
                 </div>
               </b-tab>
 
-              <b-tab title="Outputs">
+              <b-tab title="Outputs" v-if="exists(selectedModel.Outputs)">
                 <div v-if="toArrayIfNeeded(selectedModel.Outputs.Output)">
-                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="toItems(selectedModel.Outputs.Output)"></b-table>
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="setOutputs(selectedModel.Outputs.Output)"></b-table>
                 </div>
               </b-tab>
 
-              <b-tab title="Parameters">
+              <b-tab title="Parameters" v-if="exists(selectedModel.Inputs)">
+                <div v-if="toArrayIfNeeded(selectedModel.Inputs.Input)">
+                  <b-table class="text-left" :responsive="true" :striped="true" :hover="true" :items="setParameters(selectedModel.Inputs.Input)"></b-table>
+                </div>
+              </b-tab>
+
+              <!--b-tab title="Parametersets" v-if="exists(selectedModel.Parametersets)">
                 <div v-if="toArrayIfNeeded(selectedModel.Parametersets.Parameterset)">
 
                   <b-card
@@ -273,9 +207,9 @@
                   </b-card>
 
                 </div>
-              </b-tab>
+              </b-tab-->
 
-              <b-tab title="Tests">
+              <!--b-tab title="Testsets" v-if="exists(selectedModel.Testsets)">
                 <div v-if="toArrayIfNeeded(selectedModel.Testsets.Testset)">
 
                   <b-card
@@ -335,9 +269,9 @@
                   </b-card>
 
                 </div>
-              </b-tab>
+              </b-tab-->
 
-              <b-tab title="Pictures">
+              <b-tab title="Pictures" v-if="exists(selectedModel.metaData) && exists(selectedModel.metaData.pictures)">
                 <b-card v-for="picture in selectedModel.metaData.pictures" :key="picture">
                   <b-card-img :src="getPicturePath(picture)"/>
                 </b-card>
@@ -348,32 +282,31 @@
         </div>
 
         <div v-else>
-            Select a model to view its description
+          <br>
+          <b>Select a model on the left to view its description</b>
         </div>
           
       </div>
+
+
 
       <div id="modelInfo" class="col-lg-2" >
         
         <div>
           <b-card sub-title="Uploader" >
-            
             <b-card-img 
-                src="images/user_icon.png" 
-                style="max-width:50px" 
-                alt="User"
-                top>
+              src="images/user_icon.png" 
+              style="max-width:50px" 
+              alt="User"
+              top>
             </b-card-img>
-            
             <b-card-text v-if="selectedModelId" class="modelInfoCardText">
-                {{selectedModel.metaData.uploaderMail}}
+              {{compoModel.metaData.uploaderMail}}
             </b-card-text>
-            
           </b-card>
         </div>
 
         <div>
-          
           <b-card sub-title="Version" >
             <b-card-img 
                 src="images/version_iconfinder_128px.png" 
@@ -381,13 +314,11 @@
                 alt="Users"
                 top>
             </b-card-img>
-
             <b-card-text v-if="selectedModelId" class="modelInfoCardText">
-                {{selectedModel.Attributs.version}}
+              <b-form-select v-model="selectedVersion" :options="this.model.versionsList">
+              </b-form-select>
             </b-card-text>
-
           </b-card>
-
         </div>
 
         <div>
@@ -398,32 +329,30 @@
                 alt="Users"
                 top>
             </b-card-img>
-
+            <b-card-text v-if="selectedModelId" class="modelInfoCardText">
+                {{model.linkedCommunity}}
+            </b-card-text>
           </b-card>
-
         </div>
 
         <div>
           <b-card sub-title="Keywords" >
-          <b-card-img 
+            <b-card-img 
                 src="images/tag2_inconfinder_128px.png" 
                 style="max-width: 50px" 
                 alt="Users"
                 top>
             </b-card-img>
-            
             <div  v-if="selectedModelId">
-              <b-form-tags  class="modelInfoCardText text-capitalize" input-id="tags-basic" 
-                v-model="selectedModel.metaData.keywords"
+              <b-form-tags class="modelInfoCardText text-capitalize" input-id="tags-basic" 
+                v-model="compoModel.metaData.keywords"
                 disabled placeholder="">
               </b-form-tags>
             </div>
-            
-
           </b-card>
         </div>
 
-         <div>
+        <!--div>
           <b-card sub-title="Favourite by" >
           <b-card-img 
                 src="images/favourite_iconfinder_128px.png" 
@@ -432,14 +361,11 @@
                 top>
             </b-card-img>
           </b-card>          
-        </div>
+        </div-->
         
-
-      
-      
       </div>
 
-  </div>
+    </div>
   </div>
   
 </template>
@@ -447,52 +373,37 @@
 
 import { bTreeView } from 'bootstrap-vue-treeview'
 // import StarRating from 'vue-star-rating'
-
+import FileServices from "../services/FileServices"
 import ModelServices from "../services/ModelServices"
-
-import ModelPreview from './ModelPreview'
 import config from '../config'
 
 
 export default {
-  name: 'Catalog',
+  name: 'Repository',
 
   components: {
     // StarRating,
-    bTreeView,
-    ModelPreview,
+    bTreeView
   },
 
   data() {
     return {
-      file:'',
-      fileName:'',
-      packageZip:{},
-      packageName: '',
       errorMsg : "",
-      selectedModelId: null,
-      selectedModel:{},
-      modelUnitSchema :{},
-      expandedModelDetails: false,
-      expandedModelAttributs :false,
-      expandedDescription :false,
-      expandedAlgorithm :false,
-      expandedModelInputs :false,
-      expandedModelOutputs :false,
-      expandedModelParametersets: false,
-      expandedModelTestsets :false,
+      
       currentRating: "No Rating",
       currentSelectedRating: "No Current Rating",
+      
       modelTree: null,
+      showOnlyPersoModels: false,
       selectedWord: "",
-      submittedSearch:false,
-      searchResults:{
-        fromKeywords:[]
-      },
-      searchMode:true,
-      hierarchyMode:false,
-      listMode:false,
-      persoMode:false,
+      isUnitModel:false,
+      model:{},
+      compoModel:{},
+      unitModel:{},
+      selectedVersion: null,
+      selectedTreeNode: null,
+      selectedModelId: null,
+      selectedModel:{},
     }
   },
 
@@ -503,55 +414,74 @@ export default {
     if (!this.$store.getters.getDataAreLoaded) {
       await this.$store.dispatch('initModels');
     }
-    this.modelTree = [await ModelServices.getModelsTree()]
+    await this.updateModelTree()
   },
 
   computed:{
   },
 
-
   methods: {
 
-    activateSearchMode(){
-      this.searchMode =true;
-      this.hierarchyMode =false;
-      this.listMode=false;
-      this.persoMode=false;
+    isAdmin(){
+      return (!this.isUnitModel &&
+      this.$store.getters.getLoggedUserInfo != null &&
+      this.$store.getters.getLoggedUserInfo.associatedModels.findIndex(m => (m.modelId == this.model.id && m.role == "administrator")) != -1)
     },
 
-    activateHierarchyMode(){
-      this.searchMode =false;
-      this.hierarchyMode =true;
-      this.listMode=false;
-      this.persoMode=false;
+    isEditor(){
+      return (!this.isUnitModel &&
+      this.$store.getters.getLoggedUserInfo != null &&
+      this.$store.getters.getLoggedUserInfo.associatedModels.findIndex(m => (m.modelId == this.model.id && m.role == "editor")) != -1)
     },
 
-    activateListMode(){
-      this.searchMode =false;
-      this.hierarchyMode =false;
-      this.listMode=true;
-      this.persoMode=false;
-    },
-
-    activatePersoMode(){
-      this.searchMode =false;
-      this.hierarchyMode =false;
-      this.listMode=false;
-      this.persoMode=true;
+    async updateModelTree(searchKeywords = []){
+      let models = await ModelServices.getAllModels()
+      let mainChildrens = []
+      let email = this.$store.getters.getLoggedUserEMail
+      let checkEmail = false
+      if (this.showOnlyPersoModels && email != null){
+        checkEmail = true
+      }
+      
+      for(let m of models){
+        if (checkEmail && !m.administratorsMails.includes(email) && !m.editorsMails.includes(email)){
+          continue
+        } else {
+          let modelCompo = m.versions[0] //TODO : be sure it's the latest version
+          let addModel = true
+          if (searchKeywords.length > 0){
+            addModel = modelCompo.metaData.keywords.some(keyword => searchKeywords.includes(keyword))
+          }
+          if (addModel) {
+            let compoModelTree = {
+              id: modelCompo.Attributs.id,
+              name: modelCompo.Attributs.id,
+              parent: null,
+              children: []
+            }
+            let modelUnits = modelCompo.Composition.Model 
+            for (let mu of modelUnits){
+              compoModelTree.children.push({
+                  id : mu.Attributs.id,
+                  name : mu.Attributs.id.split('.').at(-1),
+                  parent : modelCompo.Attributs.id
+                }
+              )
+            }
+            mainChildrens.push(compoModelTree)
+          }
+        }
+      }
+      this.modelTree = mainChildrens
     },
 
     treeNodeSelect(event){
       if(event.selected){
-        if(event.data.name.indexOf('.xml')>0){
-          console.log(`event.data.name : ${event.data.name}`)
-          console.log(`event.data.id : ${event.data.id}`)
+        if(typeof event.data.id != 'undefined'){
+          this.selectedVersion = null
+          this.selectedTreeNode = event.data
+          this.selectModelById()
         }
-        if(typeof event.data.idValue != 'undefined'){
-          console.log(`event.data.name : ${event.data.name}`)
-          console.log(`event.data.idValue : ${event.data.idValue}`)
-          this.selectModelById(event.data.idValue)
-        }
-        
       }
     },
 
@@ -559,8 +489,8 @@ export default {
       return `http://${config.server.host}:${config.server.port}/packages/` + this.selectedModel.metaData.packageName + '/doc/images/' + picture
     },
 
-    hasAlgorithm(){
-      return !(typeof this.selectedModel.Algorithm === "undefined")
+    exists(field){
+      return !(typeof field === 'undefined')
     },
 
     toArrayIfNeeded(obj){
@@ -571,7 +501,31 @@ export default {
       }
     },
 
-    toItems(input_or_output){
+    setInputs(input_or_output){
+      let array_of_obj = this.toArrayIfNeeded(input_or_output);
+      let items = [];
+      for(let obj of array_of_obj){
+        if(obj.Attributs.inputtype == "variable"){
+          delete obj.Attributs.inputtype
+          items.push(obj.Attributs)
+        }
+      }
+      return items;
+    },
+
+    setParameters(input_or_output){
+      let array_of_obj = this.toArrayIfNeeded(input_or_output);
+      let items = [];
+      for(let obj of array_of_obj){
+        if(obj.Attributs.inputtype == "parameter"){
+          delete obj.Attributs.inputtype
+          items.push(obj.Attributs)
+        }
+      }
+      return items;
+    },
+
+    setOutputs(input_or_output){
       let array_of_obj = this.toArrayIfNeeded(input_or_output);
       let items = [];
       for(let obj of array_of_obj){
@@ -580,83 +534,71 @@ export default {
       return items;
     },
 
-    
     async submitSearch(){
-      console.log("START submitSearch")
-      console.log(this.selectedWord)
-
-      this.submittedSearch=true ;
-
-      // TODO reuse for more complex search with or condition
-      // const modelIdValues =  await ModelServices.findJsonModelsBySearchWords([this.selectedWord]);
-      
-      if(typeof this.$store.state.keywordsObj[this.selectedWord] !=='undefined'){
-        this.searchResults.fromKeywords=this.$store.state.keywordsObj[this.selectedWord];
-      }
-      
-      console.log("END submitSearch")
-    },
-
-    async saveModel(){
-      console.log("START saveModel")
-      this.errorMsg =""
-      const res =  await this.$store.dispatch('saveModel',this.selectedModel);
-      if(res.Model === undefined){
-        this.errorMsg = res;
-      }
-      console.log("END saveModel")
-    },
-
-    async reInitModel(){
-      console.log("START reInitModel")
-      this.errorMsg = ""
-      // TODO case of new empty model
-      const res = await this.$store.dispatch('reInitModel',this.selectedModelId);
-
-      if(res.Model !== undefined){
-        this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
-      }else{
-        this.errorMsg = res;
-      }
-      console.log("END reInitModel")
+      if (this.selectedWord != "")
+        await this.updateModelTree([this.selectedWord])
+      else
+        await this.updateModelTree()
     },
 
     async deleteModel(){
-      console.log("START deleteModel")
       this.errorMsg =""
-      const deletedModel = await this.$store.dispatch('deleteModel',this.selectedModel);
-      console.log('deletedModel')
-      console.log(deletedModel)
+      await this.$store.dispatch('deleteModel', {modelid: this.model.id, version: this.selectedVersion, user: this.$store.state.loggedUserInfo.email});
+      this.unselectModel()
+      await this.submitSearch()
+    },
+
+    async downloadModel(){
+      const res =  await FileServices.downloadZip(this.compoModel.metaData.zipName)
+      console.log(res)
+    },
+
+    unselectModel(){
+      this.isUnitModel=false
+      this.model={}
+      this.compoModel={}
+      this.unitModel={}
+      this.selectedVersion= null
+      this.selectedTreeNode= null
       this.selectedModelId= null
       this.selectedModel={}
-      console.log("END deleteModel")
     },
 
-    selectModelById: function (modelid){
-      this.selectedModelId = modelid;
-      this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
+    selectModelById(){
+      if(this.selectedTreeNode != null){
+        this.selectedModelId = this.selectedTreeNode.id;
+        [this.isUnitModel, this.model, this.compoModel, this.unitModel, this.selectedVersion] = this.$store.getters.getModelByIdAndVersion(this.selectedTreeNode, this.selectedVersion)
+        this.selectedModel = this.isUnitModel ? this.unitModel : this.compoModel
+      }
     },
 
-    showCurrentRating: function(rating) {
+    showCurrentRating(rating) {
       this.currentRating = (rating === 0) ? this.currentSelectedRating : "Click to select " + rating + " stars"
     },
     
-    setCurrentSelectedRating: function(rating) {
+    setCurrentSelectedRating(rating) {
       this.currentSelectedRating = "You have Selected: " + rating + " stars";
     }
     
   },
 
   watch:{
-    selectedWord(){
-      this.submittedSearch=false ;
-      this.searchResults.fromKeywords =[]
-
+    selectedVersion: function(){
+      this.selectModelById()
     }
   },
 
 }
 </script>
+
+<style>
+/*.tree-node-children .tree-node-label span:before {
+  content: ".";
+}*/
+.tree-node-children .tree-node-label span {
+  font-size: small;
+}
+</style>
 
 <style scoped>
 
@@ -677,10 +619,6 @@ p{
   outline-color: black;
 }
 
-#modelSearch{
-
-}
-
 #myDisabledInput{
   width: 100%;
   background: seashell;
@@ -688,10 +626,9 @@ p{
   text-align: center;
 }
 
-#packages{
-  padding: 20px;
-  max-height: 50vh;
+#modelsCard{
   overflow:scroll;
+  height: 100%;
 }
 
 .dropdown-menu {

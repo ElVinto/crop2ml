@@ -27,6 +27,34 @@ export default new Vuex.Store({
          return state.models;
       },
 
+      getModelById: (state) => (id) => {
+         return state.models.get(id);
+      },
+
+      getModelByIdAndVersion: (state) => (treeNodeData, version) => {
+         let isUnitModel = false
+         let mainModel = null
+         let compoModel = null
+         let unitModel = null
+         if(treeNodeData.parent == null){
+            mainModel = state.models.get(treeNodeData.id)
+            if (version == null) {
+               version = mainModel.versionsList.sort()[mainModel.versionsList.length -1]
+            }
+            compoModel = mainModel.versions.find(m => m.Attributs.version == version)
+         } else {
+            isUnitModel = true
+            mainModel = state.models.get(treeNodeData.parent)
+            if (version == null) {
+               version = mainModel.versionsList.sort()[mainModel.versionsList.length -1]
+            }
+            compoModel = mainModel.versions.find(m => m.Attributs.version == version)
+            unitModel = compoModel.Composition.Model.find(m => m.Attributs.id == treeNodeData.id).ModelContent
+         }
+
+         return [isUnitModel, mainModel, compoModel, unitModel, version]
+      },
+
       getModelIds: (state) => {
          return state.models.keys();
       },
@@ -36,7 +64,10 @@ export default new Vuex.Store({
       },
 
       getLoggedUserEMail:(state) =>{
-         return state.loggedUserInfo.email
+         if (state.loggedUserInfo == null)
+            return null
+         else
+            return state.loggedUserInfo.email
       },
       
       getLoggedUserInfo:(state) =>{
@@ -84,20 +115,22 @@ export default new Vuex.Store({
       },
 
       addModel: (state, model) => {
-         const idValue = model.metaData.idValue
-         state.models.set(idValue,model)
+         state.models.set(model.id,model)
 
-         for(let k of model.metaData.keywords){
+         for(let k of model.versions[0].metaData.keywords){
             if(!(Object.prototype.hasOwnProperty.call(state.keywordsObj,k))){
                state.keywordsObj[k]=[]
             }
-            state.keywordsObj[k].push(idValue)
+            state.keywordsObj[k].push(model.id)
          }
       },
 
-      deleteModel: (state, model) => {
-         const modelid = model.metaData.idValue
+      deleteModel: (state, modelid) => {
          state.models.delete(modelid)
+      },
+
+      setModel: (state, model) => {
+         state.models.set(model.id,model)
       },
 
       setDataAreLoaded: (state, bool) =>{
@@ -113,7 +146,7 @@ export default new Vuex.Store({
       }
    },
 
-   actions: { // assynchronous commit of changes
+   actions: {
 
       async initModels({ state, commit }) {
          return new Promise((resolve, reject) => {
@@ -132,36 +165,24 @@ export default new Vuex.Store({
          })
       },
 
-      async reInitModel({commit},modelid){
-         return new Promise((resolve, reject) => {
-            try { 
-               ModelServices.getModelById(modelid).then(savedmodel =>{ 
-                  if(savedmodel.model !== undefined){
-                     commit('addmodel',savedmodel)
-                  }
-                  resolve(savedmodel)
-               })
-            } catch (err) { 
-               console.error(err);
-               reject(err);
+      async saveModel({commit}, model){
+         const res = await ModelServices.saveModel(model, this.getters.getLoggedUserEMail)
+         commit("setModel", res.model);
+         return res.success;
+      },
+
+      async deleteModel({commit}, modelData){
+         const res = await ModelServices.deleteModelById(modelData.modelid, modelData.version, modelData.user)
+         let success = res.success
+         let updatedModel = res.model
+         if(success){
+            if (updatedModel == "" ){
+               commit('deleteModel',modelData.modelid)
+            } else {
+               commit('setModel',updatedModel)
             }
-         })
-      },
-
-      async saveModel({commit},model){
-         const savedmodel = await ModelServices.savemodel(model)
-         if(savedmodel.model !== undefined){
-            commit('addmodel',savedmodel)
-         }
-         return savedmodel;
-      },
-
-      async deleteModel({commit},model){
-         const deletedmodel = await ModelServices.deleteModelById(model.model.Attributs.modelid)
-         if(deletedmodel.model !== undefined){
-            commit('deletemodel',deletedmodel)
-         }
-         return deletedmodel;
+         } 
+         return success;
       },
    }
 });

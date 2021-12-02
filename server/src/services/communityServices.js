@@ -18,7 +18,6 @@ class CommunityServices{
                 /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===true ){
                     result.value = replacement;
                 }*/
-
                 resolve(result)
             }catch(error){
                 console.log(error)
@@ -31,16 +30,12 @@ class CommunityServices{
     static async getAllCommunities(){
         return new Promise(async (resolve, reject) => {
             try{
-    
-                console.log(' START getAllCommunities')
-
-                Community.find({}, function(err, models){
+                Community.find({}, function(err, community){
                     if(err){
                         console.log(err)
                         resolve(err)
                     } else {
-                        console.log(models)
-                        resolve(models)
+                        resolve(community)
                     }
                 })     
             } catch(error){

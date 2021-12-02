@@ -5,29 +5,6 @@ var url = `http://${config.server.host}:${config.server.port}/`;
 
 class ModelServices{
 
-    // TODO reuse for more complex search with or condition
-    /*static findJsonModelsBySearchWords = async (searchWords) =>{
-        
-        return new Promise((resolve, reject) => {
-            
-            try { 
-                let body ={
-                    searchWords: searchWords,
-                }
-                
-                axios.post(url + "cropmodels/findJsonModelsBySearchWords",body).then(res => {
-                    resolve(res.data) ;
-                })
-
-                
-            } catch (err) { 
-                console.error(err);
-                reject(err);
-            }
-        })
-
-    }*/
-
     //OK
     static getAllModels = async () =>{
         return new Promise((resolve, reject) => {
@@ -42,83 +19,13 @@ class ModelServices{
         })
     }
 
-    //OK
-    static getAllModelsPackageNames = async () =>{
-        return new Promise((resolve, reject) => {
-            try { 
-                axios.get(url + "models/getAllModelsPackageNames").then(res => {
-                    resolve(res.data) ;
-                })
-            } catch (err) { 
-                console.error(err);
-                reject(err);
-            }
-        })
-    }
-
-    /*static findAllKeywords = async () =>{
-        
-        return new Promise((resolve, reject) => {
-            
-            try { 
-                // let body ={
-                //     modelType: 'modelUnits',
-                // }
-                // axios.post(url + "models/getAllModels", body).then(res => {
-                //     resolve(res.data) ;
-                // })
-                axios.post(url + "cropmodels/findAllKeywords").then(res => {
-                    resolve(res.data) ;
-                })
-
-                
-            } catch (err) { 
-                console.error(err);
-                reject(err);
-            }
-        })
-
-    }*/
-
-    //OK
-    static getModelsTree (){
-        return new Promise((resolve,reject)=>{
-            try{
-                axios.post(url + "models/getModelsTree").then(res => {
-                    resolve(res.data) ;
-                })
-            }catch(err){
-                console.log(' modelTree FAILURE!!');
-                console.error(err);
-                reject(err);
-            }
-        })
-    }
-
-    static async getModelById (modelid){
+    static async saveModel (model, user){
         return new Promise((resolve, reject) => {
             
             try { 
                 let body ={
-                    modelid: modelid,
-                }
-                axios.post(url + "models/getModelById", body).then(res => {
-                    resolve(res.data) ;
-                })
-                
-            } catch (err) { 
-                console.error(err);
-                reject(err);
-            }
-        })
-    }
-
-    static async saveModel (modelUnit){
-        return new Promise((resolve, reject) => {
-            
-            try { 
-                let body ={
-                    modelUnit: modelUnit,
+                    model: model,
+                    user: user
                 }
                 axios.post(url + "models/saveModel", body).then(res => {
                     resolve(res.data) ;
@@ -131,12 +38,15 @@ class ModelServices{
         })
     }
 
-    static async deleteModelById (modelid){
+    //OK
+    static async deleteModelById (modelid, version, user){
         return new Promise((resolve, reject) => {
             
             try { 
                 let body ={
                     modelid: modelid,
+                    version: version,
+                    user: user
                 }
                 axios.post(url + "models/deleteModelById", body).then(res => {
                     resolve(res.data) ;
