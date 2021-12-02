@@ -1,6 +1,6 @@
 <template>
 
-  <div id ="repository" v-if="$store.getters.getDataAreLoaded" style="display:block;  " >
+  <div id ="repository" v-if="$store.getters.getDataAreLoaded" style="display:block; margin-bottom:100px" >
 
     <div class ="row"  > 
       
@@ -139,11 +139,13 @@
                       </b-tr>
                       <b-tr v-if="exists(model.publications)">
                           <b-td style='font-weight:bold;'>Publications</b-td>
-                          <b-td>{{ setPublications(this.model.publications) }}</b-td>
+                          <b-td>
+                            <div v-for="link in model.publications" :key="link"><a :href="link">{{ link }}</a></div>
+                          </b-td>
                       </b-tr>
                       <b-tr v-if="exists(model.gitLink)">
                           <b-td style='font-weight:bold;'>Git link</b-td>
-                          <b-td>{{ this.model.gitLink }}</b-td>
+                          <b-td><a :href="this.model.gitLink">{{ this.model.gitLink }}</a></b-td>
                       </b-tr>
                   </b-tbody>
                 </b-table-simple>
@@ -497,14 +499,6 @@ export default {
       }else{ 
         return [obj]
       }
-    },
-
-    setPublications(listOfPublis){
-      let text = ""
-      for (let p of listOfPublis){
-        text = text.concat(p + '<br>')
-      }
-      return text
     },
 
     setInputs(input_or_output){

@@ -8,22 +8,9 @@ class ModelServices{
     static async getAllModels(){
         return new Promise(async (resolve, reject) => {
             try{
-                const result = await Model.find({})
+                const result = await Model.find({}, {_id: 0})
                 resolve(result)
             } catch(error){
-                console.log(error)
-                reject(error);
-            }
-        }) 
-    }
-    
-    //OK
-    static async getAllModelsMetaData(){
-        return new Promise(async (resolve, reject) => {
-            try{
-                const result = await Model.find({}, {metaData: 1, _id: 0})
-                resolve(result)
-            }catch(error){
                 console.log(error)
                 reject(error);
             }
@@ -35,8 +22,6 @@ class ModelServices{
         return new Promise(async (resolve, reject) => {
             try{
                 const filter = {'id': model.id}
-                const update = model
-                const options = { upsert: true, new: true, rawResult: true, useFindAndModify: false}
                 var oldModel = await Model.findOne(filter)
                 let oldContributors = []
                 let canSave = false
@@ -48,6 +33,8 @@ class ModelServices{
                 }
 
                 if (canSave){
+                    const update = model
+                    const options = { upsert: true, new: true, rawResult: true, useFindAndModify: false}
                     var res = await Model.findOneAndUpdate(filter,update,options)
                     if (res.ok == 1){
                         let newModel = res.value
