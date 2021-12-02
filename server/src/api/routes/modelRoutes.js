@@ -32,4 +32,17 @@ router.post('/deleteModelById',async function(req, res, next){
     }
 });
 
+//OK
+router.post('/saveModel',async function(req, res, next){
+    try{
+        let model =  req.body.model;
+        let user = req.body.user;
+        result = await ModelServices.saveModel(model, user)
+        res.send(result)
+    }catch(error){
+        console.log(error)
+        res.send(error.toString())
+    }
+});
+
 module.exports = router;

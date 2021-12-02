@@ -62,9 +62,6 @@ class FileServices {
                 let xmlComposition = xmlFiles.filter(name => name.startsWith("composition."))
                 let xmlUnits = xmlFiles.filter(name => name.startsWith("unit."))
                 let metaData = JSON.parse(fields.metaData)
-                let administratorsMails = metaData.administratorsMails
-                administratorsMails.push(metaData.uploaderMail)
-                let editorsMails = metaData.editorsMails
                 let keywords = []
                 
                 // Compute composition model
@@ -95,7 +92,8 @@ class FileServices {
                         model = {
                             id: modelCompo.Attributs.id,
                             versionsList: [],
-                            versions: []
+                            versions: [],
+                            administratorsMails: []
                         }
                     }
 
@@ -115,42 +113,36 @@ class FileServices {
                     let zipName = packageName + ".zip"
                     let packagePath = path.resolve(path.join(packagesDir, packageName))
                     let zipPath = path.resolve(path.join(zipDir, zipName))
-                    await mv(tempZipPath, zipPath, async function(err) {})
-                    await mv(tempPackagePath, packagePath, async function(err) {})
+                    fs.renameSync(tempZipPath, zipPath)
+                    fs.renameSync(tempPackagePath, packagePath)
                     this.deleteDir(tempDir)
 
                     // Add keywords and others metaData to modelCompo
-                    keywords = keywords.concat(modelCompo.Description.Authors.split(' ').filter(s => s.length))
-                    keywords = keywords.concat(modelCompo.Description.Institution.split(' ').filter(s => s.length && !keywords.includes(s) ))
-                    keywords = keywords.concat(modelCompo.Attributs.id.split('.').filter(s => s.length>0  && !keywords.includes(s)))
-                    modelCompo["metaData"]={uploaderMail:metaData.uploaderMail, packageName, zipName, keywords, pictures} //TODO CMZ : check metaData
+                    let extractedKeywords = []
+                    extractedKeywords = extractedKeywords.concat(modelCompo.Description.Authors.split(' ').filter(s => s.length))
+                    extractedKeywords = extractedKeywords.concat(modelCompo.Description.Institution.split(' ').filter(s => s.length && !keywords.includes(s) ))
+                    extractedKeywords = extractedKeywords.concat(modelCompo.Attributs.id.split('.').filter(s => s.length>0  && !keywords.includes(s)))
+                    let latestVersionKeywords = []
+                    let latestVersionNum = model.versionsList.sort()[model.versionsList.length -1]
+                    let latestVersion = model.versions.find(compo => compo.Attributs.version == latestVersionNum)
+                    if (typeof latestVersion != "undefined")
+                        latestVersionKeywords = latestVersion.metaData.keywords
+                    keywords = extractedKeywords.concat(latestVersionKeywords)
+                    keywords = [...new Set(keywords)] //to remove duplicates
+                    modelCompo["metaData"]={uploaderMail:metaData.uploaderMail, packageName, zipName, keywords, pictures}
+                    
+                    // Add uploader as administrator
+                    if (!model.administratorsMails.includes(metaData.uploaderMail))
+                        model.administratorsMails.push(metaData.uploaderMail)
 
-                    // Add metaData and model compo to model
+                    // Add model compo to model
                     model.versionsList.push(modelCompo.Attributs.version)
                     model.versions.push(modelCompo)
-                    let addedFields={administratorsMails, editorsMails, linkedCommunity:metaData.linkedCommunity, modelType:metaData.modelType, largerModelPackageNames:metaData.largerModelPackageNames}
-                    Object.assign(model, addedFields);
 
                     //save model
-                    await ModelServices.saveModel(model)
+                    await ModelServices.saveModel(model, metaData.uploaderMail)
 
-                    //manage contributors
-                    for (let i in editorsMails) {
-                        await UserServices.addRole(editorsMails[i], model.id, "editor")
-                    }
-                    for (let i in administratorsMails) {
-                        await UserServices.addRole(administratorsMails[i], model.id, "administrator")
-                    }
-                    // Notif users by mail
-                    let contributors = administratorsMails.concat(editorsMails)
-                    contributors=[...new Set(contributors)] //to remove duplicates
-                    contributors.forEach (async(contrib) => {
-                        if (contrib != metaData.uploaderMail)
-                            await UserServices.notifyContributor(contrib, metaData.packageName)
-                    })
-                    
-                    resolve([true, packageName, keywords, model]) //TODO also resolve admin and editors to update after save (instead of before)
-                    
+                    resolve([true, packageName, keywords, model])
                 }
             } catch (error) {
                 reject(error)

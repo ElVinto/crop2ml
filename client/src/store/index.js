@@ -27,6 +27,10 @@ export default new Vuex.Store({
          return state.models;
       },
 
+      getModelById: (state) => (id) => {
+         return state.models.get(id);
+      },
+
       getModelByIdAndVersion: (state) => (treeNodeData, version) => {
          let isUnitModel = false
          let mainModel = null
@@ -161,12 +165,10 @@ export default new Vuex.Store({
          })
       },
 
-      async saveModel({commit},model){
-         const savedmodel = await ModelServices.savemodel(model)
-         if(savedmodel.model !== undefined){
-            commit('addmodel', savedmodel)
-         }
-         return savedmodel;
+      async saveModel({commit}, model){
+         const res = await ModelServices.saveModel(model, this.getters.getLoggedUserEMail)
+         commit("setModel", res.model);
+         return res.success;
       },
 
       async deleteModel({commit}, modelData){

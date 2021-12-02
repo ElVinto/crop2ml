@@ -88,7 +88,7 @@
                     </b-col>
                 </b-row>
                 <b-row no-gutters >
-                  <div class="col-md-4">
+                  <div class="col-md-3 text-center">
                       <b-button variant="primary" @click="downloadModel">Download model</b-button>
                   </div >
                   <!--div class="col-md-4">
@@ -97,7 +97,13 @@
                       </div>
                       <div style="margin-top:10px;font-weight:bold;">{{currentRating}}</div>
                   </div -->
-                  <div class="col-md-4" v-if="isAdmin()">
+                  <div class="col-md-3 text-center" v-if="isAdmin() || isEditor()">
+                      <b-button variant="primary" @click="$router.push({name: 'Edit', params: { modelid : selectedModelId }})">Edit model</b-button>
+                  </div >
+                  <div class="col-md-3 text-center" v-if="isAdmin()">
+                      <b-button variant="primary" @click="$router.push('/Submit')">Upload new version</b-button>
+                  </div >
+                  <div class="col-md-3 text-center" v-if="isAdmin()">
                       <b-button variant="danger" v-b-modal.modal-1>Delete model</b-button>
                       <b-modal id="modal-1" title="Delete model ?" ok-title="Yes I'm sure" ok-variant="danger" @ok="deleteModel()">
                         <p class="my-4">{{ `Are you sure you want to delete the version ${this.selectedVersion} of the model ${this.compoModel.Attributs.name} ?`}}</p>
@@ -416,8 +422,14 @@ export default {
 
     isAdmin(){
       return (!this.isUnitModel &&
-      this.$store.getters.getLoggedUserEMail != null &&
-      this.model.administratorsMails.includes(this.$store.getters.getLoggedUserEMail))
+      this.$store.getters.getLoggedUserInfo != null &&
+      this.$store.getters.getLoggedUserInfo.associatedModels.findIndex(m => (m.modelId == this.model.id && m.role == "administrator")) != -1)
+    },
+
+    isEditor(){
+      return (!this.isUnitModel &&
+      this.$store.getters.getLoggedUserInfo != null &&
+      this.$store.getters.getLoggedUserInfo.associatedModels.findIndex(m => (m.modelId == this.model.id && m.role == "editor")) != -1)
     },
 
     async updateModelTree(searchKeywords = []){
@@ -490,7 +502,7 @@ export default {
     setPublications(listOfPublis){
       let text = ""
       for (let p of listOfPublis){
-        text.concat(p + '<br>')
+        text = text.concat(p + '<br>')
       }
       return text
     },
@@ -534,28 +546,6 @@ export default {
       else
         await this.updateModelTree()
     },
-
-    async saveModel(){
-      this.errorMsg =""
-      const res =  await this.$store.dispatch('saveModel',this.selectedModel);
-      if(res.Model === undefined){
-        this.errorMsg = res;
-      }
-    },
-
-    /*async reInitModel(){
-      console.log("START reInitModel")
-      this.errorMsg = ""
-      // TODO case of new empty model
-      const res = await this.$store.dispatch('reInitModel',this.selectedModelId);
-
-      if(res.Model !== undefined){
-        this.selectedModel = this.$store.getters.getModels.get(this.selectedModelId)
-      }else{
-        this.errorMsg = res;
-      }
-      console.log("END reInitModel")
-    },*/
 
     async deleteModel(){
       this.errorMsg =""

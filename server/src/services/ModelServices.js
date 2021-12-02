@@ -31,42 +31,91 @@ class ModelServices{
     }
 
     //OK
-    /*static async saveModel (model){
-        return new Promise(async (resolve, reject) => {
-            try{
-                const filter = {'Attributs.id': model.Attributs.id, 'Attributs.version': model.Attributs.version}
-                const update = model
-                const options = { upsert: true, returnNewDocument: true}
-                var result = await Model.updateOne(filter,update,options)
-                //result = JSON.parse(JSON.stringify(result))
-                resolve(result)
-                    
-            }catch(error){
-                console.log(error)
-                reject(error);
-            }
-        }) 
-    }*/
-
-    static async saveModel (model){
+    static async saveModel (model, usermail){
         return new Promise(async (resolve, reject) => {
             try{
                 const filter = {'id': model.id}
                 const update = model
-                const options = { upsert: true, returnNewDocument: true}
-                var result = await Model.updateOne(filter,update,options)
-                //CMZ comment
-                /*if (result.lastErrorObject.n===1 && result.lastErrorObject.updatedExisting===false ){
-                    result.value = jsonModel;
-                }*/
-                //result = JSON.parse(JSON.stringify(result))
-                resolve(result)
-                    
+                const options = { upsert: true, new: true, rawResult: true, useFindAndModify: false}
+                var oldModel = await Model.findOne(filter)
+                let oldContributors = []
+                let canSave = false
+                if(!oldModel){
+                    canSave = true
+                } else {
+                    oldContributors = oldModel.administratorsMails.concat(oldModel.editorsMails)
+                    canSave = oldContributors.includes(usermail)
+                }
+
+                if (canSave){
+                    var res = await Model.findOneAndUpdate(filter,update,options)
+                    if (res.ok == 1){
+                        let newModel = res.value
+                        this.updateRoles(oldModel, newModel, usermail)
+                        resolve({success: true, model: newModel})
+                    } else {
+                        resolve({success: false})
+                    }
+                } else {
+                    resolve({success: false})
+                }
             }catch(error){
                 console.log(error)
                 reject(error);
             }
         }) 
+    }
+
+    static async updateRoles(oldModel, newModel){
+        let addedEditors = []
+        let removedEditors = []
+        let addedAdmin = []
+        let removedAdmin = []
+        if (!oldModel){
+            addedEditors = newModel.editorsMails
+            addedAdmin = newModel.administratorsMails
+        } else {
+            for (let u of newModel.editorsMails){
+                if (!oldModel.editorsMails.includes(u)){
+                    addedEditors.push(u)
+                }
+            }
+            for (let u of oldModel.editorsMails){
+                if (!newModel.editorsMails.includes(u)){
+                    removedEditors.push(u)
+                }
+            }
+            for (let u of newModel.administratorsMails){
+                if (!oldModel.administratorsMails.includes(u)){
+                    addedAdmin.push(u)
+                }
+            }
+            for (let u of oldModel.administratorsMails){
+                if (!newModel.administratorsMails.includes(u)){
+                    removedAdmin.push(u)
+                }
+            }
+
+            for (let u of removedEditors) {
+                await UserServices.deleteRole(u, newModel.id,)
+            }
+            for (let u of removedAdmin) {
+                await UserServices.deleteRole(u, newModel.id,)
+            }
+            for (let u of addedEditors) {
+                await UserServices.addRole(u, newModel.id, "editor")
+            }
+            for (let u of addedAdmin) {
+                await UserServices.addRole(u, newModel.id, "administrator")
+            }
+        }
+
+        // Notif users by mail
+        let addedContributors = addedAdmin.concat(addedEditors)
+        addedContributors=[...new Set(addedContributors)] //to remove duplicates
+        addedContributors.forEach (async(contrib) => {
+            await UserServices.notifyContributor(contrib, newModel.id)
+        })
     }
 
     //OK

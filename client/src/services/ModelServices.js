@@ -19,12 +19,13 @@ class ModelServices{
         })
     }
 
-    static async saveModel (modelUnit){
+    static async saveModel (model, user){
         return new Promise((resolve, reject) => {
             
             try { 
                 let body ={
-                    modelUnit: modelUnit,
+                    model: model,
+                    user: user
                 }
                 axios.post(url + "models/saveModel", body).then(res => {
                     resolve(res.data) ;

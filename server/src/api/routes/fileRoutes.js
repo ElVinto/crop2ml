@@ -30,10 +30,6 @@ router.post('/uploadZip', async function(req, res, next) {
         return res.status(400).json({ error: err.message });
         }
 
-        console.log(fields)
-        console.log('files received')
-        console.log(files)
-
         const [fileName] = Object.keys(files);
         const file = files[fileName]
         const oldpath = path.resolve(file.path);
@@ -48,7 +44,7 @@ router.post('/uploadZip', async function(req, res, next) {
             fs.mkdirSync(tempUnzippedDir, { recursive: true });
         }
 
-        await mv(oldpath, tempZipPath, async function(err) {
+        mv(oldpath, tempZipPath, async function(err) {
             if (err)
                 throw err;
 
