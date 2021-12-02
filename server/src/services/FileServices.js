@@ -4,7 +4,6 @@ var unzipper = require('unzipper')
 var archiver = require('archiver');
 var mv = require('mv')
 var xml2js = require('xml2js');
-const directoryTree = require("directory-tree");
 const UserServices = require('./UserServices.js');
 const ModelServices = require('./ModelServices.js');
 
@@ -31,11 +30,6 @@ class FileServices {
         });
     }*/
     
-    /**
-     * 
-     * @param {String} source 
-     * @param {String} dest 
-     */
     //OK
     static async extractZip(source, dest){
         return new Promise((resolve,reject)=>{
@@ -210,63 +204,6 @@ class FileServices {
                 reject(error)
             }
         })
-    }
-
-    /*
-    dirTree: {
-        name: "file or directory name"
-        path: "path on server"
-        size: number
-        type: "directory"|"file"
-
-        extension: "." (if file)
-        children: array of dirTree (if directory)
-    }
-    */
-
-    static createDirTree = (path) =>{
-        return directoryTree(path)
-    }
-    
-    static getDirTree(path){
-        return this.createDirTree(path)
-    }
-    
-    static getDisplayedDirTree(path){
-        let pathDirTree = this.createDirTree(path)
-        let displayedDirTree = {}
-        // this.clean(pathDirTree,displayedDirTree)
-        displayedDirTree = this.retainExtensions(pathDirTree,['.xml'])
-        return displayedDirTree;
-    }
-
-    static retainExtensions(argDirTree, extensions ){
-        if(argDirTree.type ==='file' ){
-            if(extensions.includes(argDirTree.extension)){
-                return {
-                    name: argDirTree.name,
-                    // id: `${argDirTree.name}_TestId`
-                }
-            }else{
-                return null;
-            }
-        }else{
-            let nvDirTreeChildren = [];
-            for(let argDirTreeChild of argDirTree.children){
-                let nvDirTreeChild = this.retainExtensions(argDirTreeChild, extensions)
-                if(nvDirTreeChild!=null && nvDirTreeChild.hasOwnProperty('name')){
-                    nvDirTreeChildren.push(nvDirTreeChild)
-                }
-            }
-            if(nvDirTreeChildren.length>0){
-                let newName = argDirTree.name==='packages'?'models':argDirTree.name;
-                return {
-                    name: newName,
-                    // id: `${argDirTree.name}_TestId`,
-                    children: nvDirTreeChildren
-                } 
-            }
-        }
     }
 }
 

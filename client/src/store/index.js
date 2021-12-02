@@ -161,22 +161,6 @@ export default new Vuex.Store({
          })
       },
 
-      /*async reInitModel({commit},modelid){
-         return new Promise((resolve, reject) => {
-            try { 
-               ModelServices.getModelById(modelid).then(savedmodel =>{ 
-                  if(savedmodel.model !== undefined){
-                     commit('addmodel',savedmodel)
-                  }
-                  resolve(savedmodel)
-               })
-            } catch (err) { 
-               console.error(err);
-               reject(err);
-            }
-         })
-      },*/
-
       async saveModel({commit},model){
          const savedmodel = await ModelServices.savemodel(model)
          if(savedmodel.model !== undefined){

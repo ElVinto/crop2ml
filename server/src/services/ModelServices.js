@@ -16,25 +16,6 @@ class ModelServices{
             }
         }) 
     }
-
-    //OK
-    static async getAllModelsPackageNames(){
-        return new Promise(async (resolve, reject) => {
-            try{
-                const models = await this.getAllModelsMetaData()
-                let result = []
-                models.forEach(m =>{
-                    if(!result.includes(m.metaData.packageName)){
-                        result.push(m.metaData.packageName)
-                    }
-                })
-                resolve(result)
-            } catch(error){
-                console.log(error)
-                reject(error);
-            }
-        }) 
-    }
     
     //OK
     static async getAllModelsMetaData(){
@@ -89,32 +70,6 @@ class ModelServices{
     }
 
     //OK
-    /*static async checkModelAndVersionExists (model){
-        return new Promise(async (resolve, reject) => {
-            try{
-                let filter = {'Attributs.id': model.Attributs.id, 'Attributs.version': model.Attributs.version}
-                modelAndVersionAlreadyExists = await Model.exists(filter)
-                resolve(modelAlreadyExists)
-            }catch(error){
-                console.log(error)
-                reject(error);
-            }
-        }) 
-    }*/
-
-    static async checkModelAndVersionExists (model){
-        return new Promise(async (resolve, reject) => {
-            try{
-                let filter = {'id': model.Attributs.id, 'versions': model.Attributs.version}
-                modelAndVersionAlreadyExists = await Model.exists(filter)
-                resolve(modelAlreadyExists)
-            }catch(error){
-                console.log(error)
-                reject(error);
-            }
-        })
-    }
-
     static async getModelById (modelid){
         return new Promise(async (resolve, reject) => {
             try{
@@ -126,6 +81,7 @@ class ModelServices{
         })
     }
 
+    //OK
     static async deleteModelById (modelid, version, user){
         return new Promise(async (resolve, reject) => {
             try{

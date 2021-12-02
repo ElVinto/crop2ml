@@ -3,17 +3,10 @@ var router = express.Router();
 var formidable = require('formidable');
 var path = require('path');
 var fs = require('fs');
-var mv = require('mv')
+var mv = require('mv');
 var fs = require('fs');
-
+const directoryTree = require("directory-tree");
 FileServices = require('../../services/FileServices.js');
-
-/*router.get('/data', async function(req,res,next){
-    // const foldername = req.query.folder;
-    var filePath = path.resolve(req.body.serverFilePath);
-    res = await FileServices.zipDirectory('./server/data/xml','./server/data/zipped/xml.zip')
-    console.log(res)
-})*/
 
 //OK
 router.get('/downloadZip', async function(req,res,next){
@@ -68,7 +61,7 @@ router.post('/uploadZip', async function(req, res, next) {
                 [success, packageName, extractedKeywords,model] = await FileServices.computeExtractedData(tempDir, fileName, fields)
                 let tree = null
                 if (success) {
-                    tree = FileServices.getDirTree(path.join(packagesPath, packageName))
+                    tree = directoryTree(path.join(packagesPath, packageName))
                     tree.name = packageName
                 }
                 const result = {
@@ -85,35 +78,5 @@ router.post('/uploadZip', async function(req, res, next) {
         });
     });
 });
-
-
-/*router.post('/packageTree',  function(req, res, next) {
-    console.log('START post /packageTree')
-    const packagesPath = './server/data/packages/'
-    
-    // Log packageNames
-    // const packageNames =fs.readdirSync(packagesPath)
-    // console.log('packageNames')
-    // console.log(packageNames)
-
-    let tree = FileServices.getDisplayedDirTree(packagesPath)
-    console.log('tree: ')
-    console.log(tree)
-    console.log('END post /packageTree');
-    res.send(JSON.parse(JSON.stringify(tree)));
-})*/
-
-
-/*router.get('/zipFolder',async function(req,res,next){
-    // const foldername = req.query.folder;
-     res = await FileServices.zipDirectory('./server/data/xml','./server/data/zipped/xml.zip')
-     console.log(res)
-})
-
-router.post('/zipFolder',async function(req,res,next){
-    const foldername = req.body.folder;
-    res = await FileServices.zipDirectory('./server/data/xml','./server/data/zipped/xml.zip')
-    console.log(res)
-})*/
 
 module.exports = router;

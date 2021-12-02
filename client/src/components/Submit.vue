@@ -186,9 +186,7 @@
 </template>
 <script>
 
-import ModelServices from "../services/ModelServices"
 import FileServices from "../services/FileServices"
-//import UserServices from "../services/UserServices"
 import CommunityServices from "../services/CommunityServices"
 import { bTreeView } from 'bootstrap-vue-treeview'
 
@@ -232,7 +230,7 @@ export default {
     uploadMsg: function(){
       let msg = ""
       if(!this.packageZip && !this.packageZipSent){
-        msg= 'No selected file.zip '
+        msg= 'No selected file.zip'
       }
       if(!this.packageZip && this.packageZipSent){
         msg= 'Model package sent successfully'
@@ -254,7 +252,7 @@ export default {
     }
 
     //this.registeredEmails = await UserServices.getRegisteredEmails();
-    this.registeredPackageNames = await ModelServices.getAllModelsPackageNames();
+    this.registeredPackageNames = this.$store.getters.getModelIds
     let communityList = await CommunityServices.getAllCommunities()
     this.communityNames = communityList.map(c => c.name)
   },
